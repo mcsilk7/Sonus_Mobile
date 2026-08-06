@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/miniPlayer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:layout_marginBottom="80dp"
+    android:layout_marginStart="5dp"
+    android:layout_marginEnd="5dp"
+    android:background="@drawable/bg_mini_player"
+    android:elevation="10dp"
+    android:orientation="vertical">
+
+    <!-- Pasek postępu -->
+    <ProgressBar
+        android:id="@+id/miniPlayerProgress"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:max="100"
+        android:progress="35"
+        android:progressDrawable="@drawable/bg_mini_player_progress" />
+
+    <!-- Zawartość -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- Okładka -->
+        <ImageView
+            android:id="@+id/miniPlayerCover"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:background="@drawable/bg_light_cover_placeholder"
+            android:contentDescription="Okładka"
+            android:scaleType="centerCrop"
+            app:tint="@color/accent"/>
+
+        <!-- Tytuł + Artysta -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/miniPlayerTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Midnight Echo"
+                android:textColor="@color/app_background"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/miniPlayerArtist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Aurora"
+                android:textColor="@color/card_background"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Poprzedni -->
+        <ImageView
+            android:id="@+id/miniPlayerPrev"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="Poprzedni"
+            android:padding="10dp"
+            android:src="@drawable/ic_skip_previous"
+            app:tint="#FFFFFF"/>
+
+        <!-- Play/Pause -->
+        <TextView
+            android:id="@+id/miniPlayerPlay"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_mini_btn"
+            android:gravity="center"
+            android:text="▶"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp" />
+
+        <!-- Następny -->
+        <ImageView
+            android:id="@+id/miniPlayerNext"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:contentDescription="Następny"
+            android:padding="10dp"
+            android:src="@drawable/ic_skip_next"
+            app:tint="#FFFFFF"/>
+    </LinearLayout>
+
+</LinearLayout>

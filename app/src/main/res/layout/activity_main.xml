@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_background">
+
+    <!-- ====== TREŚĆ ====== -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="100dp">
+
+        <LinearLayout
+            android:id="@+id/main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Góra -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hello_text"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="sans-serif-black"
+                        android:text="@string/app_name"
+                        android:textColor="@color/text_dark"
+                        android:textSize="28sp" />
+                </LinearLayout>
+
+                <include layout="@layout/user_avatar" />
+            </LinearLayout>
+
+            <!-- Search bar -->
+            <include layout="@layout/search_bar" />
+
+            <!-- Szybki dostęp -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Szybki dostęp"
+                android:textColor="@color/text_dark"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <!-- Ulubione -->
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1">
+
+                    <include layout="@layout/card_favorites" />
+                </FrameLayout>
+
+                <!-- Playlisty -->
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1">
+
+                    <include layout="@layout/card_playlists" />
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <!-- Ostatnio odtwarzane -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Ostatnio odtwarzane"
+                android:textColor="@color/text_dark"
+                android:textSize="20sp" />
+
+            <!-- Utwory -->
+            <include layout="@layout/item_song" />
+
+            <include layout="@layout/item_song" />
+
+            <include layout="@layout/item_song" />
+
+            <include layout="@layout/item_song" />
+
+        </LinearLayout>
+    </ScrollView>
+    <!-- Mini player -->
+    <include layout="@layout/mini_player" />
+    <!-- ====== DOLNE MENU ====== -->
+    <include layout="@layout/bottom_nav" />
+
+</FrameLayout>

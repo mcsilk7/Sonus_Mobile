@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">Sonus</string>
+    <string name="hello_text">Cześć!</string>
+    <string name="search_hint">Szukaj utworów, albumów…</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_search">Szukaj</string>
+    <string name="nav_library">Biblioteka</string>
+    <string name="nav_settings">Ustawienia</string>
+
+    <string name="login_title">Witaj ponownie!</string>
+    <string name="login_subtitle">Zaloguj się do Sonus</string>
+    <string name="register_title">Dołącz do Sonus</string>
+    <string name="register_subtitle">Stwórz nowe konto</string>
+    <string name="hint_username">Nazwa</string>
+    <string name="hint_password">Hasło</string>
+    <string name="hint_name">Imię</string>
+    <string name="hint_confirm_password">Potwierdź hasło</string>
+    <string name="btn_login">Zaloguj się</string>
+    <string name="btn_register">Zarejestruj się</string>
+    <string name="or_divider">lub</string>
+    <string name="login_google">Kontynuuj z Google</string>
+    <string name="login_facebook">Kontynuuj z Facebook</string>
+    <string name="no_account">Nie masz konta?</string>
+    <string name="have_account">Masz już konto?</string>
+    <string name="forgot_password">Zapomniałeś hasła?</string>
+
+    <string name="profile_title">Twój profil</string>
+    <string name="profile_edit">Edytuj profil</string>
+    <string name="profile_stats_songs">Utwory</string>
+    <string name="profile_stats_playlists">Playlisty</string>
+    <string name="profile_stats_hours">Godziny</string>
+    <string name="profile_stats_favorites">Ulubione</string>
+    <string name="profile_recent">Ostatnia aktywność</string>
+    <string name="profile_preferences">Preferencje</string>
+    <string name="profile_account">Konto</string>
+    <string name="profile_logout">Wyloguj się</string>
+</resources>

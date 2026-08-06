@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardPlaylists"
+    android:layout_width="match_parent"
+    android:layout_height="140dp"
+    android:background="@drawable/bg_home_card"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:background="@drawable/bg_icon_circle"
+        android:gravity="center"
+        android:text="♫"
+        android:textColor="@color/app_background"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Playlisty"
+        android:textColor="@color/text_dark"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Twoje kolekcje muzyki"
+        android:textColor="@color/text_primary"
+        android:textSize="13sp" />
+
+</LinearLayout>
