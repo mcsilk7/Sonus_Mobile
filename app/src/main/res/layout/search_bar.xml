@@ -12,18 +12,24 @@
     android:paddingEnd="16dp">
 
     <ImageView
+        android:id="@+id/ivSearchIcon"
         android:layout_width="22dp"
         android:layout_height="22dp"
         android:contentDescription="Szukaj"
         android:src="@drawable/ic_search"
         app:tint="@color/text_primary" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <EditText
+        android:id="@+id/etSearch"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginStart="12dp"
-        android:text="@string/search_hint"
-        android:textColor="@color/text_primary"
+        android:background="@null"
+        android:hint="@string/search_hint"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:textColor="@color/text_dark"
+        android:textColorHint="@color/text_primary"
         android:textSize="15sp" />
 
 </LinearLayout>

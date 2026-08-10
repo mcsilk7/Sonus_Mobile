@@ -104,13 +104,6 @@
                 android:textSize="20sp" />
 
             <!-- Utwory -->
-            <include layout="@layout/item_song" />
-
-            <include layout="@layout/item_song" />
-
-            <include layout="@layout/item_song" />
-
-            <include layout="@layout/item_song" />
 
         </LinearLayout>
     </ScrollView>

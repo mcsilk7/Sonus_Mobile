@@ -53,14 +53,49 @@
             <!-- Search bar -->
             <include layout="@layout/search_bar" />
 
-            <include layout="@layout/item_song" />
-            <include layout="@layout/item_song" />
-            <include layout="@layout/item_song" />
+            <!-- Sekcja Utwory -->
+            <TextView
+                android:id="@+id/tvSongsHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Utwory"
+                android:textColor="@color/text_dark"
+                android:textSize="20sp"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvSongResults"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never" />
+
+            <!-- Sekcja Albumy -->
+            <TextView
+                android:id="@+id/tvAlbumsHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Albumy"
+                android:textColor="@color/text_dark"
+                android:textSize="20sp"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAlbumResults"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never" />
 
         </LinearLayout>
     </ScrollView>
     <!-- Mini player -->
-    <include layout="@layout/mini_player" />
     <include layout="@layout/bottom_nav" />
 
 </FrameLayout>

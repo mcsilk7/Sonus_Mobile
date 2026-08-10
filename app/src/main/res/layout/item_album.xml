@@ -36,4 +36,20 @@
         android:textColor="@color/text_primary"
         android:textSize="13sp" />
 
+    <!-- Dodaj do biblioteki -->
+    <TextView
+        android:id="@+id/btnAddAlbumToLibrary"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="end"
+        android:layout_marginTop="-30dp"
+        android:background="@drawable/bg_icon_circle"
+        android:gravity="center"
+        android:text="+"
+        android:textColor="@color/app_background"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:clickable="true"
+        android:focusable="true" />
+
 </LinearLayout>

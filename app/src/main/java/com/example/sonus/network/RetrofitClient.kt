@@ -1,23 +1,43 @@
 package com.example.sonus.network
 
+import android.content.Context
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    // When running on a real phone, replace this with your computer's local IP address
-    // visible to the phone, for example http://192.168.0.100:8080
-    private const val BASE_URL = "http://192.168.1.77:8080"
+    private const val BASE_URL = "http://192.168.1.77:8080/"
 
-    private val okHttpClient = OkHttpClient.Builder()
-        .build()
+    private lateinit var sessionManager: SessionManager
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    fun init(context: Context) {
+        sessionManager = SessionManager(context)
+    }
 
-    val authApi: AuthApi = retrofit.create(AuthApi::class.java)
+    private val okHttpClient by lazy {
+        val logging = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+        
+        OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .addInterceptor(AuthInterceptor(sessionManager))
+            .build()
+    }
+
+    private val retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    val authApi: AuthApi by lazy { retrofit.create(AuthApi::class.java) }
+    val playlistApi: PlaylistApi by lazy { retrofit.create(PlaylistApi::class.java) }
+    val searchApi: SearchApi by lazy { retrofit.create(SearchApi::class.java) }
+    val favoriteApi: FavoriteApi by lazy { retrofit.create(FavoriteApi::class.java) }
+    val albumApi: AlbumApi by lazy { retrofit.create(AlbumApi::class.java) }
 }

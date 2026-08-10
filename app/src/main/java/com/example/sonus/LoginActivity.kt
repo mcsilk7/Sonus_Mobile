@@ -57,7 +57,12 @@ class LoginActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val authResponse = response.body()
                     if (authResponse != null) {
-                        sessionManager.saveSession(authResponse.token, authResponse.username)
+                        sessionManager.saveSession(
+                            authResponse.token, 
+                            authResponse.username, 
+                            authResponse.userId,
+                            authResponse.role
+                        )
                         navigateToMain()
                     } else {
                         showLoginError("Nieprawidłowa odpowiedź serwera")

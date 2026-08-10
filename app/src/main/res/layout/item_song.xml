@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/songItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -53,5 +54,32 @@
         android:text="0:00"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
+
+    <!-- Dodaj do playlisty -->
+    <TextView
+        android:id="@+id/btnAddToPlaylist"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:gravity="center"
+        android:text="+"
+        android:textColor="@color/text_primary"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+
+    <!-- Ulubione (Serce) -->
+    <ImageView
+        android:id="@+id/btnFavorite"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="10dp"
+        android:src="@drawable/ic_favorite"
+        app:tint="@color/text_primary"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless" />
 
 </LinearLayout>
