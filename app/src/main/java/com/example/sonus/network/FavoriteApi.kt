@@ -37,7 +37,13 @@ data class FavoriteSongDTO(
     val id: Long? = null,
     val userId: Long,
     val songId: Long,
-    val song: SongDTO? = null
+    val songTitle: String? = null,
+    val songArtist: String? = null,
+    val songDuration: Int? = null,
+    val coverPath: String? = null,
+    val addedAt: String? = null,
+    val song: SongDTO? = null, // Still keep for compatibility if needed
+    val songDto: SongDTO? = null
 )
 
 data class FavoriteAlbumDTO(

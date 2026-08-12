@@ -14,6 +14,12 @@ interface PlaylistApi {
     @GET("api/playlists/{id}")
     suspend fun getPlaylistById(@Path("id") id: Long): Response<PlaylistDTO>
 
+    @GET("api/playlists/{id}/songs")
+    suspend fun getSongsInPlaylist(@Path("id") id: Long): Response<List<SongDTO>>
+
+    @GET("api/playlists/{id}/songs/count")
+    suspend fun getSongCountInPlaylist(@Path("id") id: Long): Response<Long>
+
     @GET("api/playlists/search")
     suspend fun searchPlaylists(@Query("name") name: String): Response<List<PlaylistDTO>>
 

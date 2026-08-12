@@ -15,6 +15,7 @@ import com.example.sonus.network.AlbumDTO
 import com.example.sonus.network.RetrofitClient
 import com.example.sonus.network.SessionManager
 import com.example.sonus.network.SongDTO
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class AlbumDetailActivity : AppCompatActivity() {
@@ -28,6 +29,7 @@ class AlbumDetailActivity : AppCompatActivity() {
     
     private lateinit var songAdapter: SongAdapter
     private lateinit var sessionManager: SessionManager
+    private lateinit var recentlyPlayedManager: RecentlyPlayedManager
     
     private var albumId: Long = -1
     private var currentAlbum: AlbumDTO? = null
@@ -43,6 +45,7 @@ class AlbumDetailActivity : AppCompatActivity() {
         }
 
         sessionManager = SessionManager(this)
+        recentlyPlayedManager = RecentlyPlayedManager(this)
         initViews()
         setupRecyclerView()
         fetchAlbumDetails()
@@ -57,7 +60,7 @@ class AlbumDetailActivity : AppCompatActivity() {
         btnSaveAlbum = findViewById(R.id.btnSaveAlbum)
 
         btnBack.setOnClickListener { finish() }
-        btnSaveAlbum.setOnClickListener { saveAlbumToLibrary() }
+        btnSaveAlbum.setOnClickListener { toggleAlbumSave() }
 
         findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabPlayAlbum).setOnClickListener {
             Toast.makeText(this, "Odtwarzanie albumu...", Toast.LENGTH_SHORT).show()
@@ -68,10 +71,13 @@ class AlbumDetailActivity : AppCompatActivity() {
         songAdapter = SongAdapter(
             songs = emptyList(),
             onItemClick = { song ->
+                recentlyPlayedManager.addSong(song)
                 Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
             },
             onAddClick = { song ->
-                showPlaylistSelectionDialog(song)
+                PlaylistHelper.showPlaylistSelectionDialog(this, lifecycleScope, song) {
+                    songAdapter.notifyDataSetChanged()
+                }
             },
             onFavoriteClick = { song ->
                 toggleFavorite(song)
@@ -82,11 +88,59 @@ class AlbumDetailActivity : AppCompatActivity() {
     }
 
     private fun fetchAlbumDetails() {
+        val userId = sessionManager.getUserId()
         lifecycleScope.launch {
             try {
-                val response = RetrofitClient.albumApi.getAlbumById(albumId)
-                if (response.isSuccessful) {
-                    response.body()?.let { populateUI(it) }
+                // Fetch album details, favorites, playlists and library in parallel
+                val albumDeferred = async { RetrofitClient.albumApi.getAlbumById(albumId) }
+                val favoritesDeferred = if (userId != -1L) async { RetrofitClient.favoriteApi.getFavorites(userId) } else null
+                val libraryAlbumsDeferred = if (userId != -1L) async { RetrofitClient.albumApi.getLibraryAlbums(userId) } else null
+                val playlistSongsIdsDeferred = if (userId != -1L) async { PlaylistHelper.getAllSongsInUserPlaylists(userId) } else null
+
+                val albumResponse = albumDeferred.await()
+                val favoritesResponse = favoritesDeferred?.await()
+                val libraryAlbumsResponse = libraryAlbumsDeferred?.await()
+                val playlistSongsIds = playlistSongsIdsDeferred?.await() ?: emptySet()
+
+                if (albumResponse.isSuccessful) {
+                    var album = albumResponse.body()
+                    if (album != null) {
+                        Log.d("AlbumDetail", "Fetched album: ${album.title}, initial songs: ${album.songs?.size}")
+
+                        // Always try to fetch songs if the list is empty or null to be sure
+                        if (album.songs.isNullOrEmpty()) {
+                            Log.d("AlbumDetail", "Songs list empty, fetching from /api/albums/${albumId}/songs")
+                            val songsResponse = RetrofitClient.albumApi.getSongsInAlbum(albumId)
+                            if (songsResponse.isSuccessful) {
+                                val fetchedSongs = songsResponse.body()
+                                Log.d("AlbumDetail", "Fetched ${fetchedSongs?.size} songs for album")
+                                album = album.copy(songs = fetchedSongs)
+                            } else {
+                                Log.e("AlbumDetail", "Failed to fetch songs: ${songsResponse.code()}")
+                            }
+                        }
+
+                        // Mark songs as favorites if they are in the user's favorites list
+                        if (favoritesResponse?.isSuccessful == true) {
+                            val favoriteIds = favoritesResponse.body()?.map { it.songId }?.toSet() ?: emptySet()
+                            album.songs?.forEach { song ->
+                                song.isFavorite = favoriteIds.contains(song.id)
+                            }
+                        }
+                        
+                        // Mark songs as in playlist
+                        album.songs?.let {
+                            PlaylistHelper.enrichSongsWithPlaylistState(it, playlistSongsIds)
+                        }
+                        
+                        // Mark album as saved if in user's library
+                        if (libraryAlbumsResponse?.isSuccessful == true) {
+                            val libraryIds = libraryAlbumsResponse.body()?.map { it.id }?.toSet() ?: emptySet()
+                            album.isSaved = libraryIds.contains(album.id)
+                        }
+                        
+                        populateUI(album)
+                    }
                 } else {
                     Toast.makeText(this@AlbumDetailActivity, "Błąd pobierania albumu", Toast.LENGTH_SHORT).show()
                 }
@@ -101,54 +155,14 @@ class AlbumDetailActivity : AppCompatActivity() {
         tvTitle.text = album.title
         tvArtist.text = album.artist
         btnSaveAlbum.visibility = View.VISIBLE
-        // Here we use the songs list from AlbumDTO (1:M relationship)
-        songAdapter.updateData(album.songs ?: emptyList())
+        updateSaveButtonState(album.isSaved)
+        
+        val songs = album.songs ?: emptyList()
+        Log.d("AlbumDetail", "Updating adapter with ${songs.size} songs")
+        songAdapter.updateData(songs)
     }
 
-    private fun showPlaylistSelectionDialog(song: SongDTO) {
-        lifecycleScope.launch {
-            try {
-                val response = RetrofitClient.playlistApi.getAllPlaylists()
-                if (response.isSuccessful) {
-                    val playlists = response.body() ?: emptyList()
-                    if (playlists.isEmpty()) {
-                        Toast.makeText(this@AlbumDetailActivity, "Nie masz jeszcze żadnych playlist", Toast.LENGTH_SHORT).show()
-                        return@launch
-                    }
-
-                    val names = playlists.map { it.name }.toTypedArray()
-                    androidx.appcompat.app.AlertDialog.Builder(this@AlbumDetailActivity)
-                        .setTitle("Dodaj do playlisty")
-                        .setItems(names) { _, which ->
-                            val selectedPlaylist = playlists[which]
-                            addSongToPlaylist(selectedPlaylist.id!!, song.id)
-                        }
-                        .show()
-                } else {
-                    Toast.makeText(this@AlbumDetailActivity, "Błąd pobierania playlist", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(this@AlbumDetailActivity, "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun addSongToPlaylist(playlistId: Long, songId: Long) {
-        lifecycleScope.launch {
-            try {
-                val response = RetrofitClient.playlistApi.addSongToPlaylist(playlistId, songId)
-                if (response.isSuccessful) {
-                    Toast.makeText(this@AlbumDetailActivity, "Dodano do playlisty!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this@AlbumDetailActivity, "Błąd dodawania: ${response.code()}", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(this@AlbumDetailActivity, "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun saveAlbumToLibrary() {
+    private fun toggleAlbumSave() {
         val userId = sessionManager.getUserId()
         if (userId == -1L) {
             Toast.makeText(this, "Musisz być zalogowany", Toast.LENGTH_SHORT).show()
@@ -158,15 +172,36 @@ class AlbumDetailActivity : AppCompatActivity() {
         val album = currentAlbum ?: return
         lifecycleScope.launch {
             try {
-                val response = RetrofitClient.albumApi.addAlbumToLibrary(album.id!!, userId)
-                if (response.isSuccessful) {
-                    Toast.makeText(this@AlbumDetailActivity, "Album zapisany do biblioteki!", Toast.LENGTH_SHORT).show()
+                if (album.isSaved) {
+                    val response = RetrofitClient.albumApi.removeAlbumFromLibrary(album.id!!, userId)
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@AlbumDetailActivity, "Usunięto z biblioteki", Toast.LENGTH_SHORT).show()
+                        album.isSaved = false
+                        updateSaveButtonState(false)
+                    } else {
+                        Toast.makeText(this@AlbumDetailActivity, "Błąd: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    Toast.makeText(this@AlbumDetailActivity, "Błąd zapisu albumu: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    val response = RetrofitClient.albumApi.addAlbumToLibrary(album.id!!, userId)
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@AlbumDetailActivity, "Album zapisany do biblioteki!", Toast.LENGTH_SHORT).show()
+                        album.isSaved = true
+                        updateSaveButtonState(true)
+                    } else {
+                        Toast.makeText(this@AlbumDetailActivity, "Błąd zapisu albumu: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } catch (e: Exception) {
                 Toast.makeText(this@AlbumDetailActivity, "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun updateSaveButtonState(isSaved: Boolean) {
+        if (isSaved) {
+            btnSaveAlbum.setColorFilter(androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_red_dark))
+        } else {
+            btnSaveAlbum.setColorFilter(androidx.core.content.ContextCompat.getColor(this, R.color.app_background))
         }
     }
 

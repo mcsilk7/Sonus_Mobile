@@ -95,6 +95,7 @@
 
             <!-- Ostatnio odtwarzane -->
             <TextView
+                android:id="@+id/tvRecentlyPlayedHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
@@ -103,7 +104,12 @@
                 android:textColor="@color/text_dark"
                 android:textSize="20sp" />
 
-            <!-- Utwory -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvRecentlyPlayed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:nestedScrollingEnabled="false" />
 
         </LinearLayout>
     </ScrollView>

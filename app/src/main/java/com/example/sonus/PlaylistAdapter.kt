@@ -29,8 +29,8 @@ class PlaylistAdapter(
         val playlist = playlists[position]
         holder.name.text = playlist.name
         
-        val songCount = playlist.songCount ?: playlist.songs?.size ?: 0
-        holder.count.text = "$songCount utworów"
+        val count = playlist.songCount ?: playlist.songs?.size ?: 0
+        holder.count.text = formatSongCount(count)
         
         // TODO: Load cover image using Glide or similar if available
         // holder.cover.setImageResource(...)
@@ -38,10 +38,29 @@ class PlaylistAdapter(
         holder.itemView.setOnClickListener { onItemClick(playlist) }
     }
 
+    private fun formatSongCount(count: Int): String {
+        return when {
+            count == 1 -> "1 utwór"
+            count % 10 in 2..4 && (count % 100 !in 12..14) -> "$count utwory"
+            else -> "$count utworów"
+        }
+    }
+
     override fun getItemCount() = playlists.size
+
+    fun getData(): List<PlaylistDTO> = playlists
 
     fun updateData(newPlaylists: List<PlaylistDTO>) {
         playlists = newPlaylists
         notifyDataSetChanged()
+    }
+
+    fun updateItem(index: Int, updatedPlaylist: PlaylistDTO) {
+        if (index in playlists.indices) {
+            val mutableList = playlists.toMutableList()
+            mutableList[index] = updatedPlaylist
+            playlists = mutableList
+            notifyItemChanged(index)
+        }
     }
 }

@@ -186,7 +186,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="28dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Ulubione utwory"
+                    android:text="Ulubione piosenki"
                     android:textColor="@color/text_dark"
                     android:textSize="20sp" />
 

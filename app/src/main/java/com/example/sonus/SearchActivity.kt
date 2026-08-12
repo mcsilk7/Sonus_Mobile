@@ -33,12 +33,14 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var songAdapter: SongAdapter
     private lateinit var albumAdapter: AlbumAdapter
     private lateinit var sessionManager: SessionManager
+    private lateinit var recentlyPlayedManager: RecentlyPlayedManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         sessionManager = SessionManager(this)
+        recentlyPlayedManager = RecentlyPlayedManager(this)
         initViews()
         setupRecyclerViews()
         setupSearch()
@@ -59,10 +61,13 @@ class SearchActivity : AppCompatActivity() {
         songAdapter = SongAdapter(
             songs = emptyList(),
             onItemClick = { song ->
+                recentlyPlayedManager.addSong(song)
                 Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
             },
             onAddClick = { song ->
-                showPlaylistSelectionDialog(song)
+                PlaylistHelper.showPlaylistSelectionDialog(this, lifecycleScope, song) {
+                    songAdapter.notifyDataSetChanged()
+                }
             },
             onFavoriteClick = { song ->
                 toggleFavorite(song)
@@ -104,19 +109,42 @@ class SearchActivity : AppCompatActivity() {
     private fun performSearch(query: String) {
         if (query.isEmpty()) return
 
+        val userId = sessionManager.getUserId()
         Log.d("SonusSearch", "Searching for: $query")
         lifecycleScope.launch {
             try {
                 val songsDeferred = async { RetrofitClient.searchApi.searchSongs(query) }
                 val albumsDeferred = async { RetrofitClient.searchApi.searchAlbums(query) }
+                val favoritesDeferred = if (userId != -1L) async { RetrofitClient.favoriteApi.getFavorites(userId) } else null
+                val libraryAlbumsDeferred = if (userId != -1L) async { RetrofitClient.albumApi.getLibraryAlbums(userId) } else null
 
                 val songResponse = songsDeferred.await()
                 val albumResponse = albumsDeferred.await()
+                val favoritesResponse = favoritesDeferred?.await()
+                val libraryAlbumsResponse = libraryAlbumsDeferred?.await()
 
                 var hasResults = false
 
                 if (songResponse.isSuccessful) {
                     val songs = songResponse.body() ?: emptyList()
+
+                    // Mark as favorite if in user's favorites
+                    if (favoritesResponse?.isSuccessful == true) {
+                        val favoriteIds = favoritesResponse.body()?.map { it.songId }?.toSet() ?: emptySet()
+                        songs.forEach { song ->
+                            song.isFavorite = favoriteIds.contains(song.id)
+                        }
+                    }
+
+                    // Mark as in playlist if in any user playlist
+                    if (userId != -1L) {
+                        launch {
+                            val playlistSongsIds = PlaylistHelper.getAllSongsInUserPlaylists(userId)
+                            PlaylistHelper.enrichSongsWithPlaylistState(songs, playlistSongsIds)
+                            songAdapter.notifyDataSetChanged()
+                        }
+                    }
+
                     songAdapter.updateData(songs)
                     tvSongsHeader.visibility = if (songs.isNotEmpty()) View.VISIBLE else View.GONE
                     if (songs.isNotEmpty()) hasResults = true
@@ -124,6 +152,15 @@ class SearchActivity : AppCompatActivity() {
 
                 if (albumResponse.isSuccessful) {
                     val albums = albumResponse.body() ?: emptyList()
+                    
+                    // Mark as saved if in user's library
+                    if (libraryAlbumsResponse?.isSuccessful == true) {
+                        val libraryIds = libraryAlbumsResponse.body()?.map { it.id }?.toSet() ?: emptySet()
+                        albums.forEach { album ->
+                            album.isSaved = libraryIds.contains(album.id)
+                        }
+                    }
+                    
                     albumAdapter.updateData(albums)
                     tvAlbumsHeader.visibility = if (albums.isNotEmpty()) View.VISIBLE else View.GONE
                     if (albums.isNotEmpty()) hasResults = true
@@ -137,49 +174,6 @@ class SearchActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e("SonusSearch", "Search failed", e)
                 Toast.makeText(this@SearchActivity, "Błąd połączenia: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    private fun showPlaylistSelectionDialog(song: SongDTO) {
-        lifecycleScope.launch {
-            try {
-                val response = RetrofitClient.playlistApi.getAllPlaylists()
-                if (response.isSuccessful) {
-                    val playlists = response.body() ?: emptyList()
-                    if (playlists.isEmpty()) {
-                        Toast.makeText(this@SearchActivity, "Nie masz jeszcze żadnych playlist", Toast.LENGTH_SHORT).show()
-                        return@launch
-                    }
-
-                    val names = playlists.map { it.name }.toTypedArray()
-                    AlertDialog.Builder(this@SearchActivity)
-                        .setTitle("Dodaj do playlisty")
-                        .setItems(names) { _, which ->
-                            val selectedPlaylist = playlists[which]
-                            addSongToPlaylist(selectedPlaylist.id!!, song.id)
-                        }
-                        .show()
-                } else {
-                    Toast.makeText(this@SearchActivity, "Błąd pobierania playlist", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(this@SearchActivity, "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun addSongToPlaylist(playlistId: Long, songId: Long) {
-        lifecycleScope.launch {
-            try {
-                val response = RetrofitClient.playlistApi.addSongToPlaylist(playlistId, songId)
-                if (response.isSuccessful) {
-                    Toast.makeText(this@SearchActivity, "Dodano do playlisty!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this@SearchActivity, "Błąd dodawania: ${response.code()}", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(this@SearchActivity, "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -219,12 +213,24 @@ class SearchActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                // Using the new POST endpoint provided by the user
-                val response = RetrofitClient.albumApi.addAlbumToLibrary(album.id!!, userId)
-                if (response.isSuccessful) {
-                    Toast.makeText(this@SearchActivity, "Album dodany do biblioteki!", Toast.LENGTH_SHORT).show()
+                if (album.isSaved) {
+                    val response = RetrofitClient.albumApi.removeAlbumFromLibrary(album.id!!, userId)
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@SearchActivity, "Usunięto z biblioteki", Toast.LENGTH_SHORT).show()
+                        album.isSaved = false
+                        albumAdapter.notifyDataSetChanged()
+                    } else {
+                        Toast.makeText(this@SearchActivity, "Błąd: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    Toast.makeText(this@SearchActivity, "Błąd: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    val response = RetrofitClient.albumApi.addAlbumToLibrary(album.id!!, userId)
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@SearchActivity, "Album dodany do biblioteki!", Toast.LENGTH_SHORT).show()
+                        album.isSaved = true
+                        albumAdapter.notifyDataSetChanged()
+                    } else {
+                        Toast.makeText(this@SearchActivity, "Błąd: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } catch (e: Exception) {
                 Toast.makeText(this@SearchActivity, "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()

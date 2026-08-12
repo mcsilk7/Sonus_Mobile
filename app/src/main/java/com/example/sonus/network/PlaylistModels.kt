@@ -16,7 +16,8 @@ data class SongDTO(
     val coverPath: String? = null,
     val filePath: String? = null,
     val albumId: Long? = null,
-    var isFavorite: Boolean = false
+    var isFavorite: Boolean = false,
+    var isInPlaylist: Boolean = false
 )
 
 data class AlbumDTO(
@@ -25,7 +26,8 @@ data class AlbumDTO(
     val artist: String,
     val coverPath: String? = null,
     val songIds: List<Long>? = null,
-    val songs: List<SongDTO>? = null // Added to support 1:M detail view
+    val songs: List<SongDTO>? = null, // Added to support 1:M detail view
+    var isSaved: Boolean = false
 )
 
 

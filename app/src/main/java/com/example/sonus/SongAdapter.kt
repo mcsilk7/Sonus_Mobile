@@ -22,7 +22,7 @@ class SongAdapter(
         val artist: TextView = view.findViewById(R.id.tvSongArtist)
         val duration: TextView = view.findViewById(R.id.tvSongDuration)
         val cover: ImageView = view.findViewById(R.id.imgCover)
-        val btnAdd: View = view.findViewById(R.id.btnAddToPlaylist)
+        val btnAdd: TextView = view.findViewById(R.id.btnAddToPlaylist)
         val btnFavorite: ImageView = view.findViewById(R.id.btnFavorite)
     }
 
@@ -54,11 +54,13 @@ class SongAdapter(
         // song.coverPath?.let { ... }
 
         holder.itemView.setOnClickListener { onItemClick(song) }
-        if (onAddClick != null) {
-            holder.btnAdd.visibility = View.VISIBLE
-            holder.btnAdd.setOnClickListener { onAddClick(song) }
-        } else {
-            holder.btnAdd.visibility = View.GONE
+        
+        // Always show the add to playlist button
+        holder.btnAdd.visibility = View.VISIBLE
+        holder.btnAdd.text = if (song.isInPlaylist) "✓" else "+"
+        
+        holder.btnAdd.setOnClickListener {
+            onAddClick?.invoke(song)
         }
 
         if (onFavoriteClick != null) {

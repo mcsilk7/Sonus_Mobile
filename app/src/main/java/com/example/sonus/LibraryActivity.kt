@@ -33,6 +33,7 @@ class LibraryActivity : AppCompatActivity() {
     
     private lateinit var btnAddPlaylist: LinearLayout
     private lateinit var sessionManager: SessionManager
+    private lateinit var recentlyPlayedManager: RecentlyPlayedManager
 
     private lateinit var sectionPlaylists: View
     private lateinit var sectionAlbums: View
@@ -48,12 +49,17 @@ class LibraryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_library)
 
         sessionManager = SessionManager(this)
+        recentlyPlayedManager = RecentlyPlayedManager(this)
         initViews()
         setupRecyclerViews()
         setupTabs()
-        fetchData()
 
         NavigationHelper.setupBottomNav(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        fetchData()
     }
 
     private fun initViews() {
@@ -106,7 +112,7 @@ class LibraryActivity : AppCompatActivity() {
         // Playlists
         playlistAdapter = PlaylistAdapter(emptyList()) { playlist ->
             val intent = Intent(this, PlaylistDetailActivity::class.java)
-            intent.putExtra("PLAYLIST_ID", playlist.id)
+            intent.putExtra("PLAYLIST_ID", playlist.id ?: -1L)
             startActivity(intent)
         }
         rvPlaylists.layoutManager = LinearLayoutManager(this)
@@ -116,10 +122,14 @@ class LibraryActivity : AppCompatActivity() {
         favoriteSongAdapter = SongAdapter(
             songs = emptyList(),
             onItemClick = { song ->
+                recentlyPlayedManager.addSong(song)
                 Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
             },
             onAddClick = { song ->
-                // Handled in search, but could be here too
+                PlaylistHelper.showPlaylistSelectionDialog(this, lifecycleScope, song) {
+                    favoriteSongAdapter.notifyDataSetChanged()
+                    fetchPlaylists() // Refresh playlist counts
+                }
             },
             onFavoriteClick = { song ->
                 toggleFavorite(song)
@@ -136,13 +146,21 @@ class LibraryActivity : AppCompatActivity() {
                 intent.putExtra("ALBUM_ID", album.id)
                 startActivity(intent)
             },
-            onAddClick = null // No "+" button in library
+            onAddClick = { album ->
+                toggleAlbumLibrary(album)
+            }
         )
         rvAlbums.layoutManager = GridLayoutManager(this, 2)
         rvAlbums.adapter = albumAdapter
     }
 
     private fun fetchData() {
+        val userId = sessionManager.getUserId()
+        Log.d("SonusLibrary", "Fetching data for userId: $userId")
+        if (userId == -1L) {
+            Toast.makeText(this, "Błąd sesji: Nie znaleziono ID użytkownika", Toast.LENGTH_LONG).show()
+            return
+        }
         fetchPlaylists()
         fetchFavorites()
         fetchFavoriteAlbums()
@@ -150,18 +168,36 @@ class LibraryActivity : AppCompatActivity() {
 
     private fun fetchPlaylists() {
         val userId = sessionManager.getUserId()
-        if (userId == -1L) return
-
         lifecycleScope.launch {
             try {
                 val response = RetrofitClient.playlistApi.getUserPlaylists(userId)
                 if (response.isSuccessful) {
-                    response.body()?.let {
-                        playlistAdapter.updateData(it)
+                    val playlists = response.body() ?: emptyList()
+                    Log.d("SonusLibrary", "Fetched ${playlists.size} playlists")
+                    playlistAdapter.updateData(playlists)
+                    
+                    // Fetch song counts for playlists using the dedicated endpoint
+                    playlists.forEachIndexed { index, playlist ->
+                        val pid = playlist.id ?: return@forEachIndexed
+                        launch {
+                            try {
+                                val countResponse = RetrofitClient.playlistApi.getSongCountInPlaylist(pid)
+                                if (countResponse.isSuccessful) {
+                                    val count = countResponse.body()?.toInt() ?: 0
+                                    Log.d("SonusLibrary", "Playlist $pid count: $count")
+                                    val updatedPlaylist = playlist.copy(songCount = count)
+                                    playlistAdapter.updateItem(index, updatedPlaylist)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("SonusLibrary", "Error fetching count for playlist $pid", e)
+                            }
+                        }
                     }
+                } else {
+                    Log.e("SonusLibrary", "Playlists API error: ${response.code()}")
                 }
             } catch (e: Exception) {
-                Log.e("SonusLibrary", "Error fetching playlists", e)
+                Log.e("SonusLibrary", "Exception fetching playlists", e)
             }
         }
     }
@@ -175,13 +211,55 @@ class LibraryActivity : AppCompatActivity() {
                 val response = RetrofitClient.favoriteApi.getFavorites(userId)
                 if (response.isSuccessful) {
                     val favorites = response.body() ?: emptyList()
-                    val songs = favorites.mapNotNull { it.song }.onEach { it.isFavorite = true }
+                    Log.d("SonusLibrary", "Fetched ${favorites.size} favorite items")
+                    
+                    val songs = favorites.mapNotNull { fav -> 
+                        // Map the flattened structure from user's backend
+                        val song = (fav.song ?: fav.songDto) ?: if (fav.songTitle != null) {
+                            SongDTO(
+                                id = fav.songId,
+                                title = fav.songTitle,
+                                artist = fav.songArtist ?: "Nieznany artysta",
+                                duration = fav.songDuration,
+                                coverPath = fav.coverPath,
+                                isFavorite = true
+                            )
+                        } else null
+
+                        song?.apply { isFavorite = true } ?: run {
+                            Log.w("SonusLibrary", "Favorite item ${fav.id} has no song data. songId: ${fav.songId}")
+                            null
+                        }
+                    }
+                    
+                    Log.d("SonusLibrary", "Displaying ${songs.size} favorite songs")
+                    
+                    // Also check if these favorite songs are in any playlist
+                    launch {
+                        val playlistSongsIds = PlaylistHelper.getAllSongsInUserPlaylists(userId)
+                        PlaylistHelper.enrichSongsWithPlaylistState(songs, playlistSongsIds)
+                        favoriteSongAdapter.notifyDataSetChanged()
+                    }
+
                     favoriteSongAdapter.updateData(songs)
+                    
+                    if (favorites.isNotEmpty() && songs.isEmpty()) {
+                        Toast.makeText(this@LibraryActivity, "Błąd: Brak danych piosenek", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    Log.e("SonusLibrary", "Error fetching favorites: ${response.code()}")
+                    Toast.makeText(this@LibraryActivity, "Błąd pobierania ulubionych", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Log.e("SonusLibrary", "Error fetching favorites", e)
+                Log.e("SonusLibrary", "Exception fetching favorites", e)
             }
         }
+    }
+
+    private fun updateSectionVisibility() {
+        // This is a helper to ensure sections are visible if they have data when in "All" tab
+        // Or if the specific tab is selected.
+        // For now, let's just rely on the showSections call and fetchData being called.
     }
 
     private fun fetchFavoriteAlbums() {
@@ -193,6 +271,7 @@ class LibraryActivity : AppCompatActivity() {
                 val response = RetrofitClient.albumApi.getLibraryAlbums(userId)
                 if (response.isSuccessful) {
                     val albums = response.body() ?: emptyList()
+                    albums.forEach { it.isSaved = true }
                     albumAdapter.updateData(albums)
                 }
             } catch (e: Exception) {
@@ -217,21 +296,58 @@ class LibraryActivity : AppCompatActivity() {
         }
     }
 
-    private fun showCreatePlaylistDialog() {
-        val input = EditText(this)
-        input.hint = "Nazwa playlisty"
-        
-        AlertDialog.Builder(this)
-            .setTitle("Nowa playlista")
-            .setView(input)
-            .setPositiveButton("Stwórz") { _, _ ->
-                val name = input.text.toString().trim()
-                if (name.isNotEmpty()) {
-                    createPlaylist(name)
+    private fun toggleAlbumLibrary(album: com.example.sonus.network.AlbumDTO) {
+        val userId = sessionManager.getUserId()
+        if (userId == -1L) return
+
+        lifecycleScope.launch {
+            try {
+                if (album.isSaved) {
+                    val response = RetrofitClient.albumApi.removeAlbumFromLibrary(album.id!!, userId)
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@LibraryActivity, "Usunięto z biblioteki", Toast.LENGTH_SHORT).show()
+                        fetchFavoriteAlbums() // Refresh library
+                    }
+                } else {
+                    val response = RetrofitClient.albumApi.addAlbumToLibrary(album.id!!, userId)
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@LibraryActivity, "Dodano do biblioteki", Toast.LENGTH_SHORT).show()
+                        fetchFavoriteAlbums()
+                    }
                 }
+            } catch (e: Exception) {
+                Log.e("SonusLibrary", "Error toggling album", e)
             }
-            .setNegativeButton("Anuluj", null)
-            .show()
+        }
+    }
+
+    private fun showCreatePlaylistDialog() {
+        val view = layoutInflater.inflate(R.layout.dialog_create_playlist, null)
+        val etName = view.findViewById<EditText>(R.id.etPlaylistName)
+        val btnCancel = view.findViewById<View>(R.id.btnCancel)
+        val btnConfirm = view.findViewById<View>(R.id.btnConfirm)
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(view)
+            .create()
+
+        // Make dialog background transparent to show custom shape if needed, 
+        // but since we match app_background it's fine.
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnCancel.setOnClickListener { dialog.dismiss() }
+
+        btnConfirm.setOnClickListener {
+            val name = etName.text.toString().trim()
+            if (name.isNotEmpty()) {
+                createPlaylist(name)
+                dialog.dismiss()
+            } else {
+                etName.error = "Podaj nazwę playlisty"
+            }
+        }
+
+        dialog.show()
     }
 
     private fun createPlaylist(name: String) {

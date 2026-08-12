@@ -18,7 +18,7 @@ class AlbumAdapter(
         val title: TextView = view.findViewById(R.id.tvAlbumName)
         val artist: TextView = view.findViewById(R.id.tvAlbumArtist)
         val cover: ImageView = view.findViewById(R.id.imgAlbumCover)
-        val btnAdd: View = view.findViewById(R.id.btnAddAlbumToLibrary)
+        val btnAdd: TextView = view.findViewById(R.id.btnAddAlbumToLibrary)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
@@ -37,11 +37,12 @@ class AlbumAdapter(
 
         holder.itemView.setOnClickListener { onItemClick(album) }
         
-        if (onAddClick != null) {
-            holder.btnAdd.visibility = View.VISIBLE
-            holder.btnAdd.setOnClickListener { onAddClick.invoke(album) }
-        } else {
-            holder.btnAdd.visibility = View.GONE
+        // Always show the add to library button for consistency with songs
+        holder.btnAdd.visibility = View.VISIBLE
+        holder.btnAdd.text = if (album.isSaved) "✓" else "+"
+        
+        holder.btnAdd.setOnClickListener {
+            onAddClick?.invoke(album)
         }
     }
 

@@ -14,6 +14,7 @@ import com.example.sonus.network.PlaylistDTO
 import com.example.sonus.network.RetrofitClient
 import com.example.sonus.network.SessionManager
 import com.example.sonus.network.SongDTO
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class PlaylistDetailActivity : AppCompatActivity() {
@@ -26,6 +27,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
     
     private lateinit var songAdapter: SongAdapter
     private lateinit var sessionManager: SessionManager
+    private lateinit var recentlyPlayedManager: RecentlyPlayedManager
     
     private var playlistId: Long = -1
 
@@ -40,6 +42,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
         }
 
         sessionManager = SessionManager(this)
+        recentlyPlayedManager = RecentlyPlayedManager(this)
         initViews()
         setupRecyclerView()
         fetchPlaylistDetails()
@@ -63,9 +66,14 @@ class PlaylistDetailActivity : AppCompatActivity() {
         songAdapter = SongAdapter(
             songs = emptyList(),
             onItemClick = { song ->
+                recentlyPlayedManager.addSong(song)
                 Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
             },
-            onAddClick = null,
+            onAddClick = { song ->
+                PlaylistHelper.showPlaylistSelectionDialog(this, lifecycleScope, song) {
+                    songAdapter.notifyDataSetChanged()
+                }
+            },
             onFavoriteClick = { song ->
                 toggleFavorite(song)
             },
@@ -78,13 +86,47 @@ class PlaylistDetailActivity : AppCompatActivity() {
     }
 
     private fun fetchPlaylistDetails() {
+        val userId = sessionManager.getUserId()
         lifecycleScope.launch {
             try {
-                val response = RetrofitClient.playlistApi.getPlaylistById(playlistId)
-                if (response.isSuccessful) {
-                    response.body()?.let { populateUI(it) }
+                // Fetch playlist details and user favorites in parallel
+                val playlistDeferred = async { RetrofitClient.playlistApi.getPlaylistById(playlistId) }
+                val favoritesDeferred = if (userId != -1L) async { RetrofitClient.favoriteApi.getFavorites(userId) } else null
+
+                val playlistResponse = playlistDeferred.await()
+                val favoritesResponse = favoritesDeferred?.await()
+
+                if (playlistResponse.isSuccessful) {
+                    var playlist = playlistResponse.body()
+                    if (playlist != null) {
+                        Log.d("PlaylistDetail", "Fetched playlist: ${playlist.name}, initial songs: ${playlist.songs?.size}")
+                        
+                        // Always try to fetch songs if the list is empty or null to be sure
+                        if (playlist.songs.isNullOrEmpty()) {
+                            Log.d("PlaylistDetail", "Songs list empty, fetching from /api/playlists/${playlistId}/songs")
+                            val songsResponse = RetrofitClient.playlistApi.getSongsInPlaylist(playlistId)
+                            if (songsResponse.isSuccessful) {
+                                val fetchedSongs = songsResponse.body()
+                                Log.d("PlaylistDetail", "Fetched ${fetchedSongs?.size} songs for playlist")
+                                playlist = playlist.copy(songs = fetchedSongs)
+                            } else {
+                                Log.e("PlaylistDetail", "Failed to fetch songs: ${songsResponse.code()}")
+                                Toast.makeText(this@PlaylistDetailActivity, "Błąd pobierania utworów", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        // Mark songs as favorites if they are in the user's favorites list
+                        if (favoritesResponse?.isSuccessful == true) {
+                            val favoriteIds = favoritesResponse.body()?.map { it.songId }?.toSet() ?: emptySet()
+                            playlist.songs?.forEach { song ->
+                                song.isFavorite = favoriteIds.contains(song.id)
+                            }
+                        }
+                        populateUI(playlist)
+                    }
                 } else {
-                    Toast.makeText(this@PlaylistDetailActivity, "Błąd pobierania szczegółów", Toast.LENGTH_SHORT).show()
+                    Log.e("PlaylistDetail", "Playlist API error: ${playlistResponse.code()}")
+                    Toast.makeText(this@PlaylistDetailActivity, "Błąd pobierania szczegółów playlisty", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Log.e("PlaylistDetail", "Error", e)
@@ -94,8 +136,21 @@ class PlaylistDetailActivity : AppCompatActivity() {
 
     private fun populateUI(playlist: PlaylistDTO) {
         tvName.text = playlist.name
-        tvDescription.text = playlist.description ?: "${playlist.songCount ?: 0} utworów"
-        songAdapter.updateData(playlist.songs ?: emptyList())
+        val songs = playlist.songs ?: emptyList()
+        val count = if (songs.isNotEmpty()) songs.size else (playlist.songCount ?: 0)
+        tvDescription.text = playlist.description ?: formatSongCount(count)
+        
+        songs.forEach { it.isInPlaylist = true }
+        songAdapter.updateData(songs)
+    }
+
+    private fun formatSongCount(count: Int): String {
+        return when {
+            count == 0 -> "Brak utworów"
+            count == 1 -> "1 utwór"
+            count % 10 in 2..4 && (count % 100 !in 12..14) -> "$count utwory"
+            else -> "$count utworów"
+        }
     }
 
     private fun toggleFavorite(song: SongDTO) {

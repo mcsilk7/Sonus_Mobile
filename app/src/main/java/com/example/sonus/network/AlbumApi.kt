@@ -11,6 +11,9 @@ interface AlbumApi {
     @GET("api/albums/{id}")
     suspend fun getAlbumById(@Path("id") id: Long): Response<AlbumDTO>
 
+    @GET("api/albums/{id}/songs")
+    suspend fun getSongsInAlbum(@Path("id") id: Long): Response<List<SongDTO>>
+
     @POST("api/albums/{albumId}/library/{userId}")
     suspend fun addAlbumToLibrary(
         @Path("albumId") albumId: Long,
