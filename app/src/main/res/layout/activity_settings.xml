@@ -511,7 +511,7 @@
         </LinearLayout>
     </ScrollView>
     <!-- Mini player -->
-    <include layout="@layout/mini_player" />
+<!--    <include layout="@layout/mini_player" />-->
     <!-- Dolne menu -->
     <include layout="@layout/bottom_nav" />
 

@@ -7,6 +7,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.sonus.network.GlideHelper
+import com.example.sonus.network.RetrofitClient
 import com.example.sonus.network.SongDTO
 
 class SongAdapter(
@@ -50,8 +55,18 @@ class SongAdapter(
             holder.btnFavorite.setColorFilter(ContextCompat.getColor(context, android.R.color.white))
         }
 
-        // TODO: Load cover image using Glide
-        // song.coverPath?.let { ... }
+        // Load cover image using the new dedicated endpoint with authentication
+        val coverUrl = RetrofitClient.BASE_URL + "api/songs/${song.id}/cover"
+        val authenticatedUrl = GlideHelper.getAuthenticatedUrl(holder.itemView.context, coverUrl)
+
+        val radius = (12 * context.resources.displayMetrics.density).toInt()
+
+        Glide.with(holder.itemView.context)
+            .load(authenticatedUrl)
+            .placeholder(R.drawable.bg_cover_placeholder)
+            .error(R.drawable.bg_cover_placeholder)
+            .transform(CenterCrop(), RoundedCorners(radius))
+            .into(holder.cover)
 
         holder.itemView.setOnClickListener { onItemClick(song) }
         
@@ -80,6 +95,8 @@ class SongAdapter(
     }
 
     override fun getItemCount() = songs.size
+
+    fun getSongs(): List<SongDTO> = songs
 
     fun updateData(newSongs: List<SongDTO>) {
         songs = newSongs

@@ -53,13 +53,26 @@ class LibraryActivity : AppCompatActivity() {
         initViews()
         setupRecyclerViews()
         setupTabs()
+        initMiniPlayer()
 
         NavigationHelper.setupBottomNav(this)
     }
 
     override fun onResume() {
         super.onResume()
+        initMiniPlayer()
         fetchData()
+    }
+
+    private fun initMiniPlayer() {
+        MiniPlayerHelper.setupMiniPlayer(this)
+    }
+
+    private fun playSong(song: SongDTO) {
+        recentlyPlayedManager.addSong(song)
+        PlayerState.play(this, song, favoriteSongAdapter.getSongs())
+        initMiniPlayer()
+        Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
     }
 
     private fun initViews() {
@@ -122,8 +135,7 @@ class LibraryActivity : AppCompatActivity() {
         favoriteSongAdapter = SongAdapter(
             songs = emptyList(),
             onItemClick = { song ->
-                recentlyPlayedManager.addSong(song)
-                Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
+                playSong(song)
             },
             onAddClick = { song ->
                 PlaylistHelper.showPlaylistSelectionDialog(this, lifecycleScope, song) {
@@ -243,8 +255,8 @@ class LibraryActivity : AppCompatActivity() {
 
                     favoriteSongAdapter.updateData(songs)
                     
-                    if (favorites.isNotEmpty() && songs.isEmpty()) {
-                        Toast.makeText(this@LibraryActivity, "Błąd: Brak danych piosenek", Toast.LENGTH_LONG).show()
+                    if (songs.isNotEmpty()) {
+                        sectionFavorites.visibility = View.VISIBLE
                     }
                 } else {
                     Log.e("SonusLibrary", "Error fetching favorites: ${response.code()}")
@@ -254,12 +266,6 @@ class LibraryActivity : AppCompatActivity() {
                 Log.e("SonusLibrary", "Exception fetching favorites", e)
             }
         }
-    }
-
-    private fun updateSectionVisibility() {
-        // This is a helper to ensure sections are visible if they have data when in "All" tab
-        // Or if the specific tab is selected.
-        // For now, let's just rely on the showSections call and fetchData being called.
     }
 
     private fun fetchFavoriteAlbums() {

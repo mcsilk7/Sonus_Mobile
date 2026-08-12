@@ -15,7 +15,6 @@
         android:id="@+id/imgCover"
         android:layout_width="62dp"
         android:layout_height="62dp"
-        android:background="@drawable/bg_cover_placeholder"
         android:contentDescription="Okładka"
         android:scaleType="centerCrop" />
 

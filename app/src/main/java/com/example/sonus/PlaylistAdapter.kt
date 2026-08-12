@@ -6,7 +6,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.sonus.network.PlaylistDTO
+import com.example.sonus.network.RetrofitClient
 
 class PlaylistAdapter(
     private var playlists: List<PlaylistDTO>,
@@ -32,8 +36,21 @@ class PlaylistAdapter(
         val count = playlist.songCount ?: playlist.songs?.size ?: 0
         holder.count.text = formatSongCount(count)
         
-        // TODO: Load cover image using Glide or similar if available
-        // holder.cover.setImageResource(...)
+        // Playlist cover using the new endpoint of the first song
+        val firstSong = playlist.songs?.firstOrNull()
+        val authenticatedUrl = firstSong?.let { 
+            val coverUrl = RetrofitClient.BASE_URL + "api/songs/${it.id}/cover"
+            com.example.sonus.network.GlideHelper.getAuthenticatedUrl(holder.itemView.context, coverUrl)
+        }
+
+        val radius = (12 * holder.itemView.context.resources.displayMetrics.density).toInt()
+
+        Glide.with(holder.itemView.context)
+            .load(authenticatedUrl)
+            .placeholder(R.drawable.bg_cover_placeholder)
+            .error(R.drawable.bg_cover_placeholder)
+            .transform(CenterCrop(), RoundedCorners(radius))
+            .into(holder.cover)
 
         holder.itemView.setOnClickListener { onItemClick(playlist) }
     }

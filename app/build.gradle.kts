@@ -49,4 +49,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
     implementation("androidx.activity:activity-ktx:1.9.2")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("androidx.media:media:1.7.0")
 }

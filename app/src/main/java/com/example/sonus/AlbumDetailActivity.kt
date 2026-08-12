@@ -62,17 +62,34 @@ class AlbumDetailActivity : AppCompatActivity() {
         btnBack.setOnClickListener { finish() }
         btnSaveAlbum.setOnClickListener { toggleAlbumSave() }
 
+        initMiniPlayer()
+
         findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabPlayAlbum).setOnClickListener {
-            Toast.makeText(this, "Odtwarzanie albumu...", Toast.LENGTH_SHORT).show()
+            currentAlbum?.songs?.firstOrNull()?.let { playSong(it) }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initMiniPlayer()
+    }
+
+    private fun initMiniPlayer() {
+        MiniPlayerHelper.setupMiniPlayer(this)
+    }
+
+    private fun playSong(song: SongDTO) {
+        recentlyPlayedManager.addSong(song)
+        PlayerState.play(this, song, currentAlbum?.songs ?: emptyList())
+        initMiniPlayer()
+        Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
     }
 
     private fun setupRecyclerView() {
         songAdapter = SongAdapter(
             songs = emptyList(),
             onItemClick = { song ->
-                recentlyPlayedManager.addSong(song)
-                Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
+                playSong(song)
             },
             onAddClick = { song ->
                 PlaylistHelper.showPlaylistSelectionDialog(this, lifecycleScope, song) {
@@ -156,6 +173,18 @@ class AlbumDetailActivity : AppCompatActivity() {
         tvArtist.text = album.artist
         btnSaveAlbum.visibility = View.VISIBLE
         updateSaveButtonState(album.isSaved)
+
+        val coverUrl = RetrofitClient.BASE_URL + "api/albums/$albumId/cover"
+        val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(this, coverUrl)
+
+        val radius = (20 * resources.displayMetrics.density).toInt()
+
+        com.bumptech.glide.Glide.with(this)
+            .load(authenticatedUrl)
+            .placeholder(R.drawable.bg_playlist_head)
+            .error(R.drawable.bg_playlist_head)
+            .transform(com.bumptech.glide.load.resource.bitmap.CenterCrop(), com.bumptech.glide.load.resource.bitmap.RoundedCorners(radius))
+            .into(imgCover)
         
         val songs = album.songs ?: emptyList()
         Log.d("AlbumDetail", "Updating adapter with ${songs.size} songs")

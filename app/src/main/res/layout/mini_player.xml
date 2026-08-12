@@ -40,8 +40,7 @@
             android:layout_height="46dp"
             android:background="@drawable/bg_light_cover_placeholder"
             android:contentDescription="Okładka"
-            android:scaleType="centerCrop"
-            app:tint="@color/accent"/>
+            android:scaleType="centerCrop"/>
 
         <!-- Tytuł + Artysta -->
         <LinearLayout
@@ -86,16 +85,15 @@
             app:tint="#FFFFFF"/>
 
         <!-- Play/Pause -->
-        <TextView
+        <ImageView
             android:id="@+id/miniPlayerPlay"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="8dp"
             android:background="@drawable/bg_mini_btn"
-            android:gravity="center"
-            android:text="▶"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp" />
+            android:padding="10dp"
+            android:src="@drawable/ic_play"
+            app:tint="@color/text_primary" />
 
         <!-- Następny -->
         <ImageView

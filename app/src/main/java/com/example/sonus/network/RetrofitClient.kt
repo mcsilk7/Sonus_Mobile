@@ -8,7 +8,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://192.168.1.77:8080/"
+    const val BASE_URL = "http://192.168.1.77:8080/"
+
+    fun getFullUrl(path: String?): String? {
+        if (path == null) return null
+        if (path.startsWith("http")) return path
+        return BASE_URL.removeSuffix("/") + "/" + path.removePrefix("/")
+    }
 
     private lateinit var sessionManager: SessionManager
 

@@ -57,17 +57,34 @@ class PlaylistDetailActivity : AppCompatActivity() {
 
         btnBack.setOnClickListener { finish() }
 
+        initMiniPlayer()
+
         findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabPlayPlaylist).setOnClickListener {
-            Toast.makeText(this, "Odtwarzanie playlisty...", Toast.LENGTH_SHORT).show()
+            songAdapter.getSongs().firstOrNull()?.let { playSong(it) }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initMiniPlayer()
+    }
+
+    private fun initMiniPlayer() {
+        MiniPlayerHelper.setupMiniPlayer(this)
+    }
+
+    private fun playSong(song: SongDTO) {
+        recentlyPlayedManager.addSong(song)
+        PlayerState.play(this, song, songAdapter.getSongs())
+        initMiniPlayer()
+        Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
     }
 
     private fun setupRecyclerView() {
         songAdapter = SongAdapter(
             songs = emptyList(),
             onItemClick = { song ->
-                recentlyPlayedManager.addSong(song)
-                Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
+                playSong(song)
             },
             onAddClick = { song ->
                 PlaylistHelper.showPlaylistSelectionDialog(this, lifecycleScope, song) {
@@ -139,6 +156,22 @@ class PlaylistDetailActivity : AppCompatActivity() {
         val songs = playlist.songs ?: emptyList()
         val count = if (songs.isNotEmpty()) songs.size else (playlist.songCount ?: 0)
         tvDescription.text = playlist.description ?: formatSongCount(count)
+
+        // Load playlist cover using the new endpoint of the first song
+        val firstSong = songs.firstOrNull()
+        val authenticatedUrl = firstSong?.let {
+            val coverUrl = RetrofitClient.BASE_URL + "api/songs/${it.id}/cover"
+            com.example.sonus.network.GlideHelper.getAuthenticatedUrl(this, coverUrl)
+        }
+
+        val radius = (20 * resources.displayMetrics.density).toInt()
+
+        com.bumptech.glide.Glide.with(this)
+            .load(authenticatedUrl)
+            .placeholder(R.drawable.bg_playlist_head)
+            .error(R.drawable.bg_playlist_head)
+            .transform(com.bumptech.glide.load.resource.bitmap.CenterCrop(), com.bumptech.glide.load.resource.bitmap.RoundedCorners(radius))
+            .into(imgCover)
         
         songs.forEach { it.isInPlaylist = true }
         songAdapter.updateData(songs)

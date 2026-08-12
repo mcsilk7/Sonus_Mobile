@@ -6,7 +6,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.sonus.network.AlbumDTO
+import com.example.sonus.network.RetrofitClient
 
 class AlbumAdapter(
     private var albums: List<AlbumDTO>,
@@ -32,8 +36,17 @@ class AlbumAdapter(
         holder.title.text = album.title
         holder.artist.text = album.artist
 
-        // TODO: Load cover image using Glide
-        // holder.cover.setImageResource(...)
+        val coverUrl = RetrofitClient.BASE_URL + "api/albums/${album.id}/cover"
+        val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(holder.itemView.context, coverUrl)
+
+        val radius = (12 * holder.itemView.context.resources.displayMetrics.density).toInt()
+
+        Glide.with(holder.itemView.context)
+            .load(authenticatedUrl)
+            .placeholder(R.drawable.bg_cover_placeholder)
+            .error(R.drawable.bg_cover_placeholder)
+            .transform(CenterCrop(), RoundedCorners(radius))
+            .into(holder.cover)
 
         holder.itemView.setOnClickListener { onItemClick(album) }
         

@@ -44,8 +44,25 @@ class SearchActivity : AppCompatActivity() {
         initViews()
         setupRecyclerViews()
         setupSearch()
+        initMiniPlayer()
 
         NavigationHelper.setupBottomNav(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initMiniPlayer()
+    }
+
+    private fun initMiniPlayer() {
+        MiniPlayerHelper.setupMiniPlayer(this)
+    }
+
+    private fun playSong(song: SongDTO) {
+        recentlyPlayedManager.addSong(song)
+        PlayerState.play(this, song, songAdapter.getSongs())
+        initMiniPlayer()
+        Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
     }
 
     private fun initViews() {
@@ -61,8 +78,7 @@ class SearchActivity : AppCompatActivity() {
         songAdapter = SongAdapter(
             songs = emptyList(),
             onItemClick = { song ->
-                recentlyPlayedManager.addSong(song)
-                Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
+                playSong(song)
             },
             onAddClick = { song ->
                 PlaylistHelper.showPlaylistSelectionDialog(this, lifecycleScope, song) {
