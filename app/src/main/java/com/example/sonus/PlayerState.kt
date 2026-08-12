@@ -94,7 +94,15 @@ object PlayerState {
                     notifyStateChanged()
                 }
                 setOnCompletionListener {
-                    Log.d("PlayerState", "Playback completed")
+                    val pos = mediaPlayer?.currentPosition ?: 0
+                    val dur = getDuration()
+                    Log.d("PlayerState", "Playback completed at $pos / $dur")
+                    
+                    if (dur > 0 && pos < dur - 2000 && !isLooping) {
+                        Log.w("PlayerState", "Early completion detected, attempting to resume...")
+                        // Można tu dodać logikę re-connecta, ale najpierw sprawdźmy logi
+                    }
+
                     if (!isLooping) {
                         this@PlayerState.isPlaying = false
                         playNext(context)
@@ -187,7 +195,22 @@ object PlayerState {
     }
 
     fun getCurrentPosition(): Int = mediaPlayer?.currentPosition ?: 0
-    fun getDuration(): Int = mediaPlayer?.duration ?: 0
+
+    fun getDuration(): Int {
+        val playerDuration = mediaPlayer?.duration ?: 0
+        val dtoDuration = (currentSong?.duration ?: 0) * 1000
+        
+        // Jeśli player podaje dziwnie krótki czas (np. < 30s) a w bazie mamy dłuższą piosenkę,
+        // ufamy danym z bazy (DTO). Częsty problem przy streamingu VBR/HTTP.
+        return if (dtoDuration > playerDuration) {
+            dtoDuration
+        } else if (playerDuration > 0) {
+            playerDuration
+        } else {
+            dtoDuration
+        }
+    }
+
     fun seekTo(msec: Int) {
         mediaPlayer?.seekTo(msec)
     }

@@ -89,15 +89,6 @@
                 android:textColor="@color/text_primary"
                 android:textSize="15sp" />
 
-            <!-- Dołączył -->
-            <TextView
-                android:id="@+id/tvProfileJoined"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Dołączył: styczeń 2025"
-                android:textColor="@color/text_primary"
-                android:textSize="13sp" />
 
             <!-- Edytuj profil -->
             <TextView
@@ -119,34 +110,6 @@
                 android:layout_marginTop="28dp"
                 android:orientation="horizontal">
 
-                <!-- Utwory -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="90dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:background="@drawable/bg_profile_stat"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="10dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-black"
-                        android:text="248"
-                        android:textColor="@color/text_dark"
-                        android:textSize="22sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/profile_stats_songs"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
 
                 <!-- Playlisty -->
                 <LinearLayout
@@ -161,10 +124,11 @@
                     android:padding="10dp">
 
                     <TextView
+                        android:id="@+id/tvStatsPlaylistsCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-black"
-                        android:text="12"
+                        android:text="0"
                         android:textColor="@color/text_dark"
                         android:textSize="22sp" />
 
@@ -191,10 +155,11 @@
                     android:padding="10dp">
 
                     <TextView
+                        android:id="@+id/tvStatsHoursCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-black"
-                        android:text="86"
+                        android:text="0"
                         android:textColor="@color/text_dark"
                         android:textSize="22sp" />
 
@@ -220,10 +185,11 @@
                     android:padding="10dp">
 
                     <TextView
+                        android:id="@+id/tvStatsFavoritesCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-black"
-                        android:text="34"
+                        android:text="0"
                         android:textColor="@color/text_dark"
                         android:textSize="22sp" />
 
@@ -238,156 +204,6 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Ostatnia aktywność -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/profile_recent"
-                android:textColor="@color/text_dark"
-                android:textSize="20sp" />
-
-            <include layout="@layout/item_song" />
-            <include layout="@layout/item_song" />
-            <include layout="@layout/item_song" />
-
-            <!-- Preferencje -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/profile_preferences"
-                android:textColor="@color/text_dark"
-                android:textSize="20sp" />
-
-            <!-- Język -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_profile_item"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Język"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Polski"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="›"
-                    android:textColor="@color/text_primary"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Prywatność -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_profile_item"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Prywatność"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Zarządzaj danymi"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="›"
-                    android:textColor="@color/text_primary"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Pomoc -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_profile_item"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pomoc"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="FAQ i kontakt"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="›"
-                    android:textColor="@color/text_primary"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
             <!-- Konto -->
             <TextView
                 android:layout_width="match_parent"
@@ -397,48 +213,6 @@
                 android:text="@string/profile_account"
                 android:textColor="@color/text_dark"
                 android:textSize="20sp" />
-
-            <!-- Zmień hasło -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_profile_item"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Zmień hasło"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Zaktualizuj hasło"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="›"
-                    android:textColor="@color/text_primary"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
 
             <!-- Usuń konto -->
             <LinearLayout
@@ -510,7 +284,7 @@
     </ScrollView>
 
     <!-- Mini player -->
-    <include layout="@layout/mini_player" />
+<!--    <include layout="@layout/mini_player" />-->
 
     <!-- Dolne menu -->
     <include layout="@layout/bottom_nav" />

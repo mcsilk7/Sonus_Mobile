@@ -52,6 +52,7 @@
 
             <!-- Profil -->
             <LinearLayout
+                android:id="@+id/btnProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -61,6 +62,7 @@
                 android:padding="16dp">
 
                 <TextView
+                    android:id="@+id/tvSettingsAvatar"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:background="@drawable/bg_icon_circle"
@@ -78,6 +80,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tvSettingsName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-medium"
@@ -87,6 +90,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tvSettingsEmail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
@@ -104,144 +108,6 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Odtwarzanie -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="Odtwarzanie"
-                android:textColor="@color/text_dark"
-                android:textSize="20sp" />
-
-            <!-- Jakość dźwięku -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_settings_item"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Jakość dźwięku"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Wysoka (320 kbps)"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="›"
-                    android:textColor="@color/text_primary"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Equalizerw -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_settings_item"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Equalizer"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Dostosuj brzmienie"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="›"
-                    android:textColor="@color/text_primary"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Gapless playback -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_settings_item"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Płynne przejścia"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Gapless playback"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="48dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_settings_toggle_active"
-                    android:gravity="center"
-                    android:text="ON"
-                    android:textColor="@color/app_background"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
             <!-- Wygląd -->
             <TextView
                 android:layout_width="wrap_content"
@@ -254,6 +120,7 @@
 
             <!-- Motyw -->
             <LinearLayout
+                android:id="@+id/btnTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
@@ -277,150 +144,11 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tvCurrentTheme"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Jasny"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="›"
-                    android:textColor="@color/text_primary"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Powiadomienia -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_settings_item"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Powiadomienia"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Zarządzaj alertami"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="48dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_settings_toggle"
-                    android:gravity="center"
-                    android:text="OFF"
-                    android:textColor="@color/app_background"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Dane -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="Dane i pamięć"
-                android:textColor="@color/text_dark"
-                android:textSize="20sp" />
-
-            <!-- Pobieranie -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_settings_item"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pobieranie"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Tylko przez Wi-Fi"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="48dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_settings_toggle_active"
-                    android:gravity="center"
-                    android:text="ON"
-                    android:textColor="@color/app_background"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Cache -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_settings_item"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Wyczyść cache"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Zajęte: 245 MB"
+                        android:text="Podążaj za systemem"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp" />
                 </LinearLayout>

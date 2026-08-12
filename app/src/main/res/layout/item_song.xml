@@ -28,18 +28,22 @@
 
         <TextView
             android:id="@+id/tvSongTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
             android:text="Nazwa utworu"
             android:textColor="@color/text_dark"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/tvSongArtist"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="Artysta"
             android:textColor="@color/text_primary"
             android:textSize="14sp" />

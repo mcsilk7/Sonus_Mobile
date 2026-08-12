@@ -4,7 +4,9 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import androidx.appcompat.app.AppCompatDelegate
 import com.example.sonus.network.RetrofitClient
+import com.example.sonus.network.SessionManager
 
 class SonusApp : Application() {
 
@@ -15,6 +17,15 @@ class SonusApp : Application() {
     override fun onCreate() {
         super.onCreate()
         RetrofitClient.init(this)
+        
+        val sessionManager = SessionManager(this)
+        val themeMode = sessionManager.getTheme()
+        if (themeMode != -1) {
+            AppCompatDelegate.setDefaultNightMode(themeMode)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        }
+        
         createNotificationChannel()
     }
 
