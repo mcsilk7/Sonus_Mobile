@@ -37,7 +37,7 @@ class SessionManager(context: Context) {
         prefs.edit().putInt("app_theme", mode).apply()
     }
 
-    fun getTheme(): Int = prefs.getInt("app_theme", -1) // -1 for MODE_NIGHT_FOLLOW_SYSTEM
+    fun getTheme(): Int = prefs.getInt("app_theme", -1) 
 
     fun clearSession() {
         prefs.edit().clear().apply()

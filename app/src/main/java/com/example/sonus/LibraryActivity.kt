@@ -45,6 +45,7 @@ class LibraryActivity : AppCompatActivity() {
     private lateinit var tabFavorites: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeHelper.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_library)
 
@@ -62,6 +63,11 @@ class LibraryActivity : AppCompatActivity() {
         super.onResume()
         initMiniPlayer()
         fetchData()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        MiniPlayerHelper.onDestroy(this)
     }
 
     private fun initMiniPlayer() {
@@ -123,11 +129,17 @@ class LibraryActivity : AppCompatActivity() {
 
     private fun setupRecyclerViews() {
         // Playlists
-        playlistAdapter = PlaylistAdapter(emptyList()) { playlist ->
-            val intent = Intent(this, PlaylistDetailActivity::class.java)
-            intent.putExtra("PLAYLIST_ID", playlist.id ?: -1L)
-            startActivity(intent)
-        }
+        playlistAdapter = PlaylistAdapter(
+            playlists = emptyList(),
+            onItemClick = { playlist ->
+                val intent = Intent(this, PlaylistDetailActivity::class.java)
+                intent.putExtra("PLAYLIST_ID", playlist.id ?: -1L)
+                startActivity(intent)
+            },
+            onLongClick = { playlist ->
+                showPlaylistOptions(playlist)
+            }
+        )
         rvPlaylists.layoutManager = LinearLayoutManager(this)
         rvPlaylists.adapter = playlistAdapter
 
@@ -354,6 +366,44 @@ class LibraryActivity : AppCompatActivity() {
         }
 
         dialog.show()
+    }
+
+    private fun showPlaylistOptions(playlist: PlaylistDTO) {
+        val options = arrayOf("Usuń playlistę")
+        AlertDialog.Builder(this)
+            .setTitle(playlist.name)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> confirmDeletePlaylist(playlist)
+                }
+            }
+            .show()
+    }
+
+    private fun confirmDeletePlaylist(playlist: PlaylistDTO) {
+        AlertDialog.Builder(this)
+            .setTitle("Usuń playlistę")
+            .setMessage("Czy na pewno chcesz usunąć playlistę \"${playlist.name}\"?")
+            .setPositiveButton("Usuń") { _, _ -> deletePlaylistById(playlist.id ?: return@setPositiveButton) }
+            .setNegativeButton("Anuluj", null)
+            .show()
+    }
+
+    private fun deletePlaylistById(id: Long) {
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitClient.playlistApi.deletePlaylist(id)
+                if (response.isSuccessful) {
+                    Toast.makeText(this@LibraryActivity, "Playlista usunięta", Toast.LENGTH_SHORT).show()
+                    fetchPlaylists()
+                } else {
+                    Toast.makeText(this@LibraryActivity, "Błąd usuwania playlisty", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("SonusLibrary", "Error deleting playlist", e)
+                Toast.makeText(this@LibraryActivity, "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun createPlaylist(name: String) {

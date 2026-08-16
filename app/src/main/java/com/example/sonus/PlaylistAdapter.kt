@@ -14,7 +14,8 @@ import com.example.sonus.network.RetrofitClient
 
 class PlaylistAdapter(
     private var playlists: List<PlaylistDTO>,
-    private val onItemClick: (PlaylistDTO) -> Unit
+    private val onItemClick: (PlaylistDTO) -> Unit,
+    private val onLongClick: ((PlaylistDTO) -> Unit)? = null
 ) : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>() {
 
     class PlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -36,12 +37,14 @@ class PlaylistAdapter(
         val count = playlist.songCount ?: playlist.songs?.size ?: 0
         holder.count.text = formatSongCount(count)
         
-        // Playlist cover using the new endpoint of the first song
+        // Playlist cover: use first song's coverPath if it's a full URL, otherwise use dedicated endpoint
         val firstSong = playlist.songs?.firstOrNull()
-        val authenticatedUrl = firstSong?.let { 
-            val coverUrl = RetrofitClient.BASE_URL + "api/songs/${it.id}/cover"
-            com.example.sonus.network.GlideHelper.getAuthenticatedUrl(holder.itemView.context, coverUrl)
+        val coverUrl = if (firstSong?.coverPath?.startsWith("http") == true) {
+            firstSong.coverPath
+        } else {
+            firstSong?.let { RetrofitClient.BASE_URL + "api/songs/${it.id}/cover" }
         }
+        val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(holder.itemView.context, coverUrl)
 
         val radius = (12 * holder.itemView.context.resources.displayMetrics.density).toInt()
 
@@ -53,6 +56,13 @@ class PlaylistAdapter(
             .into(holder.cover)
 
         holder.itemView.setOnClickListener { onItemClick(playlist) }
+
+        if (onLongClick != null) {
+            holder.itemView.setOnLongClickListener {
+                onLongClick.invoke(playlist)
+                true
+            }
+        }
     }
 
     private fun formatSongCount(count: Int): String {

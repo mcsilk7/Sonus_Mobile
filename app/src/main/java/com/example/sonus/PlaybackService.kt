@@ -27,32 +27,38 @@ class PlaybackService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        PlayerState.setOnStateChangedListener {
+        PlayerState.addStateListener(playerListener)
+    }
+
+    private val playerListener = object : PlayerState.PlayerStateListener {
+        override fun onStateChanged() {
             showNotification()
         }
+    }
+
+    override fun onDestroy() {
+        PlayerState.removeStateListener(playerListener)
+        super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Call showNotification immediately to ensure startForeground is called
+        showNotification()
+        
         when (intent?.action) {
             ACTION_PLAY_PAUSE -> {
                 PlayerState.togglePlayPause(this)
-                showNotification()
             }
             ACTION_PREVIOUS -> {
                 PlayerState.playPrevious(this)
-                showNotification()
             }
             ACTION_NEXT -> {
                 PlayerState.playNext(this)
-                showNotification()
             }
             ACTION_STOP -> {
                 stopPlayback()
-            }
-            else -> {
-                showNotification()
             }
         }
         return START_NOT_STICKY
@@ -70,7 +76,7 @@ class PlaybackService : Service() {
     }
 
     private fun showNotification() {
-        val song = PlayerState.currentSong ?: return
+        val song = PlayerState.currentSong
 
         val activityIntent = Intent(this, PlayerActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -107,13 +113,10 @@ class PlaybackService : Service() {
         val playPauseIcon = if (PlayerState.isPlaying) R.drawable.ic_pause else R.drawable.ic_play
         val playPauseText = if (PlayerState.isPlaying) "Pause" else "Play"
 
-        val coverUrl = RetrofitClient.BASE_URL + "api/songs/${song.id}/cover"
-        val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(this, coverUrl)
-
         val builder = NotificationCompat.Builder(this, SonusApp.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_play)
-            .setContentTitle(song.title)
-            .setContentText(song.artist)
+            .setContentTitle(song?.title ?: "Sonus")
+            .setContentText(song?.artist ?: "Przygotowywanie...")
             .setContentIntent(contentPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(PlayerState.isPlaying)
@@ -123,25 +126,37 @@ class PlaybackService : Service() {
             .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(0, 1, 2))
 
-        Glide.with(this)
-            .asBitmap()
-            .load(authenticatedUrl)
-            .placeholder(R.drawable.bg_cover_placeholder)
-            .error(R.drawable.bg_cover_placeholder)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    builder.setLargeIcon(resource)
-                    updateNotification(builder.build())
-                }
-                override fun onLoadCleared(placeholder: Drawable?) {
-                    builder.setLargeIcon(null as Bitmap?)
-                    updateNotification(builder.build())
-                }
-                override fun onLoadFailed(errorDrawable: Drawable?) {
-                    super.onLoadFailed(errorDrawable)
-                    updateNotification(builder.build())
-                }
-            })
+        // First, call startForeground with placeholder to avoid ANR/Crash
+        updateNotification(builder.build())
+
+        if (song != null) {
+            val coverUrl = if (song.coverPath?.startsWith("http") == true) {
+                song.coverPath
+            } else {
+                RetrofitClient.BASE_URL + "api/songs/${song.id}/cover"
+            }
+            val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(this, coverUrl)
+
+            Glide.with(this)
+                .asBitmap()
+                .load(authenticatedUrl)
+                .placeholder(R.drawable.bg_cover_placeholder)
+                .error(R.drawable.bg_cover_placeholder)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        builder.setLargeIcon(resource)
+                        updateNotification(builder.build())
+                    }
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        builder.setLargeIcon(null as Bitmap?)
+                        updateNotification(builder.build())
+                    }
+                    override fun onLoadFailed(errorDrawable: Drawable?) {
+                        super.onLoadFailed(errorDrawable)
+                        updateNotification(builder.build())
+                    }
+                })
+        }
     }
 
     private fun updateNotification(notification: android.app.Notification) {

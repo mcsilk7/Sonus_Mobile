@@ -35,6 +35,7 @@ class AlbumDetailActivity : AppCompatActivity() {
     private var currentAlbum: AlbumDTO? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeHelper.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_album_detail)
 
@@ -72,6 +73,11 @@ class AlbumDetailActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         initMiniPlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        MiniPlayerHelper.onDestroy(this)
     }
 
     private fun initMiniPlayer() {
@@ -174,7 +180,11 @@ class AlbumDetailActivity : AppCompatActivity() {
         btnSaveAlbum.visibility = View.VISIBLE
         updateSaveButtonState(album.isSaved)
 
-        val coverUrl = RetrofitClient.BASE_URL + "api/albums/$albumId/cover"
+        val coverUrl = if (album.coverPath?.startsWith("http") == true) {
+            album.coverPath
+        } else {
+            RetrofitClient.BASE_URL + "api/albums/$albumId/cover"
+        }
         val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(this, coverUrl)
 
         val radius = (20 * resources.displayMetrics.density).toInt()

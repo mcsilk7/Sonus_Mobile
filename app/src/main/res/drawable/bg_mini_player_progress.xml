@@ -2,14 +2,14 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="@color/text_primary" />
+            <solid android:color="?attr/sonusTextPrimaryColor" />
             <corners android:radius="4dp" />
         </shape>
     </item>
     <item android:id="@android:id/progress">
         <clip>
             <shape>
-                <solid android:color="@color/app_background" />
+                <solid android:color="?attr/sonusBackgroundColor" />
                 <corners android:radius="4dp" />
             </shape>
         </clip>

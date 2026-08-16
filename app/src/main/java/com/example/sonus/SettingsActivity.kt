@@ -14,6 +14,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeHelper.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
@@ -55,34 +56,38 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun updateThemeText() {
         val themeText = findViewById<TextView>(R.id.tvCurrentTheme)
-        val mode = sessionManager.getTheme()
-        themeText.text = when (mode) {
-            AppCompatDelegate.MODE_NIGHT_NO -> "Jasny"
-            AppCompatDelegate.MODE_NIGHT_YES -> "Ciemny"
+        themeText.text = when (sessionManager.getTheme()) {
+            0 -> "Jasny"
+            1 -> "Ciemny"
+            2 -> "Fioletowy"
             else -> "Podążaj za systemem"
         }
     }
 
     private fun showThemeSelectionDialog() {
-        val themes = arrayOf("Jasny", "Ciemny", "Podążaj za systemem")
-        val checkedItem = when (sessionManager.getTheme()) {
-            AppCompatDelegate.MODE_NIGHT_NO -> 0
-            AppCompatDelegate.MODE_NIGHT_YES -> 1
-            else -> 2
+        val themes = arrayOf("Jasny", "Ciemny", "Fioletowy", "Podążaj za systemem")
+        val currentTheme = sessionManager.getTheme()
+        val checkedItem = when (currentTheme) {
+            0 -> 0
+            1 -> 1
+            2 -> 2
+            else -> 3
         }
 
         AlertDialog.Builder(this)
             .setTitle("Wybierz motyw")
             .setSingleChoiceItems(themes, checkedItem) { dialog, which ->
-                val mode = when (which) {
-                    0 -> AppCompatDelegate.MODE_NIGHT_NO
-                    1 -> AppCompatDelegate.MODE_NIGHT_YES
-                    else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                val selectedTheme = when (which) {
+                    0 -> 0 // Light
+                    1 -> 1 // Dark
+                    2 -> 2 // Violet
+                    else -> -1 // System
                 }
-                sessionManager.saveTheme(mode)
-                AppCompatDelegate.setDefaultNightMode(mode)
+                sessionManager.saveTheme(selectedTheme)
+                ThemeHelper.applyTheme(this)
                 updateThemeText()
                 dialog.dismiss()
+                recreate()
             }
             .show()
     }

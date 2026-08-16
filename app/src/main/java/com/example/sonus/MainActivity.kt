@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvRecentlyPlayedHeader: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeHelper.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -102,6 +103,11 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         initMiniPlayer()
         updateRecentlyPlayed()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        MiniPlayerHelper.onDestroy(this)
     }
 
     private fun setupRecentlyPlayed() {

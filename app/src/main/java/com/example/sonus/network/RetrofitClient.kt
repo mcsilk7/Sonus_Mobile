@@ -8,7 +8,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    const val BASE_URL = "http://192.168.1.77:8080/"
+//    const val BASE_URL = "http://192.168.1.77:8080/"//localhost
+//    const val BASE_URL = "http://192.168.1.59:8080/"//localnetwork
+      const val BASE_URL = "http://100.126.233.66:8080/"//tailcsale
 
     fun getFullUrl(path: String?): String? {
         if (path == null) return null
@@ -17,9 +19,11 @@ object RetrofitClient {
     }
 
     private lateinit var sessionManager: SessionManager
+    private lateinit var appContext: Context
 
     fun init(context: Context) {
-        sessionManager = SessionManager(context)
+        appContext = context.applicationContext
+        sessionManager = SessionManager(appContext)
     }
 
     private val okHttpClient by lazy {
@@ -29,7 +33,7 @@ object RetrofitClient {
         
         OkHttpClient.Builder()
             .addInterceptor(logging)
-            .addInterceptor(AuthInterceptor(sessionManager))
+            .addInterceptor(AuthInterceptor(appContext, sessionManager))
             .build()
     }
 

@@ -17,7 +17,7 @@
         android:layout_height="22dp"
         android:contentDescription="Szukaj"
         android:src="@drawable/ic_search"
-        app:tint="@color/text_primary" />
+        app:tint="?attr/sonusTextPrimaryColor" />
 
     <EditText
         android:id="@+id/etSearch"
@@ -28,8 +28,8 @@
         android:hint="@string/search_hint"
         android:imeOptions="actionSearch"
         android:inputType="text"
-        android:textColor="@color/text_dark"
-        android:textColorHint="@color/text_primary"
+        android:textColor="?attr/sonusTextDarkColor"
+        android:textColorHint="?attr/sonusTextPrimaryColor"
         android:textSize="15sp" />
 
 </LinearLayout>

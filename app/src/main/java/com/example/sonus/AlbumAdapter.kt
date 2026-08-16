@@ -36,7 +36,11 @@ class AlbumAdapter(
         holder.title.text = album.title
         holder.artist.text = album.artist
 
-        val coverUrl = RetrofitClient.BASE_URL + "api/albums/${album.id}/cover"
+        val coverUrl = if (album.coverPath?.startsWith("http") == true) {
+            album.coverPath
+        } else {
+            RetrofitClient.BASE_URL + "api/albums/${album.id}/cover"
+        }
         val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(holder.itemView.context, coverUrl)
 
         val radius = (12 * holder.itemView.context.resources.displayMetrics.density).toInt()

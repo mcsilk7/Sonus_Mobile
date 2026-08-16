@@ -55,8 +55,12 @@ class SongAdapter(
             holder.btnFavorite.setColorFilter(ContextCompat.getColor(context, android.R.color.white))
         }
 
-        // Load cover image using the new dedicated endpoint with authentication
-        val coverUrl = RetrofitClient.BASE_URL + "api/songs/${song.id}/cover"
+        // Load cover image: use coverPath if it's a full URL, otherwise use dedicated endpoint
+        val coverUrl = if (song.coverPath?.startsWith("http") == true) {
+            song.coverPath
+        } else {
+            RetrofitClient.BASE_URL + "api/songs/${song.id}/cover"
+        }
         val authenticatedUrl = GlideHelper.getAuthenticatedUrl(holder.itemView.context, coverUrl)
 
         val radius = (12 * context.resources.displayMetrics.density).toInt()

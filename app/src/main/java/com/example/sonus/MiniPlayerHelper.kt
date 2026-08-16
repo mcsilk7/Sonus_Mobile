@@ -12,6 +12,12 @@ import com.example.sonus.network.SongDTO
 object MiniPlayerHelper {
     fun setupMiniPlayer(activity: AppCompatActivity) {
         val miniPlayer = activity.findViewById<View>(R.id.miniPlayer) ?: return
+
+        // Clean up old listener if it exists to prevent leaks
+        (miniPlayer.getTag(R.id.mini_player_listener) as? PlayerState.PlayerStateListener)?.let {
+            PlayerState.removeStateListener(it)
+        }
+
         val title = activity.findViewById<TextView>(R.id.miniPlayerTitle)
         val artist = activity.findViewById<TextView>(R.id.miniPlayerArtist)
         val cover = activity.findViewById<ImageView>(R.id.miniPlayerCover)
@@ -20,18 +26,26 @@ object MiniPlayerHelper {
         val btnNext = activity.findViewById<ImageView>(R.id.miniPlayerNext)
         val progress = activity.findViewById<android.widget.ProgressBar>(R.id.miniPlayerProgress)
 
-        PlayerState.setOnStateChangedListener {
-            activity.runOnUiThread {
-                updateUI(activity, miniPlayer, title, artist, cover, btnPlay, btnPrev, btnNext, progress)
+        val listener = object : PlayerState.PlayerStateListener {
+            override fun onStateChanged() {
+                activity.runOnUiThread {
+                    updateUI(activity, miniPlayer, title, artist, cover, btnPlay, btnPrev, btnNext, progress)
+                }
             }
         }
+        
+        PlayerState.addStateListener(listener)
+        miniPlayer.setTag(R.id.mini_player_listener, listener)
 
         updateUI(activity, miniPlayer, title, artist, cover, btnPlay, btnPrev, btnNext, progress)
         
         // Start a recurring task to update progress
         val handler = android.os.Handler(android.os.Looper.getMainLooper())
-        handler.post(object : Runnable {
+        val progressRunnable = object : Runnable {
             override fun run() {
+                // Only run if the activity is not finishing/destroyed
+                if (activity.isFinishing || activity.isDestroyed) return
+                
                 if (PlayerState.isPlaying) {
                     val current = PlayerState.getCurrentPosition()
                     val total = PlayerState.getDuration()
@@ -42,7 +56,15 @@ object MiniPlayerHelper {
                 }
                 handler.postDelayed(this, 1000)
             }
-        })
+        }
+        handler.post(progressRunnable)
+    }
+
+    fun onDestroy(activity: AppCompatActivity) {
+        val miniPlayer = activity.findViewById<View>(R.id.miniPlayer) ?: return
+        (miniPlayer.getTag(R.id.mini_player_listener) as? PlayerState.PlayerStateListener)?.let {
+            PlayerState.removeStateListener(it)
+        }
     }
 
     private fun updateUI(
@@ -92,7 +114,11 @@ object MiniPlayerHelper {
                 progress?.progress = current
             }
 
-            val coverUrl = RetrofitClient.BASE_URL + "api/songs/${song.id}/cover"
+            val coverUrl = if (song.coverPath?.startsWith("http") == true) {
+                song.coverPath
+            } else {
+                RetrofitClient.BASE_URL + "api/songs/${song.id}/cover"
+            }
             val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(activity, coverUrl)
 
             val radius = (8 * activity.resources.displayMetrics.density).toInt()

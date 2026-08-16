@@ -57,7 +57,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="Midnight Echo"
-                android:textColor="@color/app_background"
+                android:textColor="?attr/sonusTextDarkColor"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -69,7 +69,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="Aurora"
-                android:textColor="@color/card_background"
+                android:textColor="?attr/sonusTextPrimaryColor"
                 android:textSize="13sp" />
         </LinearLayout>
 
@@ -82,7 +82,7 @@
             android:contentDescription="Poprzedni"
             android:padding="10dp"
             android:src="@drawable/ic_skip_previous"
-            app:tint="#FFFFFF"/>
+            app:tint="?attr/sonusTextDarkColor"/>
 
         <!-- Play/Pause -->
         <ImageView
@@ -93,7 +93,7 @@
             android:background="@drawable/bg_mini_btn"
             android:padding="10dp"
             android:src="@drawable/ic_play"
-            app:tint="@color/text_primary" />
+            app:tint="?attr/sonusAccentColor" />
 
         <!-- Następny -->
         <ImageView
@@ -103,7 +103,7 @@
             android:contentDescription="Następny"
             android:padding="10dp"
             android:src="@drawable/ic_skip_next"
-            app:tint="#FFFFFF"/>
+            app:tint="?attr/sonusTextDarkColor"/>
     </LinearLayout>
 
 </LinearLayout>

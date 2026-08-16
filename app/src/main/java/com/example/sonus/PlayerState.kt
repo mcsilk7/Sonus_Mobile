@@ -18,17 +18,35 @@ object PlayerState {
 
     var isPlaying: Boolean = false
     var isRepeatEnabled: Boolean = false
+    var isShuffleEnabled: Boolean = false
     private var isPreparing: Boolean = false
 
     private var mediaPlayer: MediaPlayer? = null
-    private val stateListeners = mutableListOf<() -> Unit>()
+    private val stateListeners = mutableSetOf<PlayerStateListener>()
 
-    fun setOnStateChangedListener(listener: () -> Unit) {
+    interface PlayerStateListener {
+        fun onStateChanged()
+    }
+
+    fun addStateListener(listener: PlayerStateListener) {
         stateListeners.add(listener)
     }
 
+    fun removeStateListener(listener: PlayerStateListener) {
+        stateListeners.remove(listener)
+    }
+
+    fun setOnStateChangedListener(listener: () -> Unit) {
+        // Legacy support
+        addStateListener(object : PlayerStateListener {
+            override fun onStateChanged() {
+                listener.invoke()
+            }
+        })
+    }
+
     private fun notifyStateChanged() {
-        stateListeners.forEach { it.invoke() }
+        stateListeners.forEach { it.onStateChanged() }
     }
 
     fun play(context: Context, song: SongDTO, playlist: List<SongDTO> = emptyList()) {
@@ -126,13 +144,33 @@ object PlayerState {
 
     fun playNext(context: Context) {
         if (currentPlaylist.isEmpty()) return
-        currentIndex = (currentIndex + 1) % currentPlaylist.size
+        
+        if (isShuffleEnabled && currentPlaylist.size > 1) {
+            var nextIndex = currentIndex
+            while (nextIndex == currentIndex) {
+                nextIndex = (0 until currentPlaylist.size).random()
+            }
+            currentIndex = nextIndex
+        } else {
+            currentIndex = (currentIndex + 1) % currentPlaylist.size
+        }
+        
         play(context, currentPlaylist[currentIndex])
     }
 
     fun playPrevious(context: Context) {
         if (currentPlaylist.isEmpty()) return
-        currentIndex = if (currentIndex > 0) currentIndex - 1 else currentPlaylist.size - 1
+        
+        if (isShuffleEnabled && currentPlaylist.size > 1) {
+            var prevIndex = currentIndex
+            while (prevIndex == currentIndex) {
+                prevIndex = (0 until currentPlaylist.size).random()
+            }
+            currentIndex = prevIndex
+        } else {
+            currentIndex = if (currentIndex > 0) currentIndex - 1 else currentPlaylist.size - 1
+        }
+        
         play(context, currentPlaylist[currentIndex])
     }
 
@@ -175,6 +213,12 @@ object PlayerState {
         isRepeatEnabled = !isRepeatEnabled
         mediaPlayer?.isLooping = isRepeatEnabled
         Log.d("PlayerState", "toggleRepeat() - isRepeatEnabled: $isRepeatEnabled")
+        notifyStateChanged()
+    }
+
+    fun toggleShuffle() {
+        isShuffleEnabled = !isShuffleEnabled
+        Log.d("PlayerState", "toggleShuffle() - isShuffleEnabled: $isShuffleEnabled")
         notifyStateChanged()
     }
 

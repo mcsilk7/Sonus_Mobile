@@ -34,7 +34,7 @@
             android:fontFamily="sans-serif-medium"
             android:maxLines="1"
             android:text="Nazwa utworu"
-            android:textColor="@color/text_dark"
+            android:textColor="?attr/sonusTextDarkColor"
             android:textSize="16sp" />
 
         <TextView
@@ -45,7 +45,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text="Artysta"
-            android:textColor="@color/text_primary"
+            android:textColor="?attr/sonusTextPrimaryColor"
             android:textSize="14sp" />
     </LinearLayout>
 
@@ -55,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="0:00"
-        android:textColor="@color/text_primary"
+        android:textColor="?attr/sonusTextPrimaryColor"
         android:textSize="14sp" />
 
     <!-- Dodaj do playlisty -->
@@ -66,7 +66,7 @@
         android:layout_marginStart="8dp"
         android:gravity="center"
         android:text="+"
-        android:textColor="@color/text_primary"
+        android:textColor="?attr/sonusTextPrimaryColor"
         android:textSize="24sp"
         android:textStyle="bold"
         android:clickable="true"
@@ -80,7 +80,7 @@
         android:layout_height="40dp"
         android:padding="10dp"
         android:src="@drawable/ic_favorite"
-        app:tint="@color/text_primary"
+        app:tint="?attr/sonusTextPrimaryColor"
         android:clickable="true"
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless" />

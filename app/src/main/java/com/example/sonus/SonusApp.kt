@@ -19,11 +19,12 @@ class SonusApp : Application() {
         RetrofitClient.init(this)
         
         val sessionManager = SessionManager(this)
-        val themeMode = sessionManager.getTheme()
-        if (themeMode != -1) {
-            AppCompatDelegate.setDefaultNightMode(themeMode)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        val theme = sessionManager.getTheme()
+        when (theme) {
+            0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) // Violet uses dark mode base
+            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
         
         createNotificationChannel()

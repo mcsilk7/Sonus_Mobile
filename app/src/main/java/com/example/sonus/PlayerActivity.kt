@@ -17,6 +17,18 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var tvCurrentTime: TextView
     private lateinit var tvTotalTime: TextView
     private val handler = Handler(Looper.getMainLooper())
+
+    private val playerListener = object : PlayerState.PlayerStateListener {
+        override fun onStateChanged() {
+            runOnUiThread {
+                updatePlayPauseIcon(findViewById(R.id.btnPlayPause))
+                updateRepeatIcon(findViewById(R.id.btnRepeat))
+                updateShuffleIcon(findViewById(R.id.btnShuffle))
+                updateSongInfo()
+            }
+        }
+    }
+
     private val updateProgressAction = object : Runnable {
         override fun run() {
             if (PlayerState.isPlaying) {
@@ -34,6 +46,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeHelper.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
 
@@ -41,17 +54,13 @@ class PlayerActivity : AppCompatActivity() {
         val btnPrevious = findViewById<ImageView>(R.id.btnPrevious)
         val btnNext = findViewById<ImageView>(R.id.btnNext)
         val btnRepeat = findViewById<TextView>(R.id.btnRepeat)
+        val btnShuffle = findViewById<TextView>(R.id.btnShuffle)
+        val btnQueue = findViewById<TextView>(R.id.btnQueue)
         seekBar = findViewById(R.id.seekBarPlayer)
         tvCurrentTime = findViewById(R.id.tvCurrentTime)
         tvTotalTime = findViewById(R.id.tvTotalTime)
 
-        PlayerState.setOnStateChangedListener {
-            runOnUiThread {
-                updatePlayPauseIcon(btnPlayPause)
-                updateRepeatIcon(btnRepeat)
-                updateSongInfo()
-            }
-        }
+        PlayerState.addStateListener(playerListener)
 
         btnPlayPause.setOnClickListener {
             PlayerState.togglePlayPause(this)
@@ -69,6 +78,15 @@ class PlayerActivity : AppCompatActivity() {
             PlayerState.toggleRepeat()
         }
 
+        btnShuffle.setOnClickListener {
+            PlayerState.toggleShuffle()
+        }
+
+        btnQueue.setOnClickListener {
+            val bottomSheet = QueueBottomSheet()
+            bottomSheet.show(supportFragmentManager, "QueueBottomSheet")
+        }
+
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) tvCurrentTime.text = formatTime(progress)
@@ -81,6 +99,7 @@ class PlayerActivity : AppCompatActivity() {
 
         updatePlayPauseIcon(btnPlayPause)
         updateRepeatIcon(btnRepeat)
+        updateShuffleIcon(btnShuffle)
         updateSongInfo()
 
         // Powrót
@@ -101,7 +120,11 @@ class PlayerActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvPlayerArtist).text = artist
 
         val imgCover = findViewById<ImageView>(R.id.imgPlayerCover)
-        val coverUrl = RetrofitClient.BASE_URL + "api/songs/$songId/cover"
+        val coverUrl = if (song?.coverPath?.startsWith("http") == true) {
+            song.coverPath
+        } else {
+            RetrofitClient.BASE_URL + "api/songs/$songId/cover"
+        }
         val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(this, coverUrl)
 
         val radius = (24 * resources.displayMetrics.density).toInt()
@@ -116,6 +139,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        PlayerState.removeStateListener(playerListener)
         handler.removeCallbacks(updateProgressAction)
     }
 
@@ -141,6 +165,17 @@ class PlayerActivity : AppCompatActivity() {
         if (PlayerState.isRepeatEnabled) {
             indicator.visibility = View.VISIBLE
             btn.setTextColor(ContextCompat.getColor(this, R.color.text_dark)) // Keep it dark
+        } else {
+            indicator.visibility = View.INVISIBLE
+            btn.setTextColor(ContextCompat.getColor(this, R.color.text_dark))
+        }
+    }
+
+    private fun updateShuffleIcon(btn: TextView) {
+        val indicator = findViewById<View>(R.id.shuffleIndicator)
+        if (PlayerState.isShuffleEnabled) {
+            indicator.visibility = View.VISIBLE
+            btn.setTextColor(ContextCompat.getColor(this, R.color.text_dark))
         } else {
             indicator.visibility = View.INVISIBLE
             btn.setTextColor(ContextCompat.getColor(this, R.color.text_dark))

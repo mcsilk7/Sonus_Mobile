@@ -23,6 +23,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
     private lateinit var tvDescription: TextView
     private lateinit var rvSongs: RecyclerView
     private lateinit var btnBack: ImageButton
+    private lateinit var btnDelete: ImageButton
     private lateinit var imgCover: ImageView
     
     private lateinit var songAdapter: SongAdapter
@@ -32,6 +33,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
     private var playlistId: Long = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeHelper.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playlist_detail)
 
@@ -53,9 +55,11 @@ class PlaylistDetailActivity : AppCompatActivity() {
         tvDescription = findViewById(R.id.tvPlaylistDescription)
         rvSongs = findViewById(R.id.rvPlaylistSongs)
         btnBack = findViewById(R.id.btnBack)
+        btnDelete = findViewById(R.id.btnDeletePlaylist)
         imgCover = findViewById(R.id.imgPlaylistCoverLarge)
 
         btnBack.setOnClickListener { finish() }
+        btnDelete.setOnClickListener { confirmDeletePlaylist() }
 
         initMiniPlayer()
 
@@ -67,6 +71,11 @@ class PlaylistDetailActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         initMiniPlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        MiniPlayerHelper.onDestroy(this)
     }
 
     private fun initMiniPlayer() {
@@ -157,12 +166,14 @@ class PlaylistDetailActivity : AppCompatActivity() {
         val count = if (songs.isNotEmpty()) songs.size else (playlist.songCount ?: 0)
         tvDescription.text = playlist.description ?: formatSongCount(count)
 
-        // Load playlist cover using the new endpoint of the first song
+        // Load playlist cover: use first song's coverPath if it's a full URL, otherwise use dedicated endpoint
         val firstSong = songs.firstOrNull()
-        val authenticatedUrl = firstSong?.let {
-            val coverUrl = RetrofitClient.BASE_URL + "api/songs/${it.id}/cover"
-            com.example.sonus.network.GlideHelper.getAuthenticatedUrl(this, coverUrl)
+        val coverUrl = if (firstSong?.coverPath?.startsWith("http") == true) {
+            firstSong.coverPath
+        } else {
+            firstSong?.let { RetrofitClient.BASE_URL + "api/songs/${it.id}/cover" }
         }
+        val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(this, coverUrl)
 
         val radius = (20 * resources.displayMetrics.density).toInt()
 
@@ -200,6 +211,32 @@ class PlaylistDetailActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 Log.e("PlaylistDetail", "Favorite error", e)
+            }
+        }
+    }
+
+    private fun confirmDeletePlaylist() {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Usuń playlistę")
+            .setMessage("Czy na pewno chcesz usunąć tę playlistę?")
+            .setPositiveButton("Usuń") { _, _ -> deletePlaylist() }
+            .setNegativeButton("Anuluj", null)
+            .show()
+    }
+
+    private fun deletePlaylist() {
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitClient.playlistApi.deletePlaylist(playlistId)
+                if (response.isSuccessful) {
+                    Toast.makeText(this@PlaylistDetailActivity, "Playlista usunięta", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    Toast.makeText(this@PlaylistDetailActivity, "Błąd usuwania playlisty", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("PlaylistDetail", "Delete error", e)
+                Toast.makeText(this@PlaylistDetailActivity, "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -36,6 +36,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var recentlyPlayedManager: RecentlyPlayedManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeHelper.applyTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
@@ -52,6 +53,11 @@ class SearchActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         initMiniPlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        MiniPlayerHelper.onDestroy(this)
     }
 
     private fun initMiniPlayer() {

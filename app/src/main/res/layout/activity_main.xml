@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/app_background">
+    android:background="?attr/sonusBackgroundColor">
 
     <!-- ====== TREŚĆ ====== -->
     <ScrollView
@@ -36,7 +36,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/hello_text"
-                        android:textColor="@color/text_primary"
+                        android:textColor="?attr/sonusTextPrimaryColor"
                         android:textSize="16sp" />
 
                     <TextView
@@ -45,7 +45,7 @@
                         android:layout_marginTop="2dp"
                         android:fontFamily="sans-serif-black"
                         android:text="@string/app_name"
-                        android:textColor="@color/text_dark"
+                        android:textColor="?attr/sonusTextDarkColor"
                         android:textSize="28sp" />
                 </LinearLayout>
 
@@ -62,7 +62,7 @@
                 android:layout_marginTop="24dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="Szybki dostęp"
-                android:textColor="@color/text_dark"
+                android:textColor="?attr/sonusTextDarkColor"
                 android:textSize="20sp" />
 
             <LinearLayout
@@ -101,7 +101,7 @@
                 android:layout_marginTop="28dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="Ostatnio odtwarzane"
-                android:textColor="@color/text_dark"
+                android:textColor="?attr/sonusTextDarkColor"
                 android:textSize="20sp" />
 
             <androidx.recyclerview.widget.RecyclerView

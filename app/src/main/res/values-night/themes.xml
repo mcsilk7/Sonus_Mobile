@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.Sonus" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:statusBarColor">@color/app_background</item>
+        <item name="sonusBackgroundColor">@color/app_background</item>
+        <item name="sonusCardColor">@color/card_background</item>
+        <item name="sonusAccentColor">@color/accent</item>
+        <item name="sonusTextPrimaryColor">@color/text_primary</item>
+        <item name="sonusTextDarkColor">@color/text_dark</item>
+
+        <item name="android:statusBarColor">?attr/sonusBackgroundColor</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:navigationBarColor">@color/app_background</item>
+        <item name="android:navigationBarColor">?attr/sonusBackgroundColor</item>
     </style>
 </resources>

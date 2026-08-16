@@ -1,8 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Base application theme. -->
     <style name="Theme.Sonus" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:statusBarColor">@color/app_background</item>
+        <item name="sonusBackgroundColor">@color/app_background</item>
+        <item name="sonusCardColor">@color/card_background</item>
+        <item name="sonusAccentColor">@color/accent</item>
+        <item name="sonusTextPrimaryColor">@color/text_primary</item>
+        <item name="sonusTextDarkColor">@color/text_dark</item>
+
+        <item name="android:statusBarColor">?attr/sonusBackgroundColor</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">@color/app_background</item>
+        <item name="android:navigationBarColor">?attr/sonusBackgroundColor</item>
+    </style>
+
+    <!-- Additional Theme: Violet -->
+    <style name="Theme.Sonus.Violet" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="sonusBackgroundColor">#120B1A</item>
+        <item name="sonusCardColor">#1F1429</item>
+        <item name="sonusAccentColor">#BB86FC</item>
+        <item name="sonusTextPrimaryColor">#A0A0A0</item>
+        <item name="sonusTextDarkColor">#FFFFFF</item>
+
+        <item name="android:statusBarColor">#120B1A</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">#120B1A</item>
     </style>
 </resources>
