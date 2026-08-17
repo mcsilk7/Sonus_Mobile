@@ -5,25 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
-    android:layout_marginBottom="80dp"
-    android:layout_marginStart="5dp"
-    android:layout_marginEnd="5dp"
+    android:layout_marginBottom="88dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
     android:background="@drawable/bg_mini_player"
-    android:elevation="10dp"
+    android:elevation="8dp"
     android:orientation="vertical">
 
-    <!-- Pasek postępu -->
-    <ProgressBar
-        android:id="@+id/miniPlayerProgress"
-        style="@android:style/Widget.ProgressBar.Horizontal"
+    <!-- Rack unit top line / separator -->
+    <View
         android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:layout_marginStart="16dp"
+        android:layout_height="1dp"
+        android:background="?attr/sonusLineColor"
         android:layout_marginTop="12dp"
-        android:layout_marginEnd="16dp"
-        android:max="100"
-        android:progress="35"
-        android:progressDrawable="@drawable/bg_mini_player_progress" />
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
 
     <!-- Zawartość -->
     <LinearLayout
@@ -33,20 +29,26 @@
         android:orientation="horizontal"
         android:padding="12dp">
 
-        <!-- Okładka -->
-        <ImageView
-            android:id="@+id/miniPlayerCover"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
-            android:background="@drawable/bg_light_cover_placeholder"
-            android:contentDescription="Okładka"
-            android:scaleType="centerCrop"/>
+        <!-- Okładka with border -->
+        <FrameLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/sonusLineColor"
+            android:padding="1dp">
+            <ImageView
+                android:id="@+id/miniPlayerCover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/sonusCardColor"
+                android:contentDescription="Okładka"
+                android:scaleType="centerCrop"/>
+        </FrameLayout>
 
         <!-- Tytuł + Artysta -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="14dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -56,54 +58,66 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Midnight Echo"
-                android:textColor="?attr/sonusTextDarkColor"
-                android:textSize="15sp"
+                android:text="Track Title"
+                android:textColor="?attr/sonusAccentColor"
+                android:textSize="14sp"
+                android:fontFamily="monospace"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/miniPlayerArtist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="1dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Aurora"
-                android:textColor="?attr/sonusTextPrimaryColor"
-                android:textSize="13sp" />
+                android:text="Artist"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium" />
         </LinearLayout>
 
-        <!-- Poprzedni -->
+        <!-- Controls -->
         <ImageView
             android:id="@+id/miniPlayerPrev"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginEnd="8dp"
-            android:contentDescription="Poprzedni"
-            android:padding="10dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="4dp"
+            android:padding="8dp"
             android:src="@drawable/ic_skip_previous"
-            app:tint="?attr/sonusTextDarkColor"/>
+            app:tint="?attr/sonusTextPrimaryColor"/>
 
-        <!-- Play/Pause -->
         <ImageView
             android:id="@+id/miniPlayerPlay"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="4dp"
             android:background="@drawable/bg_mini_btn"
             android:padding="10dp"
             android:src="@drawable/ic_play"
             app:tint="?attr/sonusAccentColor" />
 
-        <!-- Następny -->
         <ImageView
             android:id="@+id/miniPlayerNext"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:contentDescription="Następny"
-            android:padding="10dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="8dp"
             android:src="@drawable/ic_skip_next"
-            app:tint="?attr/sonusTextDarkColor"/>
+            app:tint="?attr/sonusTextPrimaryColor"/>
     </LinearLayout>
+
+    <!-- Retro Display Progress -->
+    <ProgressBar
+        android:id="@+id/miniPlayerProgress"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        android:max="100"
+        android:progress="35"
+        android:progressTint="?attr/sonusAccentColor"
+        android:progressBackgroundTint="?attr/sonusLineSoftColor" />
 
 </LinearLayout>

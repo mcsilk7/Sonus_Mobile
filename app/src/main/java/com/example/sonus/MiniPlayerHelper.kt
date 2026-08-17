@@ -1,6 +1,6 @@
 package com.example.sonus
 
-import android.content.Intent
+import androidx.navigation.findNavController
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,9 +9,12 @@ import androidx.core.content.ContextCompat
 import com.example.sonus.network.RetrofitClient
 import com.example.sonus.network.SongDTO
 
+import androidx.lifecycle.ViewModelProvider
+
 object MiniPlayerHelper {
     fun setupMiniPlayer(activity: AppCompatActivity) {
         val miniPlayer = activity.findViewById<View>(R.id.miniPlayer) ?: return
+        val viewModel = ViewModelProvider(activity).get(MainViewModel::class.java)
 
         // Clean up old listener if it exists to prevent leaks
         (miniPlayer.getTag(R.id.mini_player_listener) as? PlayerState.PlayerStateListener)?.let {
@@ -29,7 +32,7 @@ object MiniPlayerHelper {
         val listener = object : PlayerState.PlayerStateListener {
             override fun onStateChanged() {
                 activity.runOnUiThread {
-                    updateUI(activity, miniPlayer, title, artist, cover, btnPlay, btnPrev, btnNext, progress)
+                    updateUI(activity, miniPlayer, title, artist, cover, btnPlay, btnPrev, btnNext, progress, viewModel)
                 }
             }
         }
@@ -37,7 +40,7 @@ object MiniPlayerHelper {
         PlayerState.addStateListener(listener)
         miniPlayer.setTag(R.id.mini_player_listener, listener)
 
-        updateUI(activity, miniPlayer, title, artist, cover, btnPlay, btnPrev, btnNext, progress)
+        updateUI(activity, miniPlayer, title, artist, cover, btnPlay, btnPrev, btnNext, progress, viewModel)
         
         // Start a recurring task to update progress
         val handler = android.os.Handler(android.os.Looper.getMainLooper())
@@ -76,13 +79,18 @@ object MiniPlayerHelper {
         btnPlay: ImageView?,
         btnPrev: ImageView?,
         btnNext: ImageView?,
-        progress: android.widget.ProgressBar?
+        progress: android.widget.ProgressBar?,
+        viewModel: MainViewModel
     ) {
         val song = PlayerState.currentSong
         if (song == null) {
             miniPlayer.visibility = View.GONE
         } else {
-            miniPlayer.visibility = View.VISIBLE
+            // Fix: Check MainViewModel before making mini player visible.
+            // This prevents it from appearing on screens where it should be hidden (e.g. PlayerFragment).
+            val shouldBeVisible = viewModel.isMiniPlayerVisible.value ?: true
+            miniPlayer.visibility = if (shouldBeVisible) View.VISIBLE else View.GONE
+            
             title?.text = song.title
             artist?.text = song.artist
             
@@ -133,12 +141,7 @@ object MiniPlayerHelper {
             }
 
             miniPlayer.setOnClickListener {
-                val intent = Intent(activity, PlayerActivity::class.java)
-                intent.putExtra("SONG_ID", song.id)
-                intent.putExtra("SONG_TITLE", song.title)
-                intent.putExtra("SONG_ARTIST", song.artist)
-                intent.putExtra("SONG_COVER", song.coverPath)
-                activity.startActivity(intent)
+                activity.findNavController(R.id.nav_host_fragment).navigate(R.id.playerFragment)
             }
         }
     }

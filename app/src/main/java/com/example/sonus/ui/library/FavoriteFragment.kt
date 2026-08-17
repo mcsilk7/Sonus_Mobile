@@ -1,0 +1,83 @@
+package com.example.sonus.ui.library
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.sonus.*
+import com.example.sonus.network.SessionManager
+
+class FavoriteFragment : Fragment() {
+
+    private val viewModel: LibraryViewModel by viewModels()
+    private lateinit var sessionManager: SessionManager
+    private lateinit var songAdapter: SongAdapter
+    private lateinit var rvSongs: RecyclerView
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_favorite, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        sessionManager = SessionManager(requireContext())
+        UserAvatarHelper.setupAvatar(view, sessionManager, findNavController())
+        
+        view.findViewById<View>(R.id.btnBackFavorite).setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        rvSongs = view.findViewById(R.id.rvFavoriteSongsFull)
+        setupRecyclerView()
+        observeViewModel()
+        
+        viewModel.fetchLibraryData(sessionManager.getUserId())
+    }
+
+    private fun setupRecyclerView() {
+        songAdapter = SongAdapter(
+            songs = emptyList(),
+            onItemClick = { song ->
+                PlayerState.play(requireContext(), song, songAdapter.getSongs())
+                Toast.makeText(requireContext(), "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
+            },
+            onAddClick = { song ->
+                PlaylistHelper.showPlaylistSelectionDialog(requireActivity() as androidx.appcompat.app.AppCompatActivity, viewLifecycleOwner.lifecycleScope, sessionManager.getUserId(), song) {
+                    viewModel.fetchLibraryData(sessionManager.getUserId())
+                }
+            },
+            onFavoriteClick = { song ->
+                viewModel.toggleFavorite(sessionManager.getUserId(), song)
+            }
+        )
+        rvSongs.layoutManager = LinearLayoutManager(requireContext())
+        rvSongs.adapter = songAdapter
+
+        SongTouchHelper.attach(
+            rvSongs,
+            songAdapter,
+            sessionManager.getUserId(),
+            viewLifecycleOwner.lifecycleScope
+        ) {
+            viewModel.fetchLibraryData(sessionManager.getUserId())
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.favoriteSongs.observe(viewLifecycleOwner) { songs ->
+            songAdapter.updateData(songs)
+        }
+    }
+}

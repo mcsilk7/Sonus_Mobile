@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="app_background">#DBD3C8</color>
-    <color name="card_background">#AEB1B5</color>
-    <color name="accent">#4B5862</color>
-    <color name="text_primary">#252F38</color>
-    <color name="text_dark">#030C13</color>
+    <!-- Retro Studio Palette -->
+    <color name="studio_bg">#14120F</color>
+    <color name="studio_bg_panel">#1C1A16</color>
+    <color name="studio_bg_card">#221F1A</color>
+    <color name="studio_line">#34302A</color>
+    <color name="studio_line_soft">#2A2722</color>
+    <color name="studio_amber">#E8A13A</color>
+    <color name="studio_amber_dim">#8A6428</color>
+    <color name="studio_text">#F0EBE0</color>
+    <color name="studio_text_dim">#A89E8C</color>
+    <color name="studio_text_faint">#6F6656</color>
+    <color name="studio_red">#C0544A</color>
+    <color name="studio_green">#6A9955</color>
+
+    <!-- Legacy Mappings (to fix layout/code references) -->
+    <color name="app_background">@color/studio_bg</color>
+    <color name="card_background">@color/studio_bg_card</color>
+    <color name="accent">@color/studio_amber</color>
+    <color name="text_primary">@color/studio_text_dim</color>
+    <color name="text_dark">@color/studio_text</color>
 </resources>

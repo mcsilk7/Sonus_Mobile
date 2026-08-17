@@ -1,36 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardPlaylists"
     android:layout_width="match_parent"
     android:layout_height="140dp"
-    android:background="@drawable/bg_home_card"
+    android:background="@drawable/bg_settings_item"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:clickable="true"
+    android:focusable="true">
 
-    <TextView
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:background="@drawable/bg_icon_circle"
-        android:gravity="center"
-        android:text="♫"
-        android:textColor="@color/app_background"
-        android:textSize="18sp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <TextView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_icon_circle"
+            android:backgroundTint="?attr/sonusAccentColor"
+            android:gravity="center"
+            android:text="♫"
+            android:textColor="?attr/sonusBackgroundColor"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:background="?attr/sonusLineSoftColor" />
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="Playlisty"
-        android:textColor="@color/text_dark"
-        android:textSize="18sp" />
+        android:layout_marginTop="16dp"
+        android:fontFamily="monospace"
+        android:text="PL_DATA"
+        android:textColor="?attr/sonusAccentColor"
+        android:textSize="14sp"
+        android:textStyle="bold" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Twoje kolekcje muzyki"
-        android:textColor="@color/text_primary"
-        android:textSize="13sp" />
+        android:fontFamily="monospace"
+        android:text="UNIT_02"
+        android:textColor="?attr/sonusTextDarkColor"
+        android:textSize="10sp"
+        android:letterSpacing="0.1" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:text="[ ACCESS ]"
+        android:textColor="?attr/sonusAccentDimColor"
+        android:textSize="11sp" />
 
 </LinearLayout>

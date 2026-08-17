@@ -33,12 +33,6 @@ class SessionManager(context: Context) {
 
     fun isLoggedIn(): Boolean = getToken() != null
 
-    fun saveTheme(mode: Int) {
-        prefs.edit().putInt("app_theme", mode).apply()
-    }
-
-    fun getTheme(): Int = prefs.getInt("app_theme", -1) 
-
     fun clearSession() {
         prefs.edit().clear().apply()
     }

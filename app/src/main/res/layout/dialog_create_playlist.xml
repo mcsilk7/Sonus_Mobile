@@ -9,22 +9,33 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nowa playlista"
-        android:textColor="@color/text_dark"
-        android:textSize="22sp"
-        android:fontFamily="sans-serif-black"
+        android:text="INIT_NEW_UNIT"
+        android:textColor="?attr/sonusAccentColor"
+        android:textSize="20sp"
+        android:fontFamily="monospace"
+        android:textStyle="bold"
         android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ASSIGN_LABEL_IDENTIFIER"
+        android:textColor="?attr/sonusTextDarkColor"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:layout_marginBottom="8dp"/>
 
     <EditText
         android:id="@+id/etPlaylistName"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@drawable/bg_auth_input"
-        android:hint="Nazwa playlisty"
-        android:textColor="@color/text_dark"
-        android:textColorHint="@color/text_primary"
+        android:hint="ENTER_NAME..."
+        android:textColor="?attr/sonusTextPrimaryColor"
+        android:textColorHint="?attr/sonusTextFaintColor"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
+        android:fontFamily="monospace"
         android:inputType="textCapSentences"
         android:layout_marginBottom="24dp"/>
 
@@ -34,30 +45,32 @@
         android:orientation="horizontal"
         android:gravity="end">
 
-        <TextView
-            android:id="@+id/btnCancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Anuluj"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
-            android:padding="12dp"
-            android:layout_marginEnd="8dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground"/>
+            <TextView
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="[ ABORT ]"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:textSize="14sp"
+                android:fontFamily="monospace"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"/>
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnConfirm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Stwórz"
-            android:textColor="@android:color/white"
-            android:background="@drawable/bg_auth_button"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:textAllCaps="false"
-            android:textStyle="bold"/>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnConfirm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="INITIALIZE"
+                android:textColor="?attr/sonusBackgroundColor"
+                android:background="@drawable/bg_auth_button"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:fontFamily="monospace"
+                android:textAllCaps="false"
+                android:textStyle="bold"/>
     </LinearLayout>
 
 </LinearLayout>

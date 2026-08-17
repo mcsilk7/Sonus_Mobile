@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/sonusBackgroundColor">
+
+    <!-- Top Rack Header -->
+    <LinearLayout
+        android:id="@+id/topRackFavorite"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="?attr/sonusPanelColor"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:elevation="4dp">
+
+        <TextView
+            android:id="@+id/btnBackFavorite"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="ESC"
+            android:textColor="?attr/sonusAccentColor"
+            android:fontFamily="monospace"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SIGNAL_ARCHIVE"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.2" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FAVORITE_STORAGE"
+                android:textColor="?attr/sonusAccentColor"
+                android:textSize="18sp"
+                android:fontFamily="monospace"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <include layout="@layout/user_avatar" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFavoriteSongsFull"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="80dp"
+        android:padding="16dp"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp" />
+
+</FrameLayout>

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/sonusBackgroundColor">
+
+    <!-- Top Rack Header -->
+    <LinearLayout
+        android:id="@+id/topRackLibrary"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="?attr/sonusPanelColor"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:elevation="4dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ARCHIVE UNIT"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.2" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LIBRARY_MANAGEMENT"
+                android:textColor="?attr/sonusAccentColor"
+                android:textSize="18sp"
+                android:fontFamily="monospace"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <include layout="@layout/user_avatar" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="80dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="140dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Top Access Modules -->
+            <LinearLayout
+                android:id="@+id/btnGoToFavorites"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_settings_item"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_icon_circle"
+                    android:backgroundTint="?attr/sonusAccentColor"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_favorite"
+                    app:tint="?attr/sonusBackgroundColor" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:text="FAVORITE_SIGNALS"
+                        android:textColor="?attr/sonusAccentColor"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:text="OPEN_ARCHIVE_STORAGE"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:text="::OPEN"
+                    android:textColor="?attr/sonusAccentDimColor"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Tabs Deck -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:scrollbars="none">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tabAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_library_tab_active"
+                        android:padding="12dp"
+                        android:text="[ ALL ]"
+                        android:textColor="?attr/sonusBackgroundColor"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tabPlaylists"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_library_tab"
+                        android:padding="12dp"
+                        android:text="[ PLAYLISTS ]"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/tabAlbums"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_library_tab"
+                        android:padding="12dp"
+                        android:text="[ ALBUMS ]"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- Sections with rack separators -->
+            <LinearLayout
+                android:id="@+id/sectionPlaylists"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":: STORAGE_PLAYLISTS"
+                    android:textColor="?attr/sonusTextDarkColor"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvPlaylists"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:nestedScrollingEnabled="false" />
+                <include layout="@layout/item_add_playlist" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?attr/sonusLineSoftColor"
+                android:layout_marginTop="24dp" />
+
+            <LinearLayout
+                android:id="@+id/sectionAlbums"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":: STORAGE_ALBUMS"
+                    android:textColor="?attr/sonusTextDarkColor"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvAlbums"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:nestedScrollingEnabled="false" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

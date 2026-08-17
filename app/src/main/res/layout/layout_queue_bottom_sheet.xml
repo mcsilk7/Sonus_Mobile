@@ -2,30 +2,55 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/app_background"
+    android:background="?attr/sonusBackgroundColor"
     android:orientation="vertical"
     android:padding="20dp">
 
     <View
         android:layout_width="40dp"
-        android:layout_height="4dp"
+        android:layout_height="2dp"
         android:layout_gravity="center"
-        android:layout_marginBottom="16dp"
-        android:background="@color/card_background" />
+        android:layout_marginBottom="20dp"
+        android:background="?attr/sonusLineColor" />
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-black"
-        android:text="Kolejka odtwarzania"
-        android:textColor="@color/text_dark"
-        android:textSize="22sp" />
+        android:orientation="horizontal"
+        android:gravity="bottom">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="monospace"
+            android:text="STATION_QUEUE"
+            android:textColor="?attr/sonusAccentColor"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:text="DRAG_TO_REORDER"
+            android:textColor="?attr/sonusTextFaintColor"
+            android:textSize="10sp"
+            android:letterSpacing="0.1" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/sonusLineSoftColor"
+        android:layout_marginTop="12dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvQueue"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1" />
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        android:overScrollMode="never" />
 
 </LinearLayout>

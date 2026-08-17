@@ -1,15 +1,20 @@
-package com.example.sonus
+package com.example.sonus.ui.playlist
 
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.sonus.*
 import com.example.sonus.network.PlaylistDTO
 import com.example.sonus.network.RetrofitClient
 import com.example.sonus.network.SessionManager
@@ -17,7 +22,7 @@ import com.example.sonus.network.SongDTO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-class PlaylistDetailActivity : AppCompatActivity() {
+class PlaylistDetailFragment : Fragment() {
 
     private lateinit var tvName: TextView
     private lateinit var tvDescription: TextView
@@ -32,61 +37,50 @@ class PlaylistDetailActivity : AppCompatActivity() {
     
     private var playlistId: Long = -1
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        ThemeHelper.applyTheme(this)
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_playlist_detail)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_playlist_detail, container, false)
+    }
 
-        playlistId = intent.getLongExtra("PLAYLIST_ID", -1)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        playlistId = arguments?.getLong("PLAYLIST_ID", -1) ?: -1
         if (playlistId == -1L) {
-            finish()
+            findNavController().popBackStack()
             return
         }
 
-        sessionManager = SessionManager(this)
-        recentlyPlayedManager = RecentlyPlayedManager(this)
-        initViews()
+        sessionManager = SessionManager(requireContext())
+        recentlyPlayedManager = RecentlyPlayedManager(requireContext())
+        initViews(view)
         setupRecyclerView()
         fetchPlaylistDetails()
     }
 
-    private fun initViews() {
-        tvName = findViewById(R.id.tvPlaylistNameDetail)
-        tvDescription = findViewById(R.id.tvPlaylistDescription)
-        rvSongs = findViewById(R.id.rvPlaylistSongs)
-        btnBack = findViewById(R.id.btnBack)
-        btnDelete = findViewById(R.id.btnDeletePlaylist)
-        imgCover = findViewById(R.id.imgPlaylistCoverLarge)
+    private fun initViews(view: View) {
+        tvName = view.findViewById(R.id.tvPlaylistNameDetail)
+        tvDescription = view.findViewById(R.id.tvPlaylistDescription)
+        rvSongs = view.findViewById(R.id.rvPlaylistSongs)
+        btnBack = view.findViewById(R.id.btnBack)
+        btnDelete = view.findViewById(R.id.btnDeletePlaylist)
+        imgCover = view.findViewById(R.id.imgPlaylistCoverLarge)
 
-        btnBack.setOnClickListener { finish() }
+        btnBack.setOnClickListener { findNavController().popBackStack() }
         btnDelete.setOnClickListener { confirmDeletePlaylist() }
 
-        initMiniPlayer()
-
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabPlayPlaylist).setOnClickListener {
+        view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabPlayPlaylist).setOnClickListener {
             songAdapter.getSongs().firstOrNull()?.let { playSong(it) }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        initMiniPlayer()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        MiniPlayerHelper.onDestroy(this)
-    }
-
-    private fun initMiniPlayer() {
-        MiniPlayerHelper.setupMiniPlayer(this)
-    }
-
     private fun playSong(song: SongDTO) {
         recentlyPlayedManager.addSong(song)
-        PlayerState.play(this, song, songAdapter.getSongs())
-        initMiniPlayer()
-        Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
+        PlayerState.play(requireContext(), song, songAdapter.getSongs())
+        Toast.makeText(requireContext(), "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
     }
 
     private fun setupRecyclerView() {
@@ -96,7 +90,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
                 playSong(song)
             },
             onAddClick = { song ->
-                PlaylistHelper.showPlaylistSelectionDialog(this, lifecycleScope, song) {
+                PlaylistHelper.showPlaylistSelectionDialog(requireActivity() as androidx.appcompat.app.AppCompatActivity, viewLifecycleOwner.lifecycleScope, sessionManager.getUserId(), song) {
                     songAdapter.notifyDataSetChanged()
                 }
             },
@@ -107,15 +101,23 @@ class PlaylistDetailActivity : AppCompatActivity() {
                 confirmRemoveFromPlaylist(song)
             }
         )
-        rvSongs.layoutManager = LinearLayoutManager(this)
+        rvSongs.layoutManager = LinearLayoutManager(requireContext())
         rvSongs.adapter = songAdapter
+
+        SongTouchHelper.attach(
+            rvSongs,
+            songAdapter,
+            sessionManager.getUserId(),
+            viewLifecycleOwner.lifecycleScope
+        ) {
+            // Updated
+        }
     }
 
     private fun fetchPlaylistDetails() {
         val userId = sessionManager.getUserId()
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // Fetch playlist details and user favorites in parallel
                 val playlistDeferred = async { RetrofitClient.playlistApi.getPlaylistById(playlistId) }
                 val favoritesDeferred = if (userId != -1L) async { RetrofitClient.favoriteApi.getFavorites(userId) } else null
 
@@ -125,34 +127,19 @@ class PlaylistDetailActivity : AppCompatActivity() {
                 if (playlistResponse.isSuccessful) {
                     var playlist = playlistResponse.body()
                     if (playlist != null) {
-                        Log.d("PlaylistDetail", "Fetched playlist: ${playlist.name}, initial songs: ${playlist.songs?.size}")
-                        
-                        // Always try to fetch songs if the list is empty or null to be sure
                         if (playlist.songs.isNullOrEmpty()) {
-                            Log.d("PlaylistDetail", "Songs list empty, fetching from /api/playlists/${playlistId}/songs")
                             val songsResponse = RetrofitClient.playlistApi.getSongsInPlaylist(playlistId)
                             if (songsResponse.isSuccessful) {
-                                val fetchedSongs = songsResponse.body()
-                                Log.d("PlaylistDetail", "Fetched ${fetchedSongs?.size} songs for playlist")
-                                playlist = playlist.copy(songs = fetchedSongs)
-                            } else {
-                                Log.e("PlaylistDetail", "Failed to fetch songs: ${songsResponse.code()}")
-                                Toast.makeText(this@PlaylistDetailActivity, "Błąd pobierania utworów", Toast.LENGTH_SHORT).show()
+                                playlist = playlist.copy(songs = songsResponse.body())
                             }
                         }
 
-                        // Mark songs as favorites if they are in the user's favorites list
                         if (favoritesResponse?.isSuccessful == true) {
                             val favoriteIds = favoritesResponse.body()?.map { it.songId }?.toSet() ?: emptySet()
-                            playlist.songs?.forEach { song ->
-                                song.isFavorite = favoriteIds.contains(song.id)
-                            }
+                            playlist.songs?.forEach { it.isFavorite = favoriteIds.contains(it.id) }
                         }
                         populateUI(playlist)
                     }
-                } else {
-                    Log.e("PlaylistDetail", "Playlist API error: ${playlistResponse.code()}")
-                    Toast.makeText(this@PlaylistDetailActivity, "Błąd pobierania szczegółów playlisty", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Log.e("PlaylistDetail", "Error", e)
@@ -166,16 +153,15 @@ class PlaylistDetailActivity : AppCompatActivity() {
         val count = if (songs.isNotEmpty()) songs.size else (playlist.songCount ?: 0)
         tvDescription.text = playlist.description ?: formatSongCount(count)
 
-        // Load playlist cover: use first song's coverPath if it's a full URL, otherwise use dedicated endpoint
         val firstSong = songs.firstOrNull()
         val coverUrl = if (firstSong?.coverPath?.startsWith("http") == true) {
             firstSong.coverPath
         } else {
             firstSong?.let { RetrofitClient.BASE_URL + "api/songs/${it.id}/cover" }
         }
-        val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(this, coverUrl)
+        val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(requireContext(), coverUrl)
 
-        val radius = (20 * resources.displayMetrics.density).toInt()
+        val radius = resources.getDimensionPixelSize(R.dimen.studio_radius)
 
         com.bumptech.glide.Glide.with(this)
             .load(authenticatedUrl)
@@ -201,7 +187,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
         val userId = sessionManager.getUserId()
         if (userId == -1L) return
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val response = RetrofitClient.favoriteApi.toggleFavorite(userId, song.id)
                 if (response.isSuccessful) {
@@ -216,7 +202,7 @@ class PlaylistDetailActivity : AppCompatActivity() {
     }
 
     private fun confirmDeletePlaylist() {
-        androidx.appcompat.app.AlertDialog.Builder(this)
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setTitle("Usuń playlistę")
             .setMessage("Czy na pewno chcesz usunąć tę playlistę?")
             .setPositiveButton("Usuń") { _, _ -> deletePlaylist() }
@@ -225,24 +211,21 @@ class PlaylistDetailActivity : AppCompatActivity() {
     }
 
     private fun deletePlaylist() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val response = RetrofitClient.playlistApi.deletePlaylist(playlistId)
                 if (response.isSuccessful) {
-                    Toast.makeText(this@PlaylistDetailActivity, "Playlista usunięta", Toast.LENGTH_SHORT).show()
-                    finish()
-                } else {
-                    Toast.makeText(this@PlaylistDetailActivity, "Błąd usuwania playlisty", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Playlista usunięta", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
                 }
             } catch (e: Exception) {
                 Log.e("PlaylistDetail", "Delete error", e)
-                Toast.makeText(this@PlaylistDetailActivity, "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun confirmRemoveFromPlaylist(song: SongDTO) {
-        androidx.appcompat.app.AlertDialog.Builder(this)
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setTitle("Usuń utwór")
             .setMessage("Usunąć ${song.title} z tej playlisty?")
             .setPositiveButton("Usuń") { _, _ -> removeSongFromPlaylist(song.id) }
@@ -251,14 +234,12 @@ class PlaylistDetailActivity : AppCompatActivity() {
     }
 
     private fun removeSongFromPlaylist(songId: Long) {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val response = RetrofitClient.playlistApi.removeSongFromPlaylist(playlistId, songId)
                 if (response.isSuccessful) {
-                    Toast.makeText(this@PlaylistDetailActivity, "Utwór usunięty z playlisty", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Utwór usunięty z playlisty", Toast.LENGTH_SHORT).show()
                     fetchPlaylistDetails()
-                } else {
-                    Toast.makeText(this@PlaylistDetailActivity, "Błąd usuwania: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Log.e("PlaylistDetail", "Remove error", e)

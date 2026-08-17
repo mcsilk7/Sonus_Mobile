@@ -4,8 +4,9 @@
     android:layout_width="48dp"
     android:layout_height="48dp"
     android:background="@drawable/bg_icon_circle"
-    android:fontFamily="sans-serif-medium"
+    android:fontFamily="monospace"
     android:gravity="center"
-    android:text="A"
-    android:textColor="@color/app_background"
-    android:textSize="18sp" />
+    android:text="U"
+    android:textColor="?attr/sonusAccentColor"
+    android:textSize="20sp"
+    android:textStyle="bold" />

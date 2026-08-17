@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <gradient
-        android:angle="90"
-        android:startColor="@color/accent"
-        android:endColor="@color/text_primary" />
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="?attr/sonusPanelColor" />
+    <stroke android:width="2dp" android:color="?attr/sonusAccentColor" />
+    <corners android:radius="40dp" />
 </shape>

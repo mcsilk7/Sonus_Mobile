@@ -17,13 +17,13 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Header with Back Button and Cover -->
+            <!-- Header -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="350dp">
 
                 <ImageView
-                    android:id="@+id/imgPlaylistCoverLarge"
+                    android:id="@+id/imgAlbumCoverLarge"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
@@ -35,7 +35,7 @@
                     android:background="@drawable/bg_gradient_overlay" />
 
                 <ImageButton
-                    android:id="@+id/btnBack"
+                    android:id="@+id/btnBackAlbum"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
                     android:layout_margin="16dp"
@@ -47,15 +47,15 @@
                     android:alpha="0.8" />
 
                 <ImageButton
-                    android:id="@+id/btnDeletePlaylist"
+                    android:id="@+id/btnSaveAlbum"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
-                    android:layout_gravity="end"
                     android:layout_margin="16dp"
+                    android:layout_gravity="end"
                     android:background="@drawable/bg_icon_circle"
-                    android:contentDescription="Usuń playlistę"
+                    android:contentDescription="Zapisz album"
                     android:padding="10dp"
-                    android:src="@drawable/ic_delete"
+                    android:src="@drawable/ic_favorite"
                     app:tint="@color/app_background"
                     android:alpha="0.8" />
 
@@ -74,11 +74,11 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/tvPlaylistNameDetail"
+                            android:id="@+id/tvAlbumTitleDetail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-black"
-                            android:text="Nazwa Playlisty"
+                            android:text="Tytuł Albumu"
                             android:textColor="@color/app_background"
                             android:textSize="32sp"
                             android:shadowColor="#80000000"
@@ -87,19 +87,19 @@
                             android:shadowRadius="4" />
 
                         <TextView
-                            android:id="@+id/tvPlaylistDescription"
+                            android:id="@+id/tvAlbumArtistDetail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:text="Opis playlisty..."
+                            android:text="Artysta"
                             android:textColor="@color/app_background"
-                            android:textSize="15sp"
+                            android:textSize="18sp"
                             android:alpha="0.9" />
                     </LinearLayout>
 
                     <!-- Play FAB -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/fabPlayPlaylist"
+                        android:id="@+id/fabPlayAlbum"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
@@ -119,8 +119,17 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Utwory w albumie"
+                    android:textColor="@color/text_dark"
+                    android:textSize="18sp" />
+
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvPlaylistSongs"
+                    android:id="@+id/rvAlbumSongs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
@@ -129,8 +138,5 @@
 
         </LinearLayout>
     </ScrollView>
-
-    <!-- Mini player -->
-    <include layout="@layout/mini_player" />
 
 </FrameLayout>

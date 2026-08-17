@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/sonusBackgroundColor">
+
+    <!-- Top Rack Header -->
+    <LinearLayout
+        android:id="@+id/topRackSettings"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="?attr/sonusPanelColor"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:elevation="4dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SYSTEM CONFIG"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.2" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="STATION_SETTINGS"
+                android:textColor="?attr/sonusAccentColor"
+                android:textSize="18sp"
+                android:fontFamily="monospace"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <include layout="@layout/user_avatar" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="80dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="140dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Profile Overview Panel -->
+            <LinearLayout
+                android:id="@+id/btnProfile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_settings_item"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:layout_marginTop="12dp">
+                <TextView
+                    android:id="@+id/tvSettingsAvatar"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_icon_circle"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:text="A"
+                    android:textColor="?attr/sonusAccentColor"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tvSettingsName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="OPERATOR_NAME"
+                        android:textColor="?attr/sonusAccentColor"
+                        android:fontFamily="monospace"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvSettingsEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ID_LABEL"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp" />
+                </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="::EDIT"
+                    android:textColor="?attr/sonusAccentDimColor"
+                    android:fontFamily="monospace"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/bg_settings_danger"
+                android:gravity="center"
+                android:text="TERMINATE_SESSION"
+                android:textColor="?attr/sonusStatusRed"
+                android:fontFamily="monospace"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:text="SONUS STUDIO SYSTEM [BUILD_2025]"
+                android:textColor="?attr/sonusTextFaintColor"
+                android:fontFamily="monospace"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

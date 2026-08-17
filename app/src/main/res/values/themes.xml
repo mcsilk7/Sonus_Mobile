@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base application theme. -->
-    <style name="Theme.Sonus" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="sonusBackgroundColor">@color/app_background</item>
-        <item name="sonusCardColor">@color/card_background</item>
-        <item name="sonusAccentColor">@color/accent</item>
-        <item name="sonusTextPrimaryColor">@color/text_primary</item>
-        <item name="sonusTextDarkColor">@color/text_dark</item>
+    <!-- Main Theme: Retro Studio (Default) -->
+    <style name="Theme.Sonus" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Palette Mapping -->
+        <item name="sonusBackgroundColor">@color/studio_bg</item>
+        <item name="sonusPanelColor">@color/studio_bg_panel</item>
+        <item name="sonusCardColor">@color/studio_bg_card</item>
+        <item name="sonusLineColor">@color/studio_line</item>
+        <item name="sonusLineSoftColor">@color/studio_line_soft</item>
+        <item name="sonusAccentColor">@color/studio_amber</item>
+        <item name="sonusAccentDimColor">@color/studio_amber_dim</item>
+        <item name="sonusTextPrimaryColor">@color/studio_text</item>
+        <item name="sonusTextDarkColor">@color/studio_text_dim</item>
+        <item name="sonusTextFaintColor">@color/studio_text_faint</item>
+        <item name="sonusStatusRed">@color/studio_red</item>
+        <item name="sonusStatusGreen">@color/studio_green</item>
+        <item name="sonusCornerRadius">@dimen/studio_radius</item>
 
+        <!-- Android System UI -->
         <item name="android:statusBarColor">?attr/sonusBackgroundColor</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">?attr/sonusBackgroundColor</item>
-    </style>
-
-    <!-- Additional Theme: Violet -->
-    <style name="Theme.Sonus.Violet" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="sonusBackgroundColor">#120B1A</item>
-        <item name="sonusCardColor">#1F1429</item>
-        <item name="sonusAccentColor">#BB86FC</item>
-        <item name="sonusTextPrimaryColor">#A0A0A0</item>
-        <item name="sonusTextDarkColor">#FFFFFF</item>
-
-        <item name="android:statusBarColor">#120B1A</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:navigationBarColor">#120B1A</item>
+        <item name="android:navigationBarColor">?attr/sonusBackgroundColor</item>
+        <item name="android:windowBackground">?attr/sonusBackgroundColor</item>
+
+        <!-- Material Components -->
+        <item name="colorPrimary">?attr/sonusAccentColor</item>
+        <item name="colorSecondary">?attr/sonusStatusGreen</item>
+        <item name="android:textColorPrimary">?attr/sonusTextPrimaryColor</item>
     </style>
 </resources>

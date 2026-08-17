@@ -66,11 +66,7 @@ class PlaylistAdapter(
     }
 
     private fun formatSongCount(count: Int): String {
-        return when {
-            count == 1 -> "1 utwór"
-            count % 10 in 2..4 && (count % 100 !in 12..14) -> "$count utwory"
-            else -> "$count utworów"
-        }
+        return "DATA_SLOTS: $count"
     }
 
     override fun getItemCount() = playlists.size

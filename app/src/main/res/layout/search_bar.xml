@@ -4,8 +4,8 @@
     android:id="@+id/searchBar"
     android:layout_width="match_parent"
     android:layout_height="56dp"
-    android:layout_marginTop="20dp"
-    android:background="@drawable/bg_search_bar"
+    android:layout_marginTop="8dp"
+    android:background="@drawable/bg_settings_item"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingStart="16dp"
@@ -13,23 +13,24 @@
 
     <ImageView
         android:id="@+id/ivSearchIcon"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:contentDescription="Szukaj"
         android:src="@drawable/ic_search"
-        app:tint="?attr/sonusTextPrimaryColor" />
+        app:tint="?attr/sonusAccentDimColor" />
 
     <EditText
         android:id="@+id/etSearch"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="14dp"
         android:background="@null"
-        android:hint="@string/search_hint"
+        android:hint="SCAN_FOR_TRACKS..."
         android:imeOptions="actionSearch"
         android:inputType="text"
-        android:textColor="?attr/sonusTextDarkColor"
-        android:textColorHint="?attr/sonusTextPrimaryColor"
-        android:textSize="15sp" />
+        android:fontFamily="monospace"
+        android:textColor="?attr/sonusTextPrimaryColor"
+        android:textColorHint="?attr/sonusTextFaintColor"
+        android:textSize="14sp" />
 
 </LinearLayout>

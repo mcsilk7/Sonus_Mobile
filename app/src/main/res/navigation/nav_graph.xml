@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.sonus.ui.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login" />
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.sonus.ui.auth.RegisterFragment"
+        android:label="Register"
+        tools:layout="@layout/fragment_register" />
+
+    <!-- Main Container hosting ViewPager2 -->
+    <fragment
+        android:id="@+id/mainContainerFragment"
+        android:name="com.example.sonus.ui.MainContainerFragment"
+        android:label="Main"
+        tools:layout="@layout/fragment_main_container" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.sonus.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/playerFragment"
+        android:name="com.example.sonus.ui.player.PlayerFragment"
+        android:label="Player"
+        tools:layout="@layout/fragment_player" />
+
+    <fragment
+        android:id="@+id/playlistDetailFragment"
+        android:name="com.example.sonus.ui.playlist.PlaylistDetailFragment"
+        android:label="Playlist Detail"
+        tools:layout="@layout/fragment_playlist_detail" />
+
+    <fragment
+        android:id="@+id/albumDetailFragment"
+        android:name="com.example.sonus.ui.album.AlbumDetailFragment"
+        android:label="Album Detail"
+        tools:layout="@layout/fragment_album_detail" />
+
+    <fragment
+        android:id="@+id/favoriteFragment"
+        android:name="com.example.sonus.ui.library.FavoriteFragment"
+        android:label="Favorite Signals"
+        tools:layout="@layout/fragment_favorite" />
+
+</navigation>

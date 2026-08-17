@@ -1,13 +1,17 @@
-package com.example.sonus
+package com.example.sonus.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.sonus.R
 import com.example.sonus.network.LoginRequest
 import com.example.sonus.network.RetrofitClient
 import com.example.sonus.network.SessionManager
@@ -15,44 +19,50 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class LoginActivity : AppCompatActivity() {
+class LoginFragment : Fragment() {
 
     private lateinit var sessionManager: SessionManager
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        ThemeHelper.applyTheme(this)
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_login, container, false)
+    }
 
-        sessionManager = SessionManager(this)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        sessionManager = SessionManager(requireContext())
         if (sessionManager.isLoggedIn()) {
             navigateToMain()
             return
         }
 
-        findViewById<View>(R.id.btnLogin).setOnClickListener {
+        view.findViewById<View>(R.id.btnLogin).setOnClickListener {
             performLogin()
         }
 
-        findViewById<View>(R.id.tvGoToRegister).setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
+        view.findViewById<View>(R.id.tvGoToRegister).setOnClickListener {
+            findNavController().navigate(R.id.registerFragment)
         }
     }
 
     private fun performLogin() {
-        val username = findViewById<EditText>(R.id.etLoginEmail).text.toString().trim()
-        val password = findViewById<EditText>(R.id.etLoginPassword).text.toString()
-        val loginButton = findViewById<TextView>(R.id.btnLogin)
+        val username = view?.findViewById<EditText>(R.id.etLoginEmail)?.text.toString().trim() ?: ""
+        val password = view?.findViewById<EditText>(R.id.etLoginPassword)?.text.toString() ?: ""
+        val loginButton = view?.findViewById<TextView>(R.id.btnLogin)
 
         if (username.isBlank() || password.isBlank()) {
-            Toast.makeText(this, "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show()
             return
         }
 
-        loginButton.isEnabled = false
-        loginButton.alpha = 0.7f
+        loginButton?.isEnabled = false
+        loginButton?.alpha = 0.7f
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val response = RetrofitClient.authApi.login(LoginRequest(username, password))
                 if (response.isSuccessful) {
@@ -78,8 +88,8 @@ class LoginActivity : AppCompatActivity() {
                 showLoginError("Wystąpił błąd: ${exception.localizedMessage}")
             } finally {
                 withContext(Dispatchers.Main) {
-                    loginButton.isEnabled = true
-                    loginButton.alpha = 1.0f
+                    loginButton?.isEnabled = true
+                    loginButton?.alpha = 1.0f
                 }
             }
         }
@@ -87,16 +97,11 @@ class LoginActivity : AppCompatActivity() {
 
     private suspend fun showLoginError(message: String) {
         withContext(Dispatchers.Main) {
-            Toast.makeText(this@LoginActivity, message, Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
         }
     }
 
     private fun navigateToMain() {
-        startActivity(
-            Intent(this, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-        )
-        finish()
+        findNavController().navigate(R.id.mainContainerFragment)
     }
 }

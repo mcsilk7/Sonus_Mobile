@@ -258,7 +258,33 @@ object PlayerState {
     fun seekTo(msec: Int) {
         mediaPlayer?.seekTo(msec)
     }
+
+    fun moveSong(fromIndex: Int, toIndex: Int) {
+        if (fromIndex in currentPlaylist.indices && toIndex in currentPlaylist.indices) {
+            val playlist = currentPlaylist.toMutableList()
+            val song = playlist.removeAt(fromIndex)
+            playlist.add(toIndex, song)
+            currentPlaylist = playlist
+            
+            // Update currentIndex if the moving song was the current one
+            if (fromIndex == currentIndex) {
+                currentIndex = toIndex
+            } else if (fromIndex < currentIndex && toIndex >= currentIndex) {
+                currentIndex--
+            } else if (fromIndex > currentIndex && toIndex <= currentIndex) {
+                currentIndex++
+            }
+            
+            notifyStateChanged()
+        }
+    }
+
+    fun addSongToQueue(song: SongDTO) {
+        val playlist = currentPlaylist.toMutableList()
+        if (!playlist.any { it.id == song.id }) {
+            playlist.add(song)
+            currentPlaylist = playlist
+            notifyStateChanged()
+        }
+    }
 }
-
-
-

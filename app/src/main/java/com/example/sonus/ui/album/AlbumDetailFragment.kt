@@ -1,16 +1,20 @@
-package com.example.sonus
+package com.example.sonus.ui.album
 
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.sonus.*
 import com.example.sonus.network.AlbumDTO
 import com.example.sonus.network.RetrofitClient
 import com.example.sonus.network.SessionManager
@@ -18,7 +22,7 @@ import com.example.sonus.network.SongDTO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-class AlbumDetailActivity : AppCompatActivity() {
+class AlbumDetailFragment : Fragment() {
 
     private lateinit var tvTitle: TextView
     private lateinit var tvArtist: TextView
@@ -34,61 +38,50 @@ class AlbumDetailActivity : AppCompatActivity() {
     private var albumId: Long = -1
     private var currentAlbum: AlbumDTO? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        ThemeHelper.applyTheme(this)
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_album_detail)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_album_detail, container, false)
+    }
 
-        albumId = intent.getLongExtra("ALBUM_ID", -1)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        albumId = arguments?.getLong("ALBUM_ID", -1) ?: -1
         if (albumId == -1L) {
-            finish()
+            findNavController().popBackStack()
             return
         }
 
-        sessionManager = SessionManager(this)
-        recentlyPlayedManager = RecentlyPlayedManager(this)
-        initViews()
+        sessionManager = SessionManager(requireContext())
+        recentlyPlayedManager = RecentlyPlayedManager(requireContext())
+        initViews(view)
         setupRecyclerView()
         fetchAlbumDetails()
     }
 
-    private fun initViews() {
-        tvTitle = findViewById(R.id.tvAlbumTitleDetail)
-        tvArtist = findViewById(R.id.tvAlbumArtistDetail)
-        rvSongs = findViewById(R.id.rvAlbumSongs)
-        btnBack = findViewById(R.id.btnBackAlbum)
-        imgCover = findViewById(R.id.imgAlbumCoverLarge)
-        btnSaveAlbum = findViewById(R.id.btnSaveAlbum)
+    private fun initViews(view: View) {
+        tvTitle = view.findViewById(R.id.tvAlbumTitleDetail)
+        tvArtist = view.findViewById(R.id.tvAlbumArtistDetail)
+        rvSongs = view.findViewById(R.id.rvAlbumSongs)
+        btnBack = view.findViewById(R.id.btnBackAlbum)
+        imgCover = view.findViewById(R.id.imgAlbumCoverLarge)
+        btnSaveAlbum = view.findViewById(R.id.btnSaveAlbum)
 
-        btnBack.setOnClickListener { finish() }
+        btnBack.setOnClickListener { findNavController().popBackStack() }
         btnSaveAlbum.setOnClickListener { toggleAlbumSave() }
 
-        initMiniPlayer()
-
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabPlayAlbum).setOnClickListener {
+        view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabPlayAlbum).setOnClickListener {
             currentAlbum?.songs?.firstOrNull()?.let { playSong(it) }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        initMiniPlayer()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        MiniPlayerHelper.onDestroy(this)
-    }
-
-    private fun initMiniPlayer() {
-        MiniPlayerHelper.setupMiniPlayer(this)
-    }
-
     private fun playSong(song: SongDTO) {
         recentlyPlayedManager.addSong(song)
-        PlayerState.play(this, song, currentAlbum?.songs ?: emptyList())
-        initMiniPlayer()
-        Toast.makeText(this, "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
+        PlayerState.play(requireContext(), song, currentAlbum?.songs ?: emptyList())
+        Toast.makeText(requireContext(), "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
     }
 
     private fun setupRecyclerView() {
@@ -98,7 +91,7 @@ class AlbumDetailActivity : AppCompatActivity() {
                 playSong(song)
             },
             onAddClick = { song ->
-                PlaylistHelper.showPlaylistSelectionDialog(this, lifecycleScope, song) {
+                PlaylistHelper.showPlaylistSelectionDialog(requireActivity() as androidx.appcompat.app.AppCompatActivity, viewLifecycleOwner.lifecycleScope, sessionManager.getUserId(), song) {
                     songAdapter.notifyDataSetChanged()
                 }
             },
@@ -106,15 +99,23 @@ class AlbumDetailActivity : AppCompatActivity() {
                 toggleFavorite(song)
             }
         )
-        rvSongs.layoutManager = LinearLayoutManager(this)
+        rvSongs.layoutManager = LinearLayoutManager(requireContext())
         rvSongs.adapter = songAdapter
+
+        SongTouchHelper.attach(
+            rvSongs,
+            songAdapter,
+            sessionManager.getUserId(),
+            viewLifecycleOwner.lifecycleScope
+        ) {
+            // Updated
+        }
     }
 
     private fun fetchAlbumDetails() {
         val userId = sessionManager.getUserId()
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // Fetch album details, favorites, playlists and library in parallel
                 val albumDeferred = async { RetrofitClient.albumApi.getAlbumById(albumId) }
                 val favoritesDeferred = if (userId != -1L) async { RetrofitClient.favoriteApi.getFavorites(userId) } else null
                 val libraryAlbumsDeferred = if (userId != -1L) async { RetrofitClient.albumApi.getLibraryAlbums(userId) } else null
@@ -128,35 +129,20 @@ class AlbumDetailActivity : AppCompatActivity() {
                 if (albumResponse.isSuccessful) {
                     var album = albumResponse.body()
                     if (album != null) {
-                        Log.d("AlbumDetail", "Fetched album: ${album.title}, initial songs: ${album.songs?.size}")
-
-                        // Always try to fetch songs if the list is empty or null to be sure
                         if (album.songs.isNullOrEmpty()) {
-                            Log.d("AlbumDetail", "Songs list empty, fetching from /api/albums/${albumId}/songs")
                             val songsResponse = RetrofitClient.albumApi.getSongsInAlbum(albumId)
                             if (songsResponse.isSuccessful) {
-                                val fetchedSongs = songsResponse.body()
-                                Log.d("AlbumDetail", "Fetched ${fetchedSongs?.size} songs for album")
-                                album = album.copy(songs = fetchedSongs)
-                            } else {
-                                Log.e("AlbumDetail", "Failed to fetch songs: ${songsResponse.code()}")
+                                album = album.copy(songs = songsResponse.body())
                             }
                         }
 
-                        // Mark songs as favorites if they are in the user's favorites list
                         if (favoritesResponse?.isSuccessful == true) {
                             val favoriteIds = favoritesResponse.body()?.map { it.songId }?.toSet() ?: emptySet()
-                            album.songs?.forEach { song ->
-                                song.isFavorite = favoriteIds.contains(song.id)
-                            }
+                            album.songs?.forEach { it.isFavorite = favoriteIds.contains(it.id) }
                         }
                         
-                        // Mark songs as in playlist
-                        album.songs?.let {
-                            PlaylistHelper.enrichSongsWithPlaylistState(it, playlistSongsIds)
-                        }
+                        album.songs?.let { PlaylistHelper.enrichSongsWithPlaylistState(it, playlistSongsIds) }
                         
-                        // Mark album as saved if in user's library
                         if (libraryAlbumsResponse?.isSuccessful == true) {
                             val libraryIds = libraryAlbumsResponse.body()?.map { it.id }?.toSet() ?: emptySet()
                             album.isSaved = libraryIds.contains(album.id)
@@ -164,8 +150,6 @@ class AlbumDetailActivity : AppCompatActivity() {
                         
                         populateUI(album)
                     }
-                } else {
-                    Toast.makeText(this@AlbumDetailActivity, "Błąd pobierania albumu", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Log.e("AlbumDetail", "Error", e)
@@ -185,9 +169,9 @@ class AlbumDetailActivity : AppCompatActivity() {
         } else {
             RetrofitClient.BASE_URL + "api/albums/$albumId/cover"
         }
-        val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(this, coverUrl)
+        val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(requireContext(), coverUrl)
 
-        val radius = (20 * resources.displayMetrics.density).toInt()
+        val radius = resources.getDimensionPixelSize(R.dimen.studio_radius)
 
         com.bumptech.glide.Glide.with(this)
             .load(authenticatedUrl)
@@ -196,59 +180,45 @@ class AlbumDetailActivity : AppCompatActivity() {
             .transform(com.bumptech.glide.load.resource.bitmap.CenterCrop(), com.bumptech.glide.load.resource.bitmap.RoundedCorners(radius))
             .into(imgCover)
         
-        val songs = album.songs ?: emptyList()
-        Log.d("AlbumDetail", "Updating adapter with ${songs.size} songs")
-        songAdapter.updateData(songs)
+        songAdapter.updateData(album.songs ?: emptyList())
     }
 
     private fun toggleAlbumSave() {
         val userId = sessionManager.getUserId()
-        if (userId == -1L) {
-            Toast.makeText(this, "Musisz być zalogowany", Toast.LENGTH_SHORT).show()
-            return
-        }
+        if (userId == -1L) return
 
         val album = currentAlbum ?: return
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 if (album.isSaved) {
                     val response = RetrofitClient.albumApi.removeAlbumFromLibrary(album.id!!, userId)
                     if (response.isSuccessful) {
-                        Toast.makeText(this@AlbumDetailActivity, "Usunięto z biblioteki", Toast.LENGTH_SHORT).show()
                         album.isSaved = false
                         updateSaveButtonState(false)
-                    } else {
-                        Toast.makeText(this@AlbumDetailActivity, "Błąd: ${response.code()}", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     val response = RetrofitClient.albumApi.addAlbumToLibrary(album.id!!, userId)
                     if (response.isSuccessful) {
-                        Toast.makeText(this@AlbumDetailActivity, "Album zapisany do biblioteki!", Toast.LENGTH_SHORT).show()
                         album.isSaved = true
                         updateSaveButtonState(true)
-                    } else {
-                        Toast.makeText(this@AlbumDetailActivity, "Błąd zapisu albumu: ${response.code()}", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
-                Toast.makeText(this@AlbumDetailActivity, "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("AlbumDetail", "Error", e)
             }
         }
     }
 
     private fun updateSaveButtonState(isSaved: Boolean) {
-        if (isSaved) {
-            btnSaveAlbum.setColorFilter(androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_red_dark))
-        } else {
-            btnSaveAlbum.setColorFilter(androidx.core.content.ContextCompat.getColor(this, R.color.app_background))
-        }
+        val color = if (isSaved) android.R.color.holo_red_dark else R.color.studio_bg
+        btnSaveAlbum.setColorFilter(androidx.core.content.ContextCompat.getColor(requireContext(), color))
     }
 
     private fun toggleFavorite(song: SongDTO) {
         val userId = sessionManager.getUserId()
         if (userId == -1L) return
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val response = RetrofitClient.favoriteApi.toggleFavorite(userId, song.id)
                 if (response.isSuccessful) {

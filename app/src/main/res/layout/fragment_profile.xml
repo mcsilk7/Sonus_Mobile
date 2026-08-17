@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/sonusBackgroundColor">
+
+    <!-- Top Rack Header -->
+    <LinearLayout
+        android:id="@+id/topRackProfile"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="?attr/sonusPanelColor"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:elevation="4dp">
+
+        <TextView
+            android:id="@+id/btnProfileBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="ESC"
+            android:textColor="?attr/sonusAccentColor"
+            android:fontFamily="monospace"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OPERATOR_PROFILE"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.2" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="USER_ID_CONTROL"
+                android:textColor="?attr/sonusAccentColor"
+                android:textSize="18sp"
+                android:fontFamily="monospace"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnProfileSettings"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="SYS"
+            android:textColor="?attr/sonusAccentColor"
+            android:fontFamily="monospace"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="80dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="100dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Avatar Deck -->
+            <FrameLayout
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="16dp"
+                android:background="?attr/sonusLineColor"
+                android:padding="2dp">
+                <TextView
+                    android:id="@+id/profileAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/sonusCardColor"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:text="A"
+                    android:textColor="?attr/sonusAccentColor"
+                    android:textSize="42sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvProfileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="monospace"
+                android:text="Adam Kowalski"
+                android:textColor="?attr/sonusAccentColor"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvProfileEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="monospace"
+                android:text="adam@email.com"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/btnEditProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_library_tab"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text=":: EDIT_IDENTITY"
+                android:textColor="?attr/sonusTextPrimaryColor"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- Stats Monitor -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:orientation="horizontal">
+
+                <!-- Playlists -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="90dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/bg_settings_item"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="UNITS"
+                        android:textColor="?attr/sonusTextFaintColor"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
+                    <TextView
+                        android:id="@+id/tvStatsPlaylistsCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:text="0"
+                        android:textColor="?attr/sonusAccentColor"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PLAYLISTS"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace" />
+                </LinearLayout>
+
+                <!-- Hours -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="90dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_settings_item"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RUNTIME"
+                        android:textColor="?attr/sonusTextFaintColor"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
+                    <TextView
+                        android:id="@+id/tvStatsHoursCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:text="0"
+                        android:textColor="?attr/sonusAccentColor"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="HOURS"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace" />
+                </LinearLayout>
+
+                <!-- Favorites -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="90dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_settings_item"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SIGNALS"
+                        android:textColor="?attr/sonusTextFaintColor"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
+                    <TextView
+                        android:id="@+id/tvStatsFavoritesCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:text="0"
+                        android:textColor="?attr/sonusAccentColor"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FAVORITES"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?attr/sonusLineSoftColor"
+                android:layout_marginTop="32dp" />
+
+            <!-- Account Management -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="monospace"
+                android:text="[ ACCOUNT_ACCESS ]"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_settings_item"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="24dp"
+                    android:background="?attr/sonusStatusRed" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DELETE_ACCOUNT"
+                        android:textColor="?attr/sonusStatusRed"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WIPE_ALL_USER_DATA"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace" />
+                </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="::WIPE"
+                    android:textColor="?attr/sonusStatusRed"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnProfileLogout"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="28dp"
+                android:background="@drawable/bg_settings_danger"
+                android:gravity="center"
+                android:text="TERMINATE_SESSION"
+                android:textColor="?attr/sonusStatusRed"
+                android:textSize="14sp"
+                android:fontFamily="monospace"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:text="SONUS STUDIO UNIT [ VER_1.0.0 ]"
+                android:textColor="?attr/sonusTextFaintColor"
+                android:fontFamily="monospace"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

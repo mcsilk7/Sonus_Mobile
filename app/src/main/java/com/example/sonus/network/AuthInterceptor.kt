@@ -3,7 +3,7 @@ package com.example.sonus.network
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.example.sonus.LoginActivity
+import com.example.sonus.MainActivity
 import okhttp3.Interceptor
 import okhttp3.Response
 
@@ -26,7 +26,7 @@ class AuthInterceptor(
             Log.e("SonusAuth", "401 Unauthorized - Redirecting to Login")
             sessionManager.clearSession()
             
-            val intent = Intent(context, LoginActivity::class.java).apply {
+            val intent = Intent(context, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
             context.startActivity(intent)

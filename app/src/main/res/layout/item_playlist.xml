@@ -4,25 +4,37 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="12dp"
-    android:background="@drawable/bg_home_card"
+    android:background="@drawable/bg_settings_item"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="14dp">
+    android:padding="12dp">
 
-    <!-- Okładka playlisty -->
-    <ImageView
-        android:id="@+id/imgPlaylistCover"
-        android:layout_width="62dp"
-        android:layout_height="62dp"
-        android:background="@drawable/bg_cover_placeholder"
-        android:contentDescription="Okładka playlisty"
-        android:scaleType="centerCrop" />
+    <!-- Rack unit indicator -->
+    <View
+        android:layout_width="4dp"
+        android:layout_height="32dp"
+        android:background="?attr/sonusAccentDimColor"
+        android:layout_marginEnd="12dp" />
+
+    <!-- Okładka playlisty with border -->
+    <FrameLayout
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="?attr/sonusLineColor"
+        android:padding="1dp">
+        <ImageView
+            android:id="@+id/imgPlaylistCover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_cover_placeholder"
+            android:scaleType="centerCrop" />
+    </FrameLayout>
 
     <!-- Nazwa + liczba utworów -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
+        android:layout_marginStart="16dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -31,30 +43,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="monospace"
             android:maxLines="1"
-            android:text="Nazwa playlisty"
-            android:textColor="@color/text_dark"
-            android:textSize="16sp"
+            android:text="UNIT_NAME"
+            android:textColor="?attr/sonusAccentColor"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvPlaylistCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:text="12 utworów"
-            android:textColor="@color/text_primary"
-            android:textSize="14sp" />
+            android:layout_marginTop="2dp"
+            android:fontFamily="monospace"
+            android:text="DATA_SLOTS: 0"
+            android:textColor="?attr/sonusTextDarkColor"
+            android:textSize="11sp" />
     </LinearLayout>
 
-    <!-- Strzałka -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="›"
-        android:textColor="@color/text_primary"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:fontFamily="monospace"
+        android:text="::LOAD"
+        android:textColor="?attr/sonusAccentDimColor"
+        android:textSize="11sp" />
 
 </LinearLayout>

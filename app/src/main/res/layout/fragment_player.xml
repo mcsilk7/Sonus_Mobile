@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/sonusBackgroundColor"
+        android:orientation="vertical">
+
+        <!-- Top Display Header -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="?attr/sonusPanelColor"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <TextView
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="ESC"
+                android:textColor="?attr/sonusAccentColor"
+                android:fontFamily="monospace"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="STATION_MONITOR"
+                android:textColor="?attr/sonusTextPrimaryColor"
+                android:fontFamily="monospace"
+                android:textSize="12sp"
+                android:letterSpacing="0.1" />
+
+            <TextView
+                android:id="@+id/btnMore"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:gravity="center"
+                android:text="OPT"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:fontFamily="monospace"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
+        <!-- Main Deck -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Cover Art with industrial border and reels -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="320dp"
+                    android:background="?attr/sonusLineColor"
+                    android:padding="2dp">
+
+                    <ImageView
+                        android:id="@+id/imgPlayerCover"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="?attr/sonusCardColor"
+                        android:scaleType="centerCrop" />
+
+                    <com.example.sonus.ui.player.RetroReelView
+                        android:id="@+id/retroReels"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:alpha="1.0" />
+                </FrameLayout>
+
+                <!-- Metadata Display -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <TextView
+                        android:id="@+id/tvPlayerSongTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="TRACK_NAME"
+                        android:textColor="?attr/sonusAccentColor"
+                        android:textSize="24sp"
+                        android:fontFamily="monospace"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvPlayerArtist"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="ARTIST_ID"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace" />
+                </LinearLayout>
+
+                <!-- Meters / Progress -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:orientation="vertical">
+
+                    <SeekBar
+                        android:id="@+id/seekBarPlayer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:progressTint="?attr/sonusAccentColor"
+                        android:thumbTint="?attr/sonusAccentColor"
+                        android:progressBackgroundTint="?attr/sonusLineSoftColor"
+                        android:splitTrack="false" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp">
+                        <TextView
+                            android:id="@+id/tvCurrentTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="00:00"
+                            android:textColor="?attr/sonusAccentColor"
+                            android:fontFamily="monospace"
+                            android:textSize="12sp" />
+                        <TextView
+                            android:id="@+id/tvTotalTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:text="00:00"
+                            android:textColor="?attr/sonusTextDarkColor"
+                            android:fontFamily="monospace"
+                            android:textSize="12sp" />
+                    </RelativeLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Bottom Control Panel (Rack Unit Style) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:background="?attr/sonusPanelColor"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:elevation="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="48dp"
+                    android:layout_height="56dp"
+                    android:layout_marginEnd="12dp">
+                    <View
+                        android:id="@+id/shuffleIndicator"
+                        android:layout_width="8dp"
+                        android:layout_height="4dp"
+                        android:layout_gravity="top|center_horizontal"
+                        android:background="?attr/sonusAccentColor"
+                        android:visibility="invisible" />
+                    <TextView
+                        android:id="@+id/btnShuffle"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="SHF"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
+
+                <ImageView
+                    android:id="@+id/btnPrevious"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_skip_previous"
+                    app:tint="?attr/sonusTextPrimaryColor" />
+
+                <ImageView
+                    android:id="@+id/btnPlayPause"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/bg_player_play_btn"
+                    android:padding="20dp"
+                    android:src="@drawable/ic_play"
+                    app:tint="?attr/sonusBackgroundColor" />
+
+                <ImageView
+                    android:id="@+id/btnNext"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_skip_next"
+                    app:tint="?attr/sonusTextPrimaryColor" />
+
+                <FrameLayout
+                    android:layout_width="48dp"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="12dp">
+                    <View
+                        android:id="@+id/repeatIndicator"
+                        android:layout_width="8dp"
+                        android:layout_height="4dp"
+                        android:layout_gravity="top|center_horizontal"
+                        android:background="?attr/sonusAccentColor"
+                        android:visibility="invisible" />
+                    <TextView
+                        android:id="@+id/btnRepeat"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="RPT"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnQueue"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="VIEW QUEUE"
+                android:textColor="?attr/sonusAccentDimColor"
+                android:fontFamily="monospace"
+                android:textSize="11sp"
+                android:letterSpacing="0.2"
+                android:background="?attr/selectableItemBackground" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Retro Overlays -->
+    <com.example.sonus.ui.player.NoiseOverlayView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.2"
+        android:clickable="false"
+        android:focusable="false" />
+
+</FrameLayout>

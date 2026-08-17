@@ -4,19 +4,25 @@
     android:id="@+id/songItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="12dp"
-    android:background="@drawable/bg_home_card"
+    android:layout_marginBottom="1dp"
+    android:background="?attr/sonusCardColor"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="14dp">
+    android:padding="12dp">
 
-    <!-- Okładka -->
-    <ImageView
-        android:id="@+id/imgCover"
-        android:layout_width="62dp"
-        android:layout_height="62dp"
-        android:contentDescription="Okładka"
-        android:scaleType="centerCrop" />
+    <!-- Small Tape/Disk Icon style Cover -->
+    <FrameLayout
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:background="?attr/sonusLineColor"
+        android:padding="1dp">
+        <ImageView
+            android:id="@+id/imgCover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="Okładka"
+            android:scaleType="centerCrop" />
+    </FrameLayout>
 
     <!-- Tytuł + Artysta -->
     <LinearLayout
@@ -31,56 +37,56 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="monospace"
             android:maxLines="1"
-            android:text="Nazwa utworu"
-            android:textColor="?attr/sonusTextDarkColor"
-            android:textSize="16sp" />
+            android:text="Track Title"
+            android:textColor="?attr/sonusAccentColor"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvSongArtist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="2dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Artysta"
-            android:textColor="?attr/sonusTextPrimaryColor"
-            android:textSize="14sp" />
+            android:text="Artist Name"
+            android:textColor="?attr/sonusTextDarkColor"
+            android:textSize="13sp" />
     </LinearLayout>
 
-    <!-- Czas -->
+    <!-- Retro Display Duration -->
     <TextView
         android:id="@+id/tvSongDuration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:text="0:00"
-        android:textColor="?attr/sonusTextPrimaryColor"
-        android:textSize="14sp" />
+        android:fontFamily="monospace"
+        android:textColor="?attr/sonusTextDarkColor"
+        android:textSize="13sp" />
 
-    <!-- Dodaj do playlisty -->
+    <!-- Controls -->
     <TextView
         android:id="@+id/btnAddToPlaylist"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:gravity="center"
         android:text="+"
-        android:textColor="?attr/sonusTextPrimaryColor"
-        android:textSize="24sp"
-        android:textStyle="bold"
+        android:textColor="?attr/sonusTextDarkColor"
+        android:textSize="22sp"
         android:clickable="true"
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless" />
 
-    <!-- Ulubione (Serce) -->
     <ImageView
         android:id="@+id/btnFavorite"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:padding="10dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:padding="8dp"
         android:src="@drawable/ic_favorite"
-        app:tint="?attr/sonusTextPrimaryColor"
+        app:tint="?attr/sonusTextDarkColor"
         android:clickable="true"
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless" />

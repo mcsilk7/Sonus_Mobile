@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="sonusBackgroundColor" format="color" />
+    <attr name="sonusPanelColor" format="color" />
     <attr name="sonusCardColor" format="color" />
+    <attr name="sonusLineColor" format="color" />
+    <attr name="sonusLineSoftColor" format="color" />
     <attr name="sonusAccentColor" format="color" />
+    <attr name="sonusAccentDimColor" format="color" />
     <attr name="sonusTextPrimaryColor" format="color" />
     <attr name="sonusTextDarkColor" format="color" />
+    <attr name="sonusTextFaintColor" format="color" />
+    <attr name="sonusStatusRed" format="color" />
+    <attr name="sonusStatusGreen" format="color" />
+    <attr name="sonusCornerRadius" format="dimension" />
 </resources>

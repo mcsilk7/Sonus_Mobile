@@ -48,12 +48,13 @@ object PlaylistHelper {
     fun showPlaylistSelectionDialog(
         context: Context, 
         scope: CoroutineScope, 
+        userId: Long,
         song: SongDTO, 
         onAdded: () -> Unit
     ) {
         scope.launch {
             try {
-                val response = RetrofitClient.playlistApi.getAllPlaylists()
+                val response = RetrofitClient.playlistApi.getUserPlaylists(userId)
                 if (response.isSuccessful) {
                     val playlists = response.body() ?: emptyList()
                     if (playlists.isEmpty()) {

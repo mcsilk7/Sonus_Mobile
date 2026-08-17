@@ -78,7 +78,7 @@ class PlaybackService : Service() {
     private fun showNotification() {
         val song = PlayerState.currentSong
 
-        val activityIntent = Intent(this, PlayerActivity::class.java).apply {
+        val activityIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
         val contentPendingIntent = PendingIntent.getActivity(

@@ -1,57 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/albumItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_home_card"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="10dp"
+    android:layout_margin="6dp">
 
-    <!-- Okładka albumu -->
-    <ImageView
-        android:id="@+id/imgAlbumCover"
+    <!-- Industry Style Cover Art -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:background="@drawable/bg_cover_placeholder"
-        android:contentDescription="Okładka albumu"
-        android:scaleType="centerCrop" />
+        android:layout_height="140dp"
+        android:background="?attr/sonusLineColor"
+        android:padding="1dp">
+        <ImageView
+            android:id="@+id/imgAlbumCover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/sonusCardColor"
+            android:scaleType="centerCrop" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tvAlbumName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="12dp"
         android:ellipsize="end"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="monospace"
         android:maxLines="1"
-        android:text="Album"
-        android:textColor="@color/text_dark"
-        android:textSize="15sp"
+        android:text="ALBUM_ID"
+        android:textColor="?attr/sonusAccentColor"
+        android:textSize="14sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tvAlbumArtist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="2dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="Artysta"
-        android:textColor="@color/text_primary"
-        android:textSize="13sp" />
+        android:text="ARTIST_LABEL"
+        android:textColor="?attr/sonusTextDarkColor"
+        android:textSize="12sp" />
 
-    <!-- Dodaj do biblioteki -->
     <TextView
         android:id="@+id/btnAddAlbumToLibrary"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
         android:layout_gravity="end"
-        android:layout_marginTop="-30dp"
-        android:background="@drawable/bg_icon_circle"
+        android:layout_marginTop="8dp"
+        android:background="?attr/sonusLineSoftColor"
         android:gravity="center"
         android:text="+"
-        android:textColor="@color/app_background"
-        android:textSize="18sp"
+        android:textColor="?attr/sonusAccentColor"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:clickable="true"
         android:focusable="true" />

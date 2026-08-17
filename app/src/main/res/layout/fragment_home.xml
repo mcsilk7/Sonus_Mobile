@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/sonusBackgroundColor">
+
+    <!-- Top Rack Header -->
+    <LinearLayout
+        android:id="@+id/topRack"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="?attr/sonusPanelColor"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:elevation="4dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="STATION_CONTROL_UNIT"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.2" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MAIN_CONSOLE_V1"
+                android:textColor="?attr/sonusAccentColor"
+                android:textSize="20sp"
+                android:fontFamily="monospace"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <include layout="@layout/user_avatar" />
+    </LinearLayout>
+
+    <!-- ====== Main Content ====== -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="80dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="140dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Search Section (Integrated look) -->
+            <include layout="@layout/search_bar" />
+
+            <!-- Navigation Deck (Modular cards) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1">
+                    <include layout="@layout/card_favorites" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1">
+                    <include layout="@layout/card_playlists" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <!-- Channels / Recently Played Section -->
+            <LinearLayout
+                android:id="@+id/recentlyPlayedPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="?attr/sonusAccentColor" />
+                    <TextView
+                        android:id="@+id/tvRecentlyPlayedHeader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="SIGNAL_HISTORY_LOG"
+                        android:textColor="?attr/sonusTextPrimaryColor"
+                        android:textSize="16sp"
+                        android:fontFamily="monospace"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvRecentlyPlayed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:nestedScrollingEnabled="false" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>
