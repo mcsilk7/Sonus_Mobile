@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,9 +27,10 @@ class HomeFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var sessionManager: SessionManager
-    private lateinit var recentlyPlayedManager: RecentlyPlayedManager
     private lateinit var rvRecentlyPlayed: RecyclerView
-    private lateinit var songAdapter: SongAdapter
+    private lateinit var rvTerminalLog: RecyclerView
+    private lateinit var tapeAdapter: TapeReelAdapter
+    private lateinit var terminalLogAdapter: TerminalLogAdapter
     private lateinit var tvRecentlyPlayedHeader: TextView
 
     override fun onCreateView(
@@ -41,11 +41,25 @@ class HomeFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
+    private val playerListener = object : PlayerState.PlayerStateListener {
+        override fun onStateChanged() {
+            val song = PlayerState.currentSong
+            if (PlayerState.isPlaying && song != null) {
+                viewModel.addTerminalLog("SIGNAL_LOCKED: ${song.title}")
+                viewModel.addTerminalLog("BUFFERING_STREAM_0x${song.id.toString(16).uppercase()}")
+            }
+            // AUTO-REFRESH ARCHIVE on any player state change (like new song played)
+            viewModel.loadRecentlyPlayed(
+                sessionManager.getUserId(),
+                RecentlyPlayedManager.getRecentSongs()
+            )
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         sessionManager = SessionManager(requireContext())
-        recentlyPlayedManager = RecentlyPlayedManager(requireContext())
 
         if (!sessionManager.isLoggedIn()) {
             findNavController().navigate(R.id.loginFragment)
@@ -54,48 +68,48 @@ class HomeFragment : Fragment() {
 
         UserAvatarHelper.setupAvatar(view, sessionManager, findNavController())
         checkNotificationPermission()
+        PlayerState.addStateListener(playerListener)
 
-        val searchBar = view.findViewById<View>(R.id.searchBar)
-        val etSearch = searchBar.findViewById<EditText>(R.id.etSearch)
-        val ivSearchIcon = searchBar.findViewById<View>(R.id.ivSearchIcon)
         val cardFavorites = view.findViewById<View>(R.id.cardFavorites)
         val cardPlaylists = view.findViewById<View>(R.id.cardPlaylists)
-
-        val goToSearch = View.OnClickListener {
-            mainViewModel.setTabPage(1)
-        }
 
         val goToLibrary = View.OnClickListener {
             mainViewModel.setTabPage(2)
         }
 
-        searchBar.setOnClickListener(goToSearch)
-        etSearch.setOnClickListener(goToSearch)
-        ivSearchIcon.setOnClickListener(goToSearch)
-
         cardFavorites.setOnClickListener(goToLibrary)
         cardPlaylists.setOnClickListener(goToLibrary)
 
         rvRecentlyPlayed = view.findViewById(R.id.rvRecentlyPlayed)
+        rvTerminalLog = view.findViewById(R.id.rvTerminalLog)
         tvRecentlyPlayedHeader = view.findViewById(R.id.tvRecentlyPlayedHeader)
         
         setupRecentlyPlayed()
+        setupTerminal()
         observeViewModel()
+    }
 
-        etSearch.isFocusable = false
-        etSearch.isCursorVisible = false
+    private fun setupTerminal() {
+        terminalLogAdapter = TerminalLogAdapter()
+        rvTerminalLog.layoutManager = LinearLayoutManager(requireContext()).apply {
+            stackFromEnd = true // Traditional terminal behavior
+        }
+        rvTerminalLog.adapter = terminalLogAdapter
     }
 
     private fun observeViewModel() {
         viewModel.recentlyPlayed.observe(viewLifecycleOwner) { songs ->
             if (songs.isEmpty()) {
-                tvRecentlyPlayedHeader.visibility = View.GONE
                 rvRecentlyPlayed.visibility = View.GONE
             } else {
-                tvRecentlyPlayedHeader.visibility = View.VISIBLE
                 rvRecentlyPlayed.visibility = View.VISIBLE
-                songAdapter.updateData(songs)
+                tapeAdapter.updateData(songs)
             }
+        }
+
+        viewModel.terminalLogs.observe(viewLifecycleOwner) { logs ->
+            terminalLogAdapter.setLogs(logs)
+            rvTerminalLog.scrollToPosition(terminalLogAdapter.itemCount - 1)
         }
     }
 
@@ -118,43 +132,35 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        viewModel.addTerminalLog("OPERATOR_ACTIVE: SESSION_RESUMED")
         viewModel.loadRecentlyPlayed(
             sessionManager.getUserId(),
-            recentlyPlayedManager.getRecentSongs()
+            RecentlyPlayedManager.getRecentSongs()
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        PlayerState.removeStateListener(playerListener)
     }
 
     private fun setupRecentlyPlayed() {
-        songAdapter = SongAdapter(
-            songs = emptyList(),
-            onItemClick = { song ->
-                playSong(song)
-            },
-            onAddClick = { song ->
-                PlaylistHelper.showPlaylistSelectionDialog(requireActivity() as androidx.appcompat.app.AppCompatActivity, viewLifecycleOwner.lifecycleScope, sessionManager.getUserId(), song) {
-                    songAdapter.notifyDataSetChanged()
-                }
-            }
-        )
-        rvRecentlyPlayed.layoutManager = LinearLayoutManager(requireContext())
-        rvRecentlyPlayed.adapter = songAdapter
-
-        SongTouchHelper.attach(
-            rvRecentlyPlayed, 
-            songAdapter, 
-            sessionManager.getUserId(), 
-            viewLifecycleOwner.lifecycleScope
-        ) {
-            // Updated
+        tapeAdapter = TapeReelAdapter(emptyList()) { song ->
+            playSong(song)
         }
+        rvRecentlyPlayed.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        rvRecentlyPlayed.adapter = tapeAdapter
+
+        // Swipe removed for horizontal tape rack to avoid gesture conflicts
     }
 
     private fun playSong(song: SongDTO) {
-        val recentSongs = recentlyPlayedManager.getRecentSongs()
-        recentlyPlayedManager.addSong(song)
-        viewModel.loadRecentlyPlayed(sessionManager.getUserId(), recentSongs)
+        RecentlyPlayedManager.addSong(song)
+        val updatedRecentSongs = RecentlyPlayedManager.getRecentSongs()
+        viewModel.loadRecentlyPlayed(sessionManager.getUserId(), updatedRecentSongs)
+        viewModel.addTerminalLog("REEL_LOADED: ${song.title.uppercase()}")
         
-        PlayerState.play(requireContext(), song, recentSongs)
+        PlayerState.play(requireContext(), song, updatedRecentSongs)
         Toast.makeText(requireContext(), "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
     }
 }

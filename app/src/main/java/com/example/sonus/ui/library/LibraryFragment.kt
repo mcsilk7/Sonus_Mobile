@@ -36,7 +36,6 @@ class LibraryFragment : Fragment() {
     private lateinit var btnAddPlaylist: LinearLayout
     private lateinit var btnGoToFavorites: View
     private lateinit var sessionManager: SessionManager
-    private lateinit var recentlyPlayedManager: RecentlyPlayedManager
 
     private lateinit var sectionPlaylists: View
     private lateinit var sectionAlbums: View
@@ -57,7 +56,6 @@ class LibraryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         sessionManager = SessionManager(requireContext())
-        recentlyPlayedManager = RecentlyPlayedManager(requireContext())
         UserAvatarHelper.setupAvatar(view, sessionManager, findNavController())
         initViews(view)
         setupRecyclerViews()

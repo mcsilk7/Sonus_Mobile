@@ -61,6 +61,9 @@ object PlayerState {
         } else {
             currentIndex = currentPlaylist.indexOfFirst { it.id == song.id }
         }
+
+        // AUTO-ARCHIVE: Centralized recently played logic
+        RecentlyPlayedManager.addSong(song)
         
         // Start foreground service
         val serviceIntent = Intent(context, PlaybackService::class.java)
@@ -116,11 +119,6 @@ object PlayerState {
                     val dur = getDuration()
                     Log.d("PlayerState", "Playback completed at $pos / $dur")
                     
-                    if (dur > 0 && pos < dur - 2000 && !isLooping) {
-                        Log.w("PlayerState", "Early completion detected, attempting to resume...")
-                        // Można tu dodać logikę re-connecta, ale najpierw sprawdźmy logi
-                    }
-
                     if (!isLooping) {
                         this@PlayerState.isPlaying = false
                         playNext(context)
@@ -243,16 +241,7 @@ object PlayerState {
     fun getDuration(): Int {
         val playerDuration = mediaPlayer?.duration ?: 0
         val dtoDuration = (currentSong?.duration ?: 0) * 1000
-        
-        // Jeśli player podaje dziwnie krótki czas (np. < 30s) a w bazie mamy dłuższą piosenkę,
-        // ufamy danym z bazy (DTO). Częsty problem przy streamingu VBR/HTTP.
-        return if (dtoDuration > playerDuration) {
-            dtoDuration
-        } else if (playerDuration > 0) {
-            playerDuration
-        } else {
-            dtoDuration
-        }
+        return if (dtoDuration > playerDuration) dtoDuration else if (playerDuration > 0) playerDuration else dtoDuration
     }
 
     fun seekTo(msec: Int) {
@@ -266,7 +255,6 @@ object PlayerState {
             playlist.add(toIndex, song)
             currentPlaylist = playlist
             
-            // Update currentIndex if the moving song was the current one
             if (fromIndex == currentIndex) {
                 currentIndex = toIndex
             } else if (fromIndex < currentIndex && toIndex >= currentIndex) {

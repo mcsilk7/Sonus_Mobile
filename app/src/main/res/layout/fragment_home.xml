@@ -30,13 +30,14 @@
                 android:textSize="10sp"
                 android:fontFamily="monospace"
                 android:letterSpacing="0.2" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="MAIN_CONSOLE_V1"
+                android:fontFamily="monospace"
+                android:text="MAIN_CONSOLE"
                 android:textColor="?attr/sonusAccentColor"
                 android:textSize="20sp"
-                android:fontFamily="monospace"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -58,8 +59,55 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Search Section (Integrated look) -->
-            <include layout="@layout/search_bar" />
+            <!-- SYSTEM STATUS TERMINAL (Moved to Top) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_settings_item"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:background="?attr/sonusLineColor"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+                    <View
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:background="?attr/sonusStatusRed" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="monospace"
+                        android:text="SYSTEM_STATUS_LOG"
+                        android:textColor="?attr/sonusTextPrimaryColor"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:text="LIVE_FEED"
+                        android:textColor="?attr/sonusAccentColor"
+                        android:textSize="8sp" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTerminalLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:overScrollMode="never" />
+            </LinearLayout>
 
             <!-- Navigation Deck (Modular cards) -->
             <LinearLayout
@@ -85,7 +133,7 @@
                 </FrameLayout>
             </LinearLayout>
 
-            <!-- Channels / Recently Played Section -->
+            <!-- Channels / Tape Rack Section -->
             <LinearLayout
                 android:id="@+id/recentlyPlayedPanel"
                 android:layout_width="match_parent"
@@ -107,7 +155,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
-                        android:text="SIGNAL_HISTORY_LOG"
+                        android:text="LOADED_REELS_ARCHIVE"
                         android:textColor="?attr/sonusTextPrimaryColor"
                         android:textSize="16sp"
                         android:fontFamily="monospace"
@@ -119,7 +167,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:nestedScrollingEnabled="false" />
+                    android:clipToPadding="false"
+                    android:paddingEnd="16dp"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
             </LinearLayout>
 
         </LinearLayout>

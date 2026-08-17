@@ -33,7 +33,6 @@ class PlaylistDetailFragment : Fragment() {
     
     private lateinit var songAdapter: SongAdapter
     private lateinit var sessionManager: SessionManager
-    private lateinit var recentlyPlayedManager: RecentlyPlayedManager
     
     private var playlistId: Long = -1
 
@@ -55,7 +54,6 @@ class PlaylistDetailFragment : Fragment() {
         }
 
         sessionManager = SessionManager(requireContext())
-        recentlyPlayedManager = RecentlyPlayedManager(requireContext())
         initViews(view)
         setupRecyclerView()
         fetchPlaylistDetails()
@@ -78,7 +76,6 @@ class PlaylistDetailFragment : Fragment() {
     }
 
     private fun playSong(song: SongDTO) {
-        recentlyPlayedManager.addSong(song)
         PlayerState.play(requireContext(), song, songAdapter.getSongs())
         Toast.makeText(requireContext(), "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
     }
