@@ -26,7 +26,8 @@ object SongTouchHelper {
                 if (direction == ItemTouchHelper.RIGHT) {
                     // Add to Queue
                     PlayerState.addSongToQueue(song)
-                    Toast.makeText(recyclerView.context, "Added to queue: ${song.title}", Toast.LENGTH_SHORT).show()
+                    val msg = recyclerView.context.getString(R.string.toast_added_to_queue, song.title)
+                    Toast.makeText(recyclerView.context, msg, Toast.LENGTH_SHORT).show()
                     adapter.notifyItemChanged(position)
                 } else if (direction == ItemTouchHelper.LEFT) {
                     // Toggle Favorite
@@ -39,7 +40,7 @@ object SongTouchHelper {
                                 onFavoriteToggled(song)
                             }
                         } catch (e: Exception) {
-                            Toast.makeText(recyclerView.context, "Error toggling favorite", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(recyclerView.context, recyclerView.context.getString(R.string.toast_favorite_error), Toast.LENGTH_SHORT).show()
                         }
                         adapter.notifyItemChanged(position)
                     }

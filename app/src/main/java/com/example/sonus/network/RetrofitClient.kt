@@ -12,12 +12,6 @@ object RetrofitClient {
 //    const val BASE_URL = "http://192.168.1.59:8080/"//localnetwork
       const val BASE_URL = "http://100.126.233.66:8080/"//tailcsale
 
-    fun getFullUrl(path: String?): String? {
-        if (path == null) return null
-        if (path.startsWith("http")) return path
-        return BASE_URL.removeSuffix("/") + "/" + path.removePrefix("/")
-    }
-
     private lateinit var sessionManager: SessionManager
     private lateinit var appContext: Context
 

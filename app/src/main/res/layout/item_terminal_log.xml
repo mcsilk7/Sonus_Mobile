@@ -8,7 +8,7 @@
     android:paddingEnd="12dp"
     android:paddingTop="2dp"
     android:paddingBottom="2dp"
-    android:text="> SYSTEM_LOG_ENTRY"
+    android:text="@string/system_log_entry"
     android:textColor="?attr/sonusAccentDimColor"
     android:textSize="10sp"
     android:letterSpacing="0.05" />

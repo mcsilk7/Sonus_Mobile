@@ -17,16 +17,19 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/nav_graph" />
 
-    <!-- Global Mini Player -->
-    <include
-        android:id="@+id/miniPlayer"
-        layout="@layout/mini_player"
+    <!-- Global Mini Player Container -->
+    <FrameLayout
+        android:id="@+id/miniPlayerContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/bottomNav"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+        <include
+            android:id="@+id/miniPlayer"
+            layout="@layout/mini_player"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <!-- Global Bottom Nav -->
     <include
@@ -34,7 +37,6 @@
         layout="@layout/bottom_nav"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

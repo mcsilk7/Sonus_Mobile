@@ -23,19 +23,21 @@
             android:layout_weight="1"
             android:orientation="vertical">
             <TextView
+                android:id="@+id/tvHomeHeaderTop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="STATION_CONTROL_UNIT"
+                android:text="@string/station_control_unit"
                 android:textColor="?attr/sonusTextDarkColor"
                 android:textSize="10sp"
                 android:fontFamily="monospace"
                 android:letterSpacing="0.2" />
 
             <TextView
+                android:id="@+id/tvHomeHeaderMain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
-                android:text="MAIN_CONSOLE"
+                android:text="@string/main_console"
                 android:textColor="?attr/sonusAccentColor"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -51,7 +53,7 @@
         android:layout_marginTop="80dp"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingBottom="140dp">
+        android:paddingBottom="180dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -79,11 +81,12 @@
                         android:layout_height="6dp"
                         android:background="?attr/sonusStatusRed" />
                     <TextView
+                        android:id="@+id/tvTerminalHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:fontFamily="monospace"
-                        android:text="SYSTEM_STATUS_LOG"
+                        android:text="@string/system_status_log"
                         android:textColor="?attr/sonusTextPrimaryColor"
                         android:textSize="9sp"
                         android:textStyle="bold" />
@@ -92,10 +95,11 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1" />
                     <TextView
+                        android:id="@+id/tvTerminalLive"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="monospace"
-                        android:text="LIVE_FEED"
+                        android:text="@string/live_feed"
                         android:textColor="?attr/sonusAccentColor"
                         android:textSize="8sp" />
                 </LinearLayout>
@@ -155,7 +159,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
-                        android:text="LOADED_REELS_ARCHIVE"
+                        android:text="@string/loaded_reels_archive"
                         android:textColor="?attr/sonusTextPrimaryColor"
                         android:textSize="16sp"
                         android:fontFamily="monospace"

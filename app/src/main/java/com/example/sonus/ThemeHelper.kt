@@ -9,8 +9,22 @@ object ThemeHelper {
      * This is the primary theme for the Sonus application.
      */
     fun applyTheme(activity: Activity) {
-        // Always use dark mode for the Retro Studio look
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        activity.setTheme(R.style.Theme_Sonus)
+        val settingsManager = SettingsManager(activity)
+        val themeId = settingsManager.getThemeId()
+
+        when (themeId) {
+            1 -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                activity.setTheme(R.style.Theme_Sonus_Industrial_Dark)
+            }
+            2 -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                activity.setTheme(R.style.Theme_Sonus_Industrial_Light)
+            }
+            else -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                activity.setTheme(R.style.Theme_Sonus)
+            }
+        }
     }
 }

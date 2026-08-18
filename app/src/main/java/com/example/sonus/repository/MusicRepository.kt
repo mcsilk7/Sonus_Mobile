@@ -16,15 +16,21 @@ class MusicRepository {
         val response = RetrofitClient.playlistApi.getUserPlaylists(userId)
         if (response.isSuccessful) {
             val playlists = response.body() ?: emptyList()
-            // Optimization: Fetch counts in parallel
+            // Optimization: Fetch counts and first 4 songs for collage in parallel
             coroutineScope {
                 playlists.map { playlist ->
                     async {
                         try {
-                            val countResponse = RetrofitClient.playlistApi.getSongCountInPlaylist(playlist.id!!)
-                            if (countResponse.isSuccessful) {
-                                playlist.copy(songCount = countResponse.body()?.toInt() ?: 0)
-                            } else playlist
+                            val countDeferred = async { RetrofitClient.playlistApi.getSongCountInPlaylist(playlist.id!!) }
+                            val songsDeferred = async { RetrofitClient.playlistApi.getSongsInPlaylist(playlist.id!!) }
+                            
+                            val countRes = countDeferred.await()
+                            val songsRes = songsDeferred.await()
+                            
+                            val count = if (countRes.isSuccessful) countRes.body()?.toInt() ?: 0 else 0
+                            val songs = if (songsRes.isSuccessful) songsRes.body()?.take(4) else null
+                            
+                            playlist.copy(songCount = count, songs = songs)
                         } catch (e: Exception) {
                             playlist
                         }
@@ -60,9 +66,15 @@ class MusicRepository {
         } else emptyList()
     }
     
-    suspend fun toggleFavorite(userId: Long, songId: Long): Boolean = withContext(Dispatchers.IO) {
-        val response = RetrofitClient.favoriteApi.toggleFavorite(userId, songId)
-        response.isSuccessful
+    suspend fun toggleFavorite(userId: Long, songId: Long): Boolean? = withContext(Dispatchers.IO) {
+        try {
+            val response = RetrofitClient.favoriteApi.toggleFavorite(userId, songId)
+            if (response.isSuccessful) {
+                response.body()?.get("added")
+            } else null
+        } catch (e: Exception) {
+            null
+        }
     }
     
     /**

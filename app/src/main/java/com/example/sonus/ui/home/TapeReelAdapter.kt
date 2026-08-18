@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.sonus.R
+import com.example.sonus.SettingsManager
 import com.example.sonus.network.RetrofitClient
 import com.example.sonus.network.SongDTO
 import java.text.SimpleDateFormat
@@ -37,14 +38,27 @@ class TapeReelAdapter(
 
     override fun onBindViewHolder(holder: TapeViewHolder, position: Int) {
         val song = songs[position]
-        holder.tvTitle.text = song.title.uppercase()
-        holder.tvArtist.text = "SRC: ${song.artist.uppercase()}"
+        val context = holder.itemView.context
+        val settingsManager = SettingsManager(context)
+        val isTechnical = settingsManager.getThemeId() == 0
+
+        holder.tvTitle.text = if (isTechnical) song.title.uppercase() else song.title
+        holder.tvArtist.text = if (isTechnical) "SRC: ${song.artist.uppercase()}" else song.artist
         
         // Technical labels
-        holder.tvReelId.text = "REEL_#${song.id.toString().padStart(3, '0')}"
+        holder.tvReelId.text = if (isTechnical) {
+            context.getString(R.string.reel_id_prefix, song.id.toString().padStart(3, '0'))
+        } else {
+            context.getString(R.string.reel_id_label_norm, song.id.toString())
+        }
         
         val sdf = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
-        holder.tvDate.text = "LOG_DATE: ${sdf.format(Date())}"
+        val dateStr = sdf.format(Date())
+        holder.tvDate.text = if (isTechnical) {
+            context.getString(R.string.log_date_prefix, dateStr)
+        } else {
+            context.getString(R.string.log_date_label_norm, dateStr)
+        }
 
         val coverUrl = if (song.coverPath?.startsWith("http") == true) {
             song.coverPath

@@ -9,18 +9,20 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Edytuj profil"
-        android:textColor="@color/text_dark"
+        android:text="@string/edit_profile_pl"
+        android:textColor="?attr/sonusAccentColor"
         android:textSize="22sp"
-        android:fontFamily="sans-serif-black"
+        android:fontFamily="monospace"
+        android:textStyle="bold"
         android:layout_marginBottom="16dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nazwa użytkownika"
-        android:textColor="@color/text_primary"
-        android:textSize="14sp"
+        android:text="@string/username_label_pl"
+        android:textColor="?attr/sonusTextDarkColor"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
         android:layout_marginBottom="8dp"/>
 
     <EditText
@@ -28,11 +30,12 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@drawable/bg_auth_input"
-        android:hint="Wpisz nową nazwę"
-        android:textColor="@color/text_dark"
-        android:textColorHint="@color/text_primary"
+        android:hint="@string/hint_enter_name_pl"
+        android:textColor="?attr/sonusTextPrimaryColor"
+        android:textColorHint="?attr/sonusTextFaintColor"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
+        android:fontFamily="monospace"
         android:inputType="textPersonName"
         android:layout_marginBottom="24dp"/>
 
@@ -46,9 +49,10 @@
             android:id="@+id/btnEditCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Anuluj"
-            android:textColor="@color/text_primary"
+            android:text="@string/cancel_pl"
+            android:textColor="?attr/sonusTextDarkColor"
             android:textSize="16sp"
+            android:fontFamily="monospace"
             android:padding="12dp"
             android:layout_marginEnd="8dp"
             android:clickable="true"
@@ -59,11 +63,12 @@
             android:id="@+id/btnEditSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Zapisz"
-            android:textColor="@android:color/white"
+            android:text="@string/save_pl"
+            android:textColor="?attr/sonusBackgroundColor"
             android:background="@drawable/bg_auth_button"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
+            android:fontFamily="monospace"
             android:textAllCaps="false"
             android:textStyle="bold"/>
     </LinearLayout>

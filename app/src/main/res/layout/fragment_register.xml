@@ -22,19 +22,21 @@
             android:padding="16dp"
             android:background="?attr/sonusPanelColor">
             <TextView
+                android:id="@+id/tvRegTop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="REGISTRATION UNIT"
+                android:text="@string/registration_unit"
                 android:textColor="?attr/sonusTextDarkColor"
                 android:fontFamily="monospace"
                 android:textSize="10sp"
                 android:letterSpacing="0.3" />
             <TextView
+                android:id="@+id/tvRegMain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="monospace"
-                android:text="NEW_IDENTITY"
+                android:text="@string/new_identity"
                 android:textColor="?attr/sonusAccentColor"
                 android:textSize="32sp"
                 android:textStyle="bold" />
@@ -50,18 +52,20 @@
             android:background="?attr/sonusCardColor">
 
             <TextView
+                android:id="@+id/tvRegData"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DATA_ENTRY"
+                android:text="@string/data_entry"
                 android:textColor="?attr/sonusTextDarkColor"
                 android:fontFamily="monospace"
                 android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/tvRegUserLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="OPERATOR_ID"
+                android:text="@string/operator_id_label"
                 android:textColor="?attr/sonusTextPrimaryColor"
                 android:fontFamily="monospace"
                 android:textSize="13sp" />
@@ -73,17 +77,18 @@
                 android:background="@drawable/bg_auth_input"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:hint="unique name"
+                android:hint="@string/hint_unique_name"
                 android:textColor="?attr/sonusAccentColor"
                 android:textColorHint="?attr/sonusTextFaintColor"
                 android:fontFamily="monospace"
                 android:textSize="15sp" />
 
             <TextView
+                android:id="@+id/tvRegPassLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="SECURE_PASS"
+                android:text="@string/secure_pass_label"
                 android:textColor="?attr/sonusTextPrimaryColor"
                 android:fontFamily="monospace"
                 android:textSize="13sp" />
@@ -95,7 +100,7 @@
                 android:background="@drawable/bg_auth_input"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:hint="********"
+                android:hint="@string/hint_stars"
                 android:inputType="textPassword"
                 android:textColor="?attr/sonusAccentColor"
                 android:textColorHint="?attr/sonusTextFaintColor"
@@ -109,7 +114,7 @@
                 android:layout_marginTop="32dp"
                 android:background="@drawable/bg_auth_button"
                 android:gravity="center"
-                android:text="INITIALIZE_ACCOUNT"
+                android:text="@string/initialize_account"
                 android:textColor="?attr/sonusBackgroundColor"
                 android:fontFamily="monospace"
                 android:textSize="16sp"
@@ -122,7 +127,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="BACK_TO_LOGIN_INTERFACE"
+            android:text="@string/back_to_login_interface"
             android:textColor="?attr/sonusAccentDimColor"
             android:fontFamily="monospace"
             android:textSize="13sp"

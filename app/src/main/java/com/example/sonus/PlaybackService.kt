@@ -115,8 +115,8 @@ class PlaybackService : Service() {
 
         val builder = NotificationCompat.Builder(this, SonusApp.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_play)
-            .setContentTitle(song?.title ?: "Sonus")
-            .setContentText(song?.artist ?: "Przygotowywanie...")
+            .setContentTitle(song?.title ?: getString(R.string.app_name))
+            .setContentText(song?.artist ?: getString(R.string.description_pending))
             .setContentIntent(contentPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(PlayerState.isPlaying)

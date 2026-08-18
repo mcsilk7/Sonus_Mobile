@@ -16,18 +16,47 @@
         android:background="?attr/sonusAccentDimColor"
         android:layout_marginEnd="12dp" />
 
-    <!-- Okładka playlisty with border -->
+    <!-- 2x2 Grid okładek with border -->
     <FrameLayout
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:background="?attr/sonusLineColor"
         android:padding="1dp">
-        <ImageView
-            android:id="@+id/imgPlaylistCover"
+
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/bg_cover_placeholder"
-            android:scaleType="centerCrop" />
+            android:columnCount="2"
+            android:rowCount="2">
+
+            <ImageView
+                android:id="@+id/imgPlaylistCover1"
+                android:layout_width="27dp"
+                android:layout_height="27dp"
+                android:background="@drawable/bg_cover_placeholder"
+                android:scaleType="centerCrop" />
+
+            <ImageView
+                android:id="@+id/imgPlaylistCover2"
+                android:layout_width="27dp"
+                android:layout_height="27dp"
+                android:background="@drawable/bg_cover_placeholder"
+                android:scaleType="centerCrop" />
+
+            <ImageView
+                android:id="@+id/imgPlaylistCover3"
+                android:layout_width="27dp"
+                android:layout_height="27dp"
+                android:background="@drawable/bg_cover_placeholder"
+                android:scaleType="centerCrop" />
+
+            <ImageView
+                android:id="@+id/imgPlaylistCover4"
+                android:layout_width="27dp"
+                android:layout_height="27dp"
+                android:background="@drawable/bg_cover_placeholder"
+                android:scaleType="centerCrop" />
+        </GridLayout>
     </FrameLayout>
 
     <!-- Nazwa + liczba utworów -->
@@ -45,7 +74,7 @@
             android:ellipsize="end"
             android:fontFamily="monospace"
             android:maxLines="1"
-            android:text="UNIT_NAME"
+            android:text="@string/unit_id_prefix"
             android:textColor="?attr/sonusAccentColor"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -56,16 +85,17 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:fontFamily="monospace"
-            android:text="DATA_SLOTS: 0"
+            android:text="@string/description_pending"
             android:textColor="?attr/sonusTextDarkColor"
             android:textSize="11sp" />
     </LinearLayout>
 
     <TextView
+        android:id="@+id/tvPlaylistLoad"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="monospace"
-        android:text="::LOAD"
+        android:text="@string/double_colon_load"
         android:textColor="?attr/sonusAccentDimColor"
         android:textSize="11sp" />
 

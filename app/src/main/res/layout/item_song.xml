@@ -39,7 +39,7 @@
             android:ellipsize="end"
             android:fontFamily="monospace"
             android:maxLines="1"
-            android:text="Track Title"
+            android:text="@string/track_name_placeholder"
             android:textColor="?attr/sonusAccentColor"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -51,7 +51,7 @@
             android:layout_marginTop="2dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Artist Name"
+            android:text="@string/artist_id_placeholder"
             android:textColor="?attr/sonusTextDarkColor"
             android:textSize="13sp" />
     </LinearLayout>
@@ -62,7 +62,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:text="0:00"
+        android:text="@string/time_placeholder"
         android:fontFamily="monospace"
         android:textColor="?attr/sonusTextDarkColor"
         android:textSize="13sp" />

@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -45,8 +44,8 @@ class HomeFragment : Fragment() {
         override fun onStateChanged() {
             val song = PlayerState.currentSong
             if (PlayerState.isPlaying && song != null) {
-                viewModel.addTerminalLog("SIGNAL_LOCKED: ${song.title}")
-                viewModel.addTerminalLog("BUFFERING_STREAM_0x${song.id.toString(16).uppercase()}")
+                viewModel.addTerminalLog(getString(R.string.terminal_signal_locked, song.title))
+                viewModel.addTerminalLog(getString(R.string.terminal_buffering, song.id.toString(16).uppercase()))
             }
             // AUTO-REFRESH ARCHIVE on any player state change (like new song played)
             viewModel.loadRecentlyPlayed(
@@ -73,12 +72,13 @@ class HomeFragment : Fragment() {
         val cardFavorites = view.findViewById<View>(R.id.cardFavorites)
         val cardPlaylists = view.findViewById<View>(R.id.cardPlaylists)
 
-        val goToLibrary = View.OnClickListener {
-            mainViewModel.setTabPage(2)
+        cardFavorites.setOnClickListener {
+            findNavController().navigate(R.id.favoriteFragment)
         }
-
-        cardFavorites.setOnClickListener(goToLibrary)
-        cardPlaylists.setOnClickListener(goToLibrary)
+        cardPlaylists.setOnClickListener {
+            mainViewModel.setLibraryFilter(1) // 1: PLAYLISTS
+            mainViewModel.setTabPage(2) // 2: LIB
+        }
 
         rvRecentlyPlayed = view.findViewById(R.id.rvRecentlyPlayed)
         rvTerminalLog = view.findViewById(R.id.rvTerminalLog)
@@ -87,6 +87,25 @@ class HomeFragment : Fragment() {
         setupRecentlyPlayed()
         setupTerminal()
         observeViewModel()
+        applyThemeStrings(view)
+    }
+
+    private fun applyThemeStrings(view: View) {
+        val context = requireContext()
+        view.findViewById<TextView>(R.id.tvHomeHeaderTop).text = LabelProvider.getLabel(context, "home_header_top")
+        view.findViewById<TextView>(R.id.tvHomeHeaderMain).text = LabelProvider.getLabel(context, "home_header_main")
+        view.findViewById<TextView>(R.id.tvFavCardLabel).text = LabelProvider.getLabel(context, "home_fav_card")
+        view.findViewById<TextView>(R.id.tvPlCardLabel).text = LabelProvider.getLabel(context, "home_pl_card")
+        
+        view.findViewById<TextView>(R.id.tvFavCardDesc).text = LabelProvider.getLabel(context, "home_fav_desc")
+        view.findViewById<TextView>(R.id.tvPlCardDesc).text = LabelProvider.getLabel(context, "home_pl_desc")
+        view.findViewById<TextView>(R.id.tvFavCardAccess).text = LabelProvider.getLabel(context, "home_access")
+        view.findViewById<TextView>(R.id.tvPlCardAccess).text = LabelProvider.getLabel(context, "home_access")
+        
+        view.findViewById<TextView>(R.id.tvTerminalHeader).text = LabelProvider.getLabel(context, "home_log_header")
+        view.findViewById<TextView>(R.id.tvTerminalLive).text = LabelProvider.getLabel(context, "home_live_feed")
+        
+        tvRecentlyPlayedHeader.text = LabelProvider.getLabel(context, "home_recent_header")
     }
 
     private fun setupTerminal() {
@@ -132,7 +151,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.addTerminalLog("OPERATOR_ACTIVE: SESSION_RESUMED")
+        viewModel.addTerminalLog(getString(R.string.terminal_session_resumed))
         viewModel.loadRecentlyPlayed(
             sessionManager.getUserId(),
             RecentlyPlayedManager.getRecentSongs()
@@ -158,9 +177,9 @@ class HomeFragment : Fragment() {
         RecentlyPlayedManager.addSong(song)
         val updatedRecentSongs = RecentlyPlayedManager.getRecentSongs()
         viewModel.loadRecentlyPlayed(sessionManager.getUserId(), updatedRecentSongs)
-        viewModel.addTerminalLog("REEL_LOADED: ${song.title.uppercase()}")
+        viewModel.addTerminalLog(getString(R.string.terminal_reel_loaded, song.title.uppercase()))
         
         PlayerState.play(requireContext(), song, updatedRecentSongs)
-        Toast.makeText(requireContext(), "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.toast_playing, song.title), Toast.LENGTH_SHORT).show()
     }
 }

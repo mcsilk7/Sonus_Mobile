@@ -1,37 +1,298 @@
 <resources>
     <string name="app_name">Sonus</string>
     <string name="hello_text">Cześć!</string>
-    <string name="search_hint">Szukaj utworów, albumów…</string>
-    <string name="nav_home">Home</string>
-    <string name="nav_search">Szukaj</string>
-    <string name="nav_library">Biblioteka</string>
-    <string name="nav_settings">Ustawienia</string>
+    <string name="zero">0</string>
+    <string name="default_avatar">A</string>
 
-    <string name="login_title">Witaj ponownie!</string>
-    <string name="login_subtitle">Zaloguj się do Sonus</string>
-    <string name="register_title">Dołącz do Sonus</string>
-    <string name="register_subtitle">Stwórz nowe konto</string>
-    <string name="hint_username">Nazwa</string>
-    <string name="hint_password">Hasło</string>
-    <string name="hint_name">Imię</string>
-    <string name="hint_confirm_password">Potwierdź hasło</string>
-    <string name="btn_login">Zaloguj się</string>
-    <string name="btn_register">Zarejestruj się</string>
-    <string name="or_divider">lub</string>
-    <string name="login_google">Kontynuuj z Google</string>
-    <string name="login_facebook">Kontynuuj z Facebook</string>
-    <string name="no_account">Nie masz konta?</string>
-    <string name="have_account">Masz już konto?</string>
-    <string name="forgot_password">Zapomniałeś hasła?</string>
+    <!-- Navigation Labels - Technical -->
+    <string name="nav_dir">DIR</string>
+    <string name="nav_srch">SRCH</string>
+    <string name="nav_lib">LIB</string>
+    <string name="nav_sys">SYS</string>
+    <string name="nav_esc">ESC</string>
+    <string name="nav_opt">OPT</string>
+    <string name="nav_back">←</string>
+    <string name="nav_forward">›</string>
 
-    <string name="profile_title">Twój profil</string>
-    <string name="profile_edit">Edytuj profil</string>
-    <string name="profile_stats_songs">Utwory</string>
-    <string name="profile_stats_playlists">Playlisty</string>
-    <string name="profile_stats_hours">Godziny</string>
-    <string name="profile_stats_favorites">Ulubione</string>
-    <string name="profile_recent">Ostatnia aktywność</string>
-    <string name="profile_preferences">Preferencje</string>
-    <string name="profile_account">Konto</string>
-    <string name="profile_logout">Wyloguj się</string>
+    <!-- Navigation Labels - Normal -->
+    <string name="nav_home_norm">Home</string>
+    <string name="nav_search_norm">Search</string>
+    <string name="nav_library_norm">Library</string>
+    <string name="nav_settings_norm">Settings</string>
+    <string name="nav_back_norm">Back</string>
+
+    <!-- Home - Technical -->
+    <string name="station_control_unit">STATION_CONTROL_UNIT</string>
+    <string name="main_console">MAIN_CONSOLE</string>
+    <string name="fav_data">FAV_DATA</string>
+    <string name="unit_01">UNIT_01</string>
+    <string name="pl_data">PL_DATA</string>
+    <string name="unit_02">UNIT_02</string>
+    <string name="access_bracket">[ ACCESS ]</string>
+    <string name="system_status_log">SYSTEM_STATUS_LOG</string>
+    <string name="live_feed">LIVE_FEED</string>
+    <string name="loaded_reels_archive">LOADED_REELS_ARCHIVE</string>
+    <string name="signal_history_log">SIGNAL_HISTORY_LOG</string>
+
+    <!-- Home - Normal -->
+    <string name="welcome_norm">Welcome Operator</string>
+    <string name="dashboard_norm">Dashboard</string>
+    <string name="favorites_norm">Favorites</string>
+    <string name="favorites_desc_norm">Your saved signals</string>
+    <string name="playlists_norm">Playlists</string>
+    <string name="playlists_desc_norm">Music collections</string>
+    <string name="access_norm">Open</string>
+    <string name="recent_norm">Recently Played</string>
+    <string name="status_log_norm">Activity Log</string>
+    <string name="live_feed_norm">Monitoring</string>
+
+    <!-- Search - Technical -->
+    <string name="signal_scanner">SIGNAL_SCANNER</string>
+    <string name="track_finder_unit">TRACK_FINDER_UNIT</string>
+    <string name="search_hint">SCAN_FOR_TRACKS...</string>
+    <string name="recently_searched">[ RECENTLY_SEARCHED ]</string>
+    <string name="search_results_songs">[ SEARCH_RESULTS_SONGS ]</string>
+    <string name="search_results_albums">[ SEARCH_RESULTS_ALBUMS ]</string>
+
+    <!-- Search - Normal -->
+    <string name="search_title_norm">Signal Scanner</string>
+    <string name="search_desc_norm">Search Database</string>
+    <string name="search_hint_norm">Search for songs, albums…</string>
+    <string name="history_norm">Search History</string>
+    <string name="results_songs_norm">Found Tracks</string>
+    <string name="results_albums_norm">Found Albums</string>
+
+    <!-- Library - Technical -->
+    <string name="archive_unit">ARCHIVE UNIT</string>
+    <string name="library_management">LIBRARY_MANAGEMENT</string>
+    <string name="favorite_signals">FAVORITE_SIGNALS</string>
+    <string name="open_archive_storage">OPEN_ARCHIVE_STORAGE</string>
+    <string name="double_colon_open">::OPEN</string>
+    <string name="tab_all">[ ALL ]</string>
+    <string name="tab_playlists">[ PLAYLISTS ]</string>
+    <string name="tab_albums">[ ALBUMS ]</string>
+    <string name="storage_playlists">:: STORAGE_PLAYLISTS</string>
+    <string name="storage_albums">:: STORAGE_ALBUMS</string>
+    <string name="initialize_playlist">INITIALIZE_PLAYLIST</string>
+    <string name="create_new_virtual_disk">CREATE_NEW_VIRTUAL_DISK</string>
+    <string name="exe_bracket">[ EXE ]</string>
+    <string name="double_colon_load">::LOAD</string>
+    <string name="data_slots_prefix">DATA_SLOTS: %d</string>
+
+    <!-- Library - Normal -->
+    <string name="library_norm">Collection</string>
+    <string name="library_desc_norm">Media Library</string>
+    <string name="favorites_full_norm">Favorite Tracks</string>
+    <string name="storage_norm">Local Storage</string>
+    <string name="open_norm">Enter</string>
+    <string name="all_norm">All Items</string>
+    <string name="playlists_label_norm">Playlists</string>
+    <string name="albums_label_norm">Albums</string>
+    <string name="new_playlist_norm">Create Playlist</string>
+    <string name="new_disk_norm">Initialize memory unit</string>
+    <string name="execute_norm">Run</string>
+    <string name="load_norm">Load</string>
+    <string name="tracks_count_norm">%d tracks</string>
+
+    <!-- Player - Technical -->
+    <string name="station_monitor">STATION_MONITOR</string>
+    <string name="track_name_placeholder">TRACK_NAME</string>
+    <string name="artist_id_placeholder">ARTIST_ID</string>
+    <string name="shf">SHF</string>
+    <string name="rpt">RPT</string>
+    <string name="view_queue">VIEW QUEUE</string>
+    <string name="time_placeholder">00:00</string>
+    <string name="station_queue">STATION_QUEUE</string>
+    <string name="drag_to_reorder">DRAG_TO_REORDER</string>
+
+    <!-- Player - Normal -->
+    <string name="player_norm">Signal Monitor</string>
+    <string name="shuffle_norm">Shuffle</string>
+    <string name="repeat_norm">Repeat</string>
+    <string name="queue_norm">Playback Queue</string>
+    <string name="reorder_norm">Drag to change order</string>
+
+    <!-- Detail Views - Technical -->
+    <string name="album_access_point">ALBUM_ACCESS_POINT</string>
+    <string name="disk_archive_unit">DISK_ARCHIVE_UNIT</string>
+    <string name="data_stream_list">[ DATA_STREAM_LIST ]</string>
+    <string name="src_prefix">SRC: %s</string>
+    <string name="storage_access_module">STORAGE_ACCESS_MODULE</string>
+    <string name="virtual_disk_management">VIRTUAL_DISK_MANAGEMENT</string>
+    <string name="unit_id_prefix">UNIT_ID: 0x%s</string>
+    <string name="log_prefix">LOG: %s</string>
+    <string name="description_pending">DESCRIPTION_LOG: PENDING...</string>
+    <string name="album_id_label">ALBUM_ID</string>
+    <string name="artist_label">ARTIST_LABEL</string>
+    <string name="signal_archive">SIGNAL_ARCHIVE</string>
+    <string name="favorite_storage">FAVORITE_STORAGE</string>
+
+    <!-- Detail Views - Normal -->
+    <string name="album_detail_norm">Album Details</string>
+    <string name="playlist_detail_norm">Playlist Unit</string>
+    <string name="tracklist_norm">Tracklist</string>
+    <string name="artist_prefix_norm">By: %s</string>
+    <string name="id_prefix_norm">ID: %s</string>
+    <string name="status_prefix_norm">Status: %s</string>
+    <string name="waiting_norm">Updating data...</string>
+
+    <!-- Settings - Technical -->
+    <string name="system_config">SYSTEM_CONFIG</string>
+    <string name="station_settings">STATION_SETTINGS</string>
+    <string name="operator_name">OPERATOR_NAME</string>
+    <string name="id_label">ID_LABEL</string>
+    <string name="double_colon_edit">::EDIT</string>
+    <string name="visual_configuration">[ VISUAL_CONFIGURATION ]</string>
+    <string name="theme_engine_selection">THEME_ENGINE_SELECTION</string>
+    <string name="active_theme_prefix">ACTIVE: [ %s ]</string>
+    <string name="select_theme_title">SELECT_THEME_ENGINE</string>
+    <string name="double_colon_select">::SELECT</string>
+    <string name="tape_reel_animation">TAPE_REEL_ANIMATION</string>
+    <string name="toggle_mechanical_visuals">TOGGLE_MECHANICAL_VISUALS</string>
+    <string name="terminate_session">TERMINATE_SESSION</string>
+    <string name="build_info">SONUS STUDIO SYSTEM [BUILD_2025]</string>
+
+    <!-- Settings - Normal -->
+    <string name="settings_norm">System Configuration</string>
+    <string name="config_norm">User Settings</string>
+    <string name="name_label_norm">User Name</string>
+    <string name="mail_label_norm">Contact ID</string>
+    <string name="edit_norm">Edit</string>
+    <string name="visuals_norm">Interface Appearance</string>
+    <string name="theme_label_norm">Visual Engine</string>
+    <string name="theme_active_norm">Selected: %s</string>
+    <string name="theme_select_norm">Change theme</string>
+    <string name="reels_norm">Mechanical Animations</string>
+    <string name="reels_desc_norm">Toggle spinning reels in player</string>
+    <string name="logout_norm">Sign Out</string>
+    <string name="build_norm">System Version 2025</string>
+
+    <!-- Profile - Technical -->
+    <string name="operator_profile">OPERATOR_PROFILE</string>
+    <string name="user_id_control">USER_ID_CONTROL</string>
+    <string name="edit_identity">:: EDIT_IDENTITY</string>
+    <string name="units_label">UNITS</string>
+    <string name="runtime_label">RUNTIME</string>
+    <string name="signals_label">SIGNALS</string>
+    <string name="playlists_caps">PLAYLISTS</string>
+    <string name="hours_caps">HOURS</string>
+    <string name="favorites_caps">FAVORITES</string>
+    <string name="account_access_bracket">[ ACCOUNT_ACCESS ]</string>
+    <string name="delete_account">DELETE_ACCOUNT</string>
+    <string name="wipe_all_user_data">WIPE_ALL_USER_DATA</string>
+    <string name="double_colon_wipe">::WIPE</string>
+    <string name="build_ver">SONUS STUDIO UNIT [ VER_1.0.0 ]</string>
+
+    <!-- Profile - Normal -->
+    <string name="profile_norm">Operator Profile</string>
+    <string name="account_norm">Account Security</string>
+    <string name="edit_profile_norm">Edit Profile</string>
+    <string name="stats_playlists_norm">Total Playlists</string>
+    <string name="stats_hours_norm">Listening Hours</string>
+    <string name="stats_favs_norm">Favorite Tracks</string>
+    <string name="danger_zone_norm">Account Management</string>
+    <string name="delete_norm">Delete Account</string>
+    <string name="delete_desc_norm">Permanently remove profile</string>
+    <string name="wipe_norm">Wipe</string>
+
+    <!-- Auth - Technical -->
+    <string name="access_control">ACCESS CONTROL</string>
+    <string name="station_login_v2">STATION_LOGIN_v2</string>
+    <string name="user_id_label">USER_ID</string>
+    <string name="pass_code_label">PASS_CODE</string>
+    <string name="authorize">AUTHORIZE</string>
+    <string name="create_new_station_account">CREATE_NEW_STATION_ACCOUNT</string>
+    <string name="registration_unit">REGISTRATION UNIT</string>
+    <string name="new_identity">NEW_IDENTITY</string>
+    <string name="data_entry">DATA_ENTRY</string>
+    <string name="operator_id_label">OPERATOR_ID</string>
+    <string name="secure_pass_label">SECURE_PASS</string>
+    <string name="initialize_account">INITIALIZE_ACCOUNT</string>
+    <string name="back_to_login_interface">BACK_TO_LOGIN_INTERFACE</string>
+    <string name="hint_enter_id">enter id</string>
+    <string name="hint_stars">********</string>
+    <string name="hint_unique_name">unique name</string>
+
+    <!-- Auth - Normal -->
+    <string name="login_title_norm">Authorized Access</string>
+    <string name="login_norm">Station Login</string>
+    <string name="user_norm">Username</string>
+    <string name="pass_norm">Password</string>
+    <string name="login_btn_norm">Sign In</string>
+    <string name="signup_btn_norm">Register New Account</string>
+    <string name="register_title_norm">New Operator</string>
+    <string name="register_norm">Create Identity</string>
+    <string name="data_norm">Registration Form</string>
+    <string name="id_norm">Enter your name</string>
+    <string name="pass_secure_norm">Create password</string>
+    <string name="signup_norm">Finish Registration</string>
+    <string name="back_login_norm">Return to login screen</string>
+
+    <!-- Dialogs -->
+    <string name="init_new_unit">INIT_NEW_UNIT</string>
+    <string name="assign_label_identifier">ASSIGN_LABEL_IDENTIFIER</string>
+    <string name="hint_enter_name_technical">ENTER_NAME...</string>
+    <string name="abort_bracket">[ ABORT ]</string>
+    <string name="initialize">INITIALIZE</string>
+    <string name="edit_profile_pl">Edytuj profil</string>
+    <string name="username_label_pl">Nazwa użytkownika</string>
+    <string name="hint_enter_name_pl">Wpisz nową nazwę</string>
+    <string name="cancel_pl">Anuluj</string>
+    <string name="save_pl">Zapisz</string>
+    <string name="reel_id_prefix">REEL_#%s</string>
+    <string name="log_date_prefix">LOG_DATE: %s</string>
+    <string name="reel_id_label_norm">ID: %s</string>
+    <string name="log_date_label_norm">Date: %s</string>
+
+    <!-- Toasts and Messages -->
+    <string name="toast_added_to_queue">Added to queue: %s</string>
+    <string name="toast_favorite_error">Error toggling favorite</string>
+    <string name="toast_playlist_empty">Nie masz jeszcze żadnych playlist</string>
+    <string name="toast_playlist_fetch_error">Błąd pobierania playlist</string>
+    <string name="toast_network_error">Błąd sieci: %s</string>
+    <string name="toast_added_to_playlist">Dodano do playlisty!</string>
+    <string name="toast_add_error">Błąd dodawania: %d</string>
+    <string name="toast_profile_updated">Profil zaktualizowany</string>
+    <string name="error_name_empty">Nazwa nie może być pusta</string>
+    <string name="toast_playlist_created">Utworzono playlistę</string>
+    <string name="toast_playlist_deleted">Playlista usunięta</string>
+    <string name="confirm_delete_playlist_title">Usuń playlistę</string>
+    <string name="confirm_delete_playlist_msg">Czy na pewno chcesz usunąć playlistę \"%s\"?</string>
+    <string name="confirm_delete_playlist_msg_generic">Czy na pewno chcesz usunąć tę playlistę?</string>
+    <string name="btn_delete">Usuń</string>
+    <string name="btn_cancel">Anuluj</string>
+    <string name="toast_song_removed">Utwór usunięty z playlisty</string>
+    <string name="confirm_remove_song_title">Usuń utwór</string>
+    <string name="confirm_remove_song_msg">Usunąć %s z tej playlisty?</string>
+    <string name="toast_server_error">Błąd połączenia z serwerem</string>
+    <string name="toast_unexpected_error">Wystąpił nieoczekiwany błąd</string>
+    <string name="toast_connection_error">Błąd połączenia</string>
+    <string name="toast_fill_all">Wypełnij wszystkie pola</string>
+    <string name="error_invalid_server_res">Nieprawidłowa odpowiedź serwera</string>
+    <string name="error_login_failed">Błąd logowania: %s</string>
+    <string name="error_network_check">Błąd sieci: sprawdź połączenie i serwer</string>
+    <string name="error_generic">Wystąpił błąd: %s</string>
+    <string name="toast_register_success">Rejestracja zakończona sukcesem</string>
+    <string name="error_password_short">Hasło musi mieć co najmniej 6 znaków</string>
+    <string name="error_registration_failed">Błąd rejestracji: %s</string>
+    <string name="toast_notifications_disabled">Brak powiadomień uniemożliwi sterowanie muzyką w tle</string>
+    <string name="toast_playing">Odtwarzanie: %s</string>
+    <string name="terminal_signal_locked">SIGNAL_LOCKED: %s</string>
+    <string name="terminal_buffering">BUFFERING_STREAM_0x%s</string>
+    <string name="terminal_session_resumed">OPERATOR_ACTIVE: SESSION_RESUMED</string>
+    <string name="terminal_reel_loaded">REEL_LOADED: %s</string>
+    <string name="mechanical_visuals_enabled">MECHANICAL_VISUALS: ENABLED</string>
+    <string name="mechanical_visuals_disabled">MECHANICAL_VISUALS: DISABLED</string>
+    <string name="playback_channel_name">Odtwarzanie muzyki</string>
+    <string name="playback_channel_desc">Powiadomienie o aktualnie odtwarzanym utworze</string>
+    <string name="system_log_entry">> SYSTEM_LOG_ENTRY</string>
+    <string name="theme_amber_os">[ AMBER_OS ]</string>
+    <string name="theme_ind_dark">[ IND_DARK ]</string>
+    <string name="theme_ind_light">[ IND_LIGHT ]</string>
+    <string name="theme_amber_os_norm">Amber OS</string>
+    <string name="theme_ind_dark_norm">Industrial Dark</string>
+    <string name="theme_ind_light_norm">Industrial Light</string>
+    <string name="unknown_title">Unknown Track</string>
+    <string name="unknown_artist">Unknown Artist</string>
+
 </resources>

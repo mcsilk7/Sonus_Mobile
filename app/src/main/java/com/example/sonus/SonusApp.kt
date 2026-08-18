@@ -16,7 +16,9 @@ class SonusApp : Application() {
     override fun onCreate() {
         super.onCreate()
         RetrofitClient.init(this)
-        
+        RecentlyPlayedManager.init(this)
+        SearchHistoryManager.init(this)
+
         // Force dark mode for Retro Studio theme globally
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         
@@ -25,8 +27,8 @@ class SonusApp : Application() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Odtwarzanie muzyki"
-            val descriptionText = "Powiadomienie o aktualnie odtwarzanym utworze"
+            val name = getString(R.string.playback_channel_name)
+            val descriptionText = getString(R.string.playback_channel_desc)
             val importance = NotificationManager.IMPORTANCE_LOW
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = descriptionText

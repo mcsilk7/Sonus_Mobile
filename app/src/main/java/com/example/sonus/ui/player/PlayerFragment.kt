@@ -3,10 +3,13 @@ package com.example.sonus.ui.player
 import android.Manifest
 import android.content.pm.PackageManager
 import android.media.audiofx.Visualizer
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -28,6 +31,7 @@ class PlayerFragment : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
     
     private lateinit var retroReels: RetroReelView
+    private lateinit var settingsManager: SettingsManager
 
     private val playerListener = object : PlayerState.PlayerStateListener {
         override fun onStateChanged() {
@@ -72,6 +76,7 @@ class PlayerFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_player, container, false)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -81,11 +86,15 @@ class PlayerFragment : Fragment() {
         val btnRepeat = view.findViewById<TextView>(R.id.btnRepeat)
         val btnShuffle = view.findViewById<TextView>(R.id.btnShuffle)
         val btnQueue = view.findViewById<TextView>(R.id.btnQueue)
+        val btnClose = view.findViewById<View>(R.id.btnClosePlayer)
+        
         seekBar = view.findViewById(R.id.seekBarPlayer)
         tvCurrentTime = view.findViewById(R.id.tvCurrentTime)
         tvTotalTime = view.findViewById(R.id.tvTotalTime)
 
+        settingsManager = SettingsManager(requireContext())
         retroReels = view.findViewById(R.id.retroReels)
+        retroReels.visibility = if (settingsManager.isReelsEnabled()) View.VISIBLE else View.GONE
 
         PlayerState.addStateListener(playerListener)
 
@@ -114,6 +123,26 @@ class PlayerFragment : Fragment() {
             bottomSheet.show(childFragmentManager, "QueueBottomSheet")
         }
 
+        btnClose.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        // Setup Swipe Down to Close
+        val gestureDetector = GestureDetector(requireContext(), object : GestureDetector.SimpleOnGestureListener() {
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                if (velocityY > 1000 && (e2.y - (e1?.y ?: 0f)) > 100) {
+                    findNavController().popBackStack()
+                    return true
+                }
+                return false
+            }
+        })
+
+        view.findViewById<View>(R.id.playerRoot).setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            true
+        }
+
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) tvCurrentTime.text = formatTime(progress)
@@ -129,6 +158,13 @@ class PlayerFragment : Fragment() {
         updateShuffleIcon(btnShuffle)
         updateSongInfo(view)
 
+        view.findViewById<TextView>(R.id.tvPlayerHeader).text = LabelProvider.getLabel(requireContext(), "player_header")
+
+        view.findViewById<TextView>(R.id.btnShuffle).text = LabelProvider.getLabel(requireContext(), "player_shf")
+        view.findViewById<TextView>(R.id.btnRepeat).text = LabelProvider.getLabel(requireContext(), "player_rpt")
+        view.findViewById<TextView>(R.id.btnQueue).text = LabelProvider.getLabel(requireContext(), "player_queue")
+        view.findViewById<TextView>(R.id.btnBack).text = LabelProvider.getLabel(requireContext(), "nav_back")
+
         view.findViewById<View>(R.id.btnBack).setOnClickListener {
             findNavController().popBackStack()
         }
@@ -140,8 +176,8 @@ class PlayerFragment : Fragment() {
     private fun updateSongInfo(view: View) {
         val song = PlayerState.currentSong
         val songId = song?.id ?: -1L
-        val title = song?.title ?: "Nieznany tytuł"
-        val artist = song?.artist ?: "Nieznany artysta"
+        val title = song?.title ?: getString(R.string.unknown_title)
+        val artist = song?.artist ?: getString(R.string.unknown_artist)
 
         view.findViewById<TextView>(R.id.tvPlayerSongTitle).text = title
         view.findViewById<TextView>(R.id.tvPlayerArtist).text = artist
@@ -166,12 +202,17 @@ class PlayerFragment : Fragment() {
 
     private fun updateVisuals() {
         if (::retroReels.isInitialized) {
-            retroReels.isSpinning = PlayerState.isPlaying
+            val enabled = settingsManager.isReelsEnabled()
+            retroReels.visibility = if (enabled) View.VISIBLE else View.GONE
             
-            // Set initial progress
-            val total = PlayerState.getDuration()
-            if (total > 0) {
-                retroReels.progress = PlayerState.getCurrentPosition().toFloat() / total.toFloat()
+            if (enabled) {
+                retroReels.isSpinning = PlayerState.isPlaying
+                
+                // Set initial progress
+                val total = PlayerState.getDuration()
+                if (total > 0) {
+                    retroReels.progress = PlayerState.getCurrentPosition().toFloat() / total.toFloat()
+                }
             }
         }
     }

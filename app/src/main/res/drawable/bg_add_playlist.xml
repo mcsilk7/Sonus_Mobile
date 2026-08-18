@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#33AEB1B5" /> <!-- Lekko przezroczyste tło karty -->
+    <solid android:color="@color/studio_overlay_mask" /> <!-- Lekko przezroczyste tło karty -->
     <stroke
         android:width="2dp"
         android:color="@color/accent"

@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottomNav"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
-    android:layout_gravity="bottom"
+    android:layout_height="90dp"
     android:background="@drawable/bg_bottom_nav"
     android:elevation="12dp"
-    android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingBottom="8dp">
+    android:paddingTop="8dp"
+    android:paddingBottom="16dp">
 
     <LinearLayout
         android:id="@+id/navHome"
@@ -17,20 +15,26 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
         <TextView
+            android:id="@+id/tvNavHome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="DIR"
+            android:text="@string/nav_dir"
             android:textColor="?attr/sonusTextDarkColor"
             android:fontFamily="monospace"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
+
         <View
             android:id="@+id/indicatorHome"
-            android:layout_width="16dp"
+            android:layout_width="24dp"
             android:layout_height="2dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:background="?attr/sonusAccentColor"
             android:visibility="invisible" />
     </LinearLayout>
@@ -41,19 +45,25 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
         <TextView
+            android:id="@+id/tvNavSearch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SRCH"
+            android:text="@string/nav_srch"
             android:textColor="?attr/sonusTextDarkColor"
             android:fontFamily="monospace"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
+
         <View
             android:id="@+id/indicatorSearch"
-            android:layout_width="16dp"
+            android:layout_width="24dp"
             android:layout_height="2dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:background="?attr/sonusAccentColor"
             android:visibility="invisible" />
     </LinearLayout>
@@ -64,19 +74,25 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
         <TextView
+            android:id="@+id/tvNavLibrary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="LIB"
+            android:text="@string/nav_lib"
             android:textColor="?attr/sonusTextDarkColor"
             android:fontFamily="monospace"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
+
         <View
             android:id="@+id/indicatorLibrary"
-            android:layout_width="16dp"
+            android:layout_width="24dp"
             android:layout_height="2dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:background="?attr/sonusAccentColor"
             android:visibility="invisible" />
     </LinearLayout>
@@ -87,19 +103,25 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
         <TextView
+            android:id="@+id/tvNavSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SYS"
+            android:text="@string/nav_sys"
             android:textColor="?attr/sonusTextDarkColor"
             android:fontFamily="monospace"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
+
         <View
             android:id="@+id/indicatorSettings"
-            android:layout_width="16dp"
+            android:layout_width="24dp"
             android:layout_height="2dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:background="?attr/sonusAccentColor"
             android:visibility="invisible" />
     </LinearLayout>

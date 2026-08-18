@@ -23,17 +23,19 @@
             android:layout_weight="1"
             android:orientation="vertical">
             <TextView
+                android:id="@+id/tvLibHeaderTop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ARCHIVE UNIT"
+                android:text="@string/archive_unit"
                 android:textColor="?attr/sonusTextDarkColor"
                 android:textSize="10sp"
                 android:fontFamily="monospace"
                 android:letterSpacing="0.2" />
             <TextView
+                android:id="@+id/tvLibHeaderMain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="LIBRARY_MANAGEMENT"
+                android:text="@string/library_management"
                 android:textColor="?attr/sonusAccentColor"
                 android:textSize="18sp"
                 android:fontFamily="monospace"
@@ -49,7 +51,7 @@
         android:layout_marginTop="80dp"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingBottom="140dp">
+        android:paddingBottom="180dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,27 +88,30 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
                     <TextView
+                        android:id="@+id/tvLibFavSignals"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="monospace"
-                        android:text="FAVORITE_SIGNALS"
+                        android:text="@string/favorite_signals"
                         android:textColor="?attr/sonusAccentColor"
                         android:textSize="14sp"
                         android:textStyle="bold" />
                     <TextView
+                        android:id="@+id/tvLibFavOpenArchive"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="monospace"
-                        android:text="OPEN_ARCHIVE_STORAGE"
+                        android:text="@string/open_archive_storage"
                         android:textColor="?attr/sonusTextDarkColor"
                         android:textSize="10sp" />
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/tvLibFavOpen"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
-                    android:text="::OPEN"
+                    android:text="@string/double_colon_open"
                     android:textColor="?attr/sonusAccentDimColor"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -127,7 +132,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_library_tab_active"
                         android:padding="12dp"
-                        android:text="[ ALL ]"
+                        android:text="@string/tab_all"
                         android:textColor="?attr/sonusBackgroundColor"
                         android:fontFamily="monospace"
                         android:textSize="12sp"
@@ -139,7 +144,7 @@
                         android:layout_marginStart="8dp"
                         android:background="@drawable/bg_library_tab"
                         android:padding="12dp"
-                        android:text="[ PLAYLISTS ]"
+                        android:text="@string/tab_playlists"
                         android:textColor="?attr/sonusTextDarkColor"
                         android:fontFamily="monospace"
                         android:textSize="12sp" />
@@ -150,7 +155,7 @@
                         android:layout_marginStart="8dp"
                         android:background="@drawable/bg_library_tab"
                         android:padding="12dp"
-                        android:text="[ ALBUMS ]"
+                        android:text="@string/tab_albums"
                         android:textColor="?attr/sonusTextDarkColor"
                         android:fontFamily="monospace"
                         android:textSize="12sp" />
@@ -165,9 +170,10 @@
                 android:layout_marginTop="24dp"
                 android:orientation="vertical">
                 <TextView
+                    android:id="@+id/tvLibSecPlaylists"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=":: STORAGE_PLAYLISTS"
+                    android:text="@string/storage_playlists"
                     android:textColor="?attr/sonusTextDarkColor"
                     android:textSize="14sp"
                     android:fontFamily="monospace"
@@ -194,9 +200,10 @@
                 android:layout_marginTop="24dp"
                 android:orientation="vertical">
                 <TextView
+                    android:id="@+id/tvLibSecAlbums"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=":: STORAGE_ALBUMS"
+                    android:text="@string/storage_albums"
                     android:textColor="?attr/sonusTextDarkColor"
                     android:textSize="14sp"
                     android:fontFamily="monospace"

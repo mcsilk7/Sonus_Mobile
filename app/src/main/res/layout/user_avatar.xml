@@ -6,7 +6,7 @@
     android:background="@drawable/bg_icon_circle"
     android:fontFamily="monospace"
     android:gravity="center"
-    android:text="U"
+    android:text="@string/default_avatar"
     android:textColor="?attr/sonusAccentColor"
     android:textSize="20sp"
     android:textStyle="bold" />

@@ -22,17 +22,19 @@
             android:layout_weight="1"
             android:orientation="vertical">
             <TextView
+                android:id="@+id/tvSearchHeaderTop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SIGNAL SCANNER"
+                android:text="@string/signal_scanner"
                 android:textColor="?attr/sonusTextDarkColor"
                 android:textSize="10sp"
                 android:fontFamily="monospace"
                 android:letterSpacing="0.2" />
             <TextView
+                android:id="@+id/tvSearchHeaderMain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TRACK_FINDER_UNIT"
+                android:text="@string/track_finder_unit"
                 android:textColor="?attr/sonusAccentColor"
                 android:textSize="18sp"
                 android:fontFamily="monospace"
@@ -48,7 +50,7 @@
         android:layout_marginTop="80dp"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingBottom="140dp">
+        android:paddingBottom="180dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -70,7 +72,7 @@
                     android:id="@+id/tvSongsHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="[ SEARCH_RESULTS_SONGS ]"
+                    android:text="@string/search_results_songs"
                     android:textColor="?attr/sonusAccentDimColor"
                     android:textSize="13sp"
                     android:fontFamily="monospace"
@@ -89,7 +91,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:text="[ SEARCH_RESULTS_ALBUMS ]"
+                    android:text="@string/search_results_albums"
                     android:textColor="?attr/sonusAccentDimColor"
                     android:textSize="13sp"
                     android:fontFamily="monospace"

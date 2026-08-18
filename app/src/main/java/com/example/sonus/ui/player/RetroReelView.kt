@@ -5,6 +5,8 @@ import android.graphics.*
 import android.os.SystemClock
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.ContextCompat
+import com.example.sonus.R
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -16,10 +18,11 @@ class RetroReelView @JvmOverloads constructor(
         setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
-    private val accentColor = Color.parseColor("#E8A13A")
-    private val metalColor = Color.parseColor("#3A3630")
-    private val lineColor = Color.parseColor("#555048")
-    private val tapeColor = Color.parseColor("#1A1814")
+    private val accentColor = ContextCompat.getColor(context, R.color.studio_amber)
+    private val metalColor = ContextCompat.getColor(context, R.color.studio_metal)
+    private val lineColor = ContextCompat.getColor(context, R.color.studio_outline)
+    private val tapeColor = ContextCompat.getColor(context, R.color.studio_tape)
+    private val hubColor = ContextCompat.getColor(context, R.color.studio_hub)
 
     private val structurePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -144,7 +147,7 @@ class RetroReelView @JvmOverloads constructor(
         structurePaint.color = lineColor
         canvas.drawCircle(cx, cy, radius, structurePaint)
 
-        fillPaint.color = Color.parseColor("#2A2620")
+        fillPaint.color = hubColor
         canvas.drawCircle(cx, cy, radius * 0.35f, fillPaint)
         structurePaint.color = accentColor
         structurePaint.strokeWidth = 2f

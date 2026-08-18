@@ -37,6 +37,11 @@ class MainContainerFragment : Fragment() {
         // Ensure standard bottom nav behavior
         viewPager.isUserInputEnabled = true 
 
+        // CRITICAL FIX: Restore initial page from ViewModel BEFORE registering callback
+        // to prevent ViewPager from resetting ViewModel to 0 on creation.
+        val initialPage = viewModel.currentTabPage.value ?: 0
+        viewPager.setCurrentItem(initialPage, false)
+
         // Sync ViewPager with ViewModel (Bottom Nav clicks)
         viewModel.currentTabPage.observe(viewLifecycleOwner) { page ->
             if (viewPager.currentItem != page) {

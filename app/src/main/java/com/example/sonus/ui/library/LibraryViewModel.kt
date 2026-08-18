@@ -22,13 +22,8 @@ class LibraryViewModel : ViewModel() {
     private val _libraryAlbums = MutableLiveData<List<AlbumDTO>>()
     val libraryAlbums: LiveData<List<AlbumDTO>> = _libraryAlbums
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
-
     fun fetchLibraryData(userId: Long) {
         viewModelScope.launch {
-            _isLoading.value = true
-            
             // Parallel execution
             launch {
                 _playlists.value = repository.getUserPlaylists(userId)
@@ -39,15 +34,13 @@ class LibraryViewModel : ViewModel() {
             launch {
                 _libraryAlbums.value = repository.getLibraryAlbums(userId)
             }
-            
-            _isLoading.value = false
         }
     }
 
     fun toggleFavorite(userId: Long, song: SongDTO) {
         viewModelScope.launch {
-            val success = repository.toggleFavorite(userId, song.id)
-            if (success) {
+            val added = repository.toggleFavorite(userId, song.id)
+            if (added != null) {
                 // Refresh favorites
                 _favoriteSongs.value = repository.getFavoriteSongs(userId)
             }

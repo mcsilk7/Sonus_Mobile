@@ -25,7 +25,7 @@
         android:layout_height="match_parent"
         android:layout_marginStart="14dp"
         android:background="@null"
-        android:hint="SCAN_FOR_TRACKS..."
+        android:hint="@string/search_hint"
         android:imeOptions="actionSearch"
         android:inputType="text"
         android:fontFamily="monospace"

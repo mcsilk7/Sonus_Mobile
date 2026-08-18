@@ -36,15 +36,6 @@ object PlayerState {
         stateListeners.remove(listener)
     }
 
-    fun setOnStateChangedListener(listener: () -> Unit) {
-        // Legacy support
-        addStateListener(object : PlayerStateListener {
-            override fun onStateChanged() {
-                listener.invoke()
-            }
-        })
-    }
-
     private fun notifyStateChanged() {
         stateListeners.forEach { it.onStateChanged() }
     }
@@ -52,15 +43,24 @@ object PlayerState {
     fun play(context: Context, song: SongDTO, playlist: List<SongDTO> = emptyList()) {
         Log.d("PlayerState", "play() called for song: ${song.title}")
 
+        // TOP-QUEUE LOGIC: The requested song and following songs always start from index 0
         if (playlist.isNotEmpty()) {
-            currentPlaylist = playlist
-            currentIndex = playlist.indexOfFirst { it.id == song.id }
-        } else if (currentPlaylist.isEmpty() || currentPlaylist.none { it.id == song.id }) {
-            currentPlaylist = listOf(song)
-            currentIndex = 0
+            val index = playlist.indexOfFirst { it.id == song.id }
+            currentPlaylist = if (index != -1) {
+                playlist.subList(index, playlist.size)
+            } else {
+                listOf(song)
+            }
         } else {
-            currentIndex = currentPlaylist.indexOfFirst { it.id == song.id }
+            val index = currentPlaylist.indexOfFirst { it.id == song.id }
+            if (index != -1) {
+                currentPlaylist = currentPlaylist.subList(index, currentPlaylist.size)
+            } else {
+                currentPlaylist = listOf(song)
+            }
         }
+        
+        currentIndex = 0
 
         // AUTO-ARCHIVE: Centralized recently played logic
         RecentlyPlayedManager.addSong(song)
@@ -115,15 +115,15 @@ object PlayerState {
                     notifyStateChanged()
                 }
                 setOnCompletionListener {
-                    val pos = mediaPlayer?.currentPosition ?: 0
-                    val dur = getDuration()
-                    Log.d("PlayerState", "Playback completed at $pos / $dur")
+                    Log.d("PlayerState", "Playback completed naturally")
                     
                     if (!isLooping) {
                         this@PlayerState.isPlaying = false
-                        playNext(context)
+                        // CONSUME MODE: Remove finished song from queue
+                        consumeCurrentAndPlayNext(context)
+                    } else {
+                        notifyStateChanged()
                     }
-                    notifyStateChanged()
                 }
                 setOnErrorListener { _, what, extra ->
                     Log.e("PlayerState", "MediaPlayer error: $what, extra: $extra")
@@ -140,35 +140,46 @@ object PlayerState {
         }
     }
 
+    private fun consumeCurrentAndPlayNext(context: Context) {
+        if (currentPlaylist.isEmpty()) return
+
+        val playlist = currentPlaylist.toMutableList()
+        if (currentIndex in playlist.indices) {
+            playlist.removeAt(currentIndex)
+            currentPlaylist = playlist
+        }
+
+        if (currentPlaylist.isEmpty()) {
+            currentIndex = -1
+            currentSong = null
+            stop()
+            return
+        }
+
+        // After removal, the next song is now at the same index (shifted)
+        if (currentIndex >= currentPlaylist.size) {
+            currentIndex = 0
+        }
+
+        if (isShuffleEnabled) {
+            currentIndex = (0 until currentPlaylist.size).random()
+        }
+
+        play(context, currentPlaylist[currentIndex])
+    }
+
     fun playNext(context: Context) {
         if (currentPlaylist.isEmpty()) return
         
-        if (isShuffleEnabled && currentPlaylist.size > 1) {
-            var nextIndex = currentIndex
-            while (nextIndex == currentIndex) {
-                nextIndex = (0 until currentPlaylist.size).random()
-            }
-            currentIndex = nextIndex
-        } else {
-            currentIndex = (currentIndex + 1) % currentPlaylist.size
-        }
-        
-        play(context, currentPlaylist[currentIndex])
+        // When user manually skips, we also consume the current one
+        consumeCurrentAndPlayNext(context)
     }
 
     fun playPrevious(context: Context) {
         if (currentPlaylist.isEmpty()) return
         
-        if (isShuffleEnabled && currentPlaylist.size > 1) {
-            var prevIndex = currentIndex
-            while (prevIndex == currentIndex) {
-                prevIndex = (0 until currentPlaylist.size).random()
-            }
-            currentIndex = prevIndex
-        } else {
-            currentIndex = if (currentIndex > 0) currentIndex - 1 else currentPlaylist.size - 1
-        }
-        
+        // Since we consume songs, "Previous" in a pure queue doesn't exist.
+        // But if user expects to restart the same song:
         play(context, currentPlaylist[currentIndex])
     }
 

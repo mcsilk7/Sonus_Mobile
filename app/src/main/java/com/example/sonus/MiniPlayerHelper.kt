@@ -7,8 +7,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.sonus.network.RetrofitClient
-import com.example.sonus.network.SongDTO
-
 import androidx.lifecycle.ViewModelProvider
 
 object MiniPlayerHelper {
@@ -141,7 +139,7 @@ object MiniPlayerHelper {
             }
 
             miniPlayer.setOnClickListener {
-                activity.findNavController(R.id.nav_host_fragment).navigate(R.id.playerFragment)
+                activity.findNavController(R.id.nav_host_fragment).navigate(R.id.action_global_playerFragment)
             }
         }
     }

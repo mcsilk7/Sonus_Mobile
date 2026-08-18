@@ -17,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.sonus.*
 import com.example.sonus.network.PlaylistDTO
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 
 class LibraryFragment : Fragment() {
 
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: LibraryViewModel by viewModels()
     private lateinit var playlistAdapter: PlaylistAdapter
     private lateinit var albumAdapter: AlbumAdapter
@@ -61,6 +63,15 @@ class LibraryFragment : Fragment() {
         setupRecyclerViews()
         setupTabs()
         observeViewModel()
+        applyThemeStrings(view)
+        
+        mainViewModel.libraryFilter.observe(viewLifecycleOwner) { filter ->
+            when (filter) {
+                0 -> { updateTabSelection(tabAll); showSections(true, true) }
+                1 -> { updateTabSelection(tabPlaylists); showSections(true, false) }
+                2 -> { updateTabSelection(tabAlbums); showSections(false, true) }
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -102,9 +113,15 @@ class LibraryFragment : Fragment() {
     }
 
     private fun setupTabs() {
-        tabAll.setOnClickListener { updateTabSelection(it as TextView); showSections(true, true) }
-        tabPlaylists.setOnClickListener { updateTabSelection(it as TextView); showSections(true, false) }
-        tabAlbums.setOnClickListener { updateTabSelection(it as TextView); showSections(false, true) }
+        tabAll.setOnClickListener { 
+            mainViewModel.setLibraryFilter(0)
+        }
+        tabPlaylists.setOnClickListener { 
+            mainViewModel.setLibraryFilter(1)
+        }
+        tabAlbums.setOnClickListener { 
+            mainViewModel.setLibraryFilter(2)
+        }
     }
 
     private fun updateTabSelection(selectedTab: TextView) {
@@ -123,6 +140,29 @@ class LibraryFragment : Fragment() {
     private fun showSections(playlists: Boolean, albums: Boolean) {
         sectionPlaylists.visibility = if (playlists) View.VISIBLE else View.GONE
         sectionAlbums.visibility = if (albums) View.VISIBLE else View.GONE
+    }
+
+    private fun applyThemeStrings(view: View) {
+        val context = requireContext()
+        view.findViewById<TextView>(R.id.tvLibHeaderTop).text = LabelProvider.getLabel(context, "library_header_top")
+        view.findViewById<TextView>(R.id.tvLibHeaderMain).text = LabelProvider.getLabel(context, "library_header_main")
+        
+        view.findViewById<TextView>(R.id.tabAll).text = LabelProvider.getLabel(context, "library_tab_all")
+        view.findViewById<TextView>(R.id.tabPlaylists).text = LabelProvider.getLabel(context, "library_tab_playlists")
+        view.findViewById<TextView>(R.id.tabAlbums).text = LabelProvider.getLabel(context, "library_tab_albums")
+        
+        view.findViewById<TextView>(R.id.tvLibSecPlaylists).text = LabelProvider.getLabel(context, "library_sec_playlists")
+        view.findViewById<TextView>(R.id.tvLibSecAlbums).text = LabelProvider.getLabel(context, "library_sec_albums")
+        
+        // Add Playlist Item
+        view.findViewById<TextView>(R.id.tvAddPlaylistTitle).text = LabelProvider.getLabel(context, "library_init_playlist")
+        view.findViewById<TextView>(R.id.tvAddPlaylistDesc).text = LabelProvider.getLabel(context, "library_create_disk")
+        view.findViewById<TextView>(R.id.tvAddPlaylistExe).text = LabelProvider.getLabel(context, "library_exe")
+
+        // Favorite Module
+        view.findViewById<TextView>(R.id.tvLibFavSignals).text = LabelProvider.getLabel(context, "library_fav_signals")
+        view.findViewById<TextView>(R.id.tvLibFavOpenArchive).text = LabelProvider.getLabel(context, "library_open_archive")
+        view.findViewById<TextView>(R.id.tvLibFavOpen).text = LabelProvider.getLabel(context, "library_open")
     }
 
     private fun setupRecyclerViews() {
@@ -162,13 +202,13 @@ class LibraryFragment : Fragment() {
                 if (album.isSaved) {
                     val response = RetrofitClient.albumApi.removeAlbumFromLibrary(album.id!!, userId)
                     if (response.isSuccessful) {
-                        Toast.makeText(requireContext(), "Usunięto z biblioteki", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), getString(R.string.toast_song_removed), Toast.LENGTH_SHORT).show()
                         viewModel.fetchLibraryData(userId)
                     }
                 } else {
                     val response = RetrofitClient.albumApi.addAlbumToLibrary(album.id!!, userId)
                     if (response.isSuccessful) {
-                        Toast.makeText(requireContext(), "Dodano do biblioteki", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), getString(R.string.toast_added_to_playlist), Toast.LENGTH_SHORT).show()
                         viewModel.fetchLibraryData(userId)
                     }
                 }
@@ -179,12 +219,24 @@ class LibraryFragment : Fragment() {
     }
 
     private fun showCreatePlaylistDialog() {
+        val context = requireContext()
+        val isTechnical = SettingsManager(context).getThemeId() == 0
+        
         val view = layoutInflater.inflate(R.layout.dialog_create_playlist, null)
         val etName = view.findViewById<EditText>(R.id.etPlaylistName)
-        val btnCancel = view.findViewById<View>(R.id.btnCancel)
-        val btnConfirm = view.findViewById<View>(R.id.btnConfirm)
+        val btnCancel = view.findViewById<TextView>(R.id.btnCancel)
+        val btnConfirm = view.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnConfirm)
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val title = view.findViewById<TextView>(R.id.tvCreatePlaylistTitle)
+        val subtitle = view.findViewById<TextView>(R.id.tvCreatePlaylistSubtitle)
+
+        title.text = if (isTechnical) getString(R.string.init_new_unit) else getString(R.string.new_playlist_norm)
+        subtitle.text = if (isTechnical) getString(R.string.assign_label_identifier) else getString(R.string.new_disk_norm)
+        etName.hint = if (isTechnical) getString(R.string.hint_enter_name_technical) else getString(R.string.hint_enter_name_pl)
+        btnCancel.text = if (isTechnical) getString(R.string.abort_bracket) else getString(R.string.cancel_pl)
+        btnConfirm.text = if (isTechnical) getString(R.string.initialize) else getString(R.string.save_pl)
+
+        val dialog = AlertDialog.Builder(context)
             .setView(view)
             .create()
 
@@ -197,7 +249,7 @@ class LibraryFragment : Fragment() {
                 createPlaylist(name)
                 dialog.dismiss()
             } else {
-                etName.error = "Podaj nazwę playlisty"
+                etName.error = getString(R.string.error_name_empty)
             }
         }
         dialog.show()
@@ -211,17 +263,17 @@ class LibraryFragment : Fragment() {
             try {
                 val response = RetrofitClient.playlistApi.createPlaylist(userId, PlaylistDTO(name = name))
                 if (response.isSuccessful) {
-                    Toast.makeText(requireContext(), "Utworzono playlistę", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_playlist_created), Toast.LENGTH_SHORT).show()
                     viewModel.fetchLibraryData(userId)
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_network_error, e.message), Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun showPlaylistOptions(playlist: PlaylistDTO) {
-        val options = arrayOf("Usuń playlistę")
+        val options = arrayOf(getString(R.string.btn_delete))
         AlertDialog.Builder(requireContext())
             .setTitle(playlist.name)
             .setItems(options) { _, which ->
@@ -233,11 +285,19 @@ class LibraryFragment : Fragment() {
     }
 
     private fun confirmDeletePlaylist(playlist: PlaylistDTO) {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Usuń playlistę")
-            .setMessage("Czy na pewno chcesz usunąć playlistę \"${playlist.name}\"?")
-            .setPositiveButton("Usuń") { _, _ -> deletePlaylistById(playlist.id ?: return@setPositiveButton) }
-            .setNegativeButton("Anuluj", null)
+        val context = requireContext()
+        val isTechnical = SettingsManager(context).getThemeId() == 0
+        
+        val title = if (isTechnical) getString(R.string.confirm_delete_playlist_title).uppercase() else "Delete Playlist"
+        val message = if (isTechnical) getString(R.string.confirm_delete_playlist_msg, playlist.name) else "Are you sure you want to delete \"${playlist.name}\"?"
+        val confirm = if (isTechnical) getString(R.string.btn_delete).uppercase() else "Delete"
+        val cancel = if (isTechnical) getString(R.string.btn_cancel).uppercase() else "Cancel"
+
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(confirm) { _, _ -> deletePlaylistById(playlist.id ?: return@setPositiveButton) }
+            .setNegativeButton(cancel, null)
             .show()
     }
 
@@ -246,7 +306,7 @@ class LibraryFragment : Fragment() {
             try {
                 val response = RetrofitClient.playlistApi.deletePlaylist(id)
                 if (response.isSuccessful) {
-                    Toast.makeText(requireContext(), "Playlista usunięta", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_playlist_deleted), Toast.LENGTH_SHORT).show()
                     viewModel.fetchLibraryData(sessionManager.getUserId())
                 }
             } catch (e: Exception) {

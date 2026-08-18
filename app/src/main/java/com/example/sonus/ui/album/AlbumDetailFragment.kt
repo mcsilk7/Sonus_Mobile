@@ -27,9 +27,9 @@ class AlbumDetailFragment : Fragment() {
     private lateinit var tvTitle: TextView
     private lateinit var tvArtist: TextView
     private lateinit var rvSongs: RecyclerView
-    private lateinit var btnBack: ImageButton
+    private lateinit var btnBack: View
     private lateinit var imgCover: ImageView
-    private lateinit var btnSaveAlbum: ImageButton
+    private lateinit var btnSaveAlbum: ImageView
     
     private lateinit var songAdapter: SongAdapter
     private lateinit var sessionManager: SessionManager
@@ -58,6 +58,15 @@ class AlbumDetailFragment : Fragment() {
         initViews(view)
         setupRecyclerView()
         fetchAlbumDetails()
+        applyThemeStrings(view)
+    }
+
+    private fun applyThemeStrings(view: View) {
+        val context = requireContext()
+        view.findViewById<TextView>(R.id.tvAlbumHeaderTop).text = LabelProvider.getLabel(context, "album_detail_top")
+        view.findViewById<TextView>(R.id.tvAlbumHeaderMain).text = LabelProvider.getLabel(context, "album_detail_main")
+        view.findViewById<TextView>(R.id.tvAlbumDataStreamLabel).text = LabelProvider.getLabel(context, "data_stream_list")
+        view.findViewById<TextView>(R.id.btnBackAlbum).text = LabelProvider.getLabel(context, "nav_back")
     }
 
     private fun initViews(view: View) {
@@ -78,7 +87,7 @@ class AlbumDetailFragment : Fragment() {
 
     private fun playSong(song: SongDTO) {
         PlayerState.play(requireContext(), song, currentAlbum?.songs ?: emptyList())
-        Toast.makeText(requireContext(), "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.toast_playing, song.title), Toast.LENGTH_SHORT).show()
     }
 
     private fun setupRecyclerView() {
@@ -156,8 +165,14 @@ class AlbumDetailFragment : Fragment() {
 
     private fun populateUI(album: AlbumDTO) {
         currentAlbum = album
-        tvTitle.text = album.title
-        tvArtist.text = album.artist
+        val isTechnical = SettingsManager(requireContext()).getThemeId() == 0
+        
+        tvTitle.text = if (isTechnical) album.title.uppercase() else album.title
+        tvArtist.text = if (isTechnical) {
+            getString(R.string.src_prefix, album.artist.uppercase())
+        } else {
+            getString(R.string.artist_prefix_norm, album.artist)
+        }
         btnSaveAlbum.visibility = View.VISIBLE
         updateSaveButtonState(album.isSaved)
 
@@ -207,7 +222,7 @@ class AlbumDetailFragment : Fragment() {
     }
 
     private fun updateSaveButtonState(isSaved: Boolean) {
-        val color = if (isSaved) android.R.color.holo_red_dark else R.color.studio_bg
+        val color = if (isSaved) R.color.studio_red else R.color.studio_bg
         btnSaveAlbum.setColorFilter(androidx.core.content.ContextCompat.getColor(requireContext(), color))
     }
 

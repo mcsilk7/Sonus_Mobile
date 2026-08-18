@@ -22,7 +22,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:gravity="center"
-            android:text="ESC"
+            android:text="@string/nav_esc"
             android:textColor="?attr/sonusAccentColor"
             android:fontFamily="monospace"
             android:textSize="14sp"
@@ -40,7 +40,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SIGNAL_ARCHIVE"
+                android:text="@string/signal_archive"
                 android:textColor="?attr/sonusTextDarkColor"
                 android:textSize="10sp"
                 android:fontFamily="monospace"
@@ -48,7 +48,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="FAVORITE_STORAGE"
+                android:text="@string/favorite_storage"
                 android:textColor="?attr/sonusAccentColor"
                 android:textSize="18sp"
                 android:fontFamily="monospace"
@@ -65,6 +65,6 @@
         android:layout_marginTop="80dp"
         android:padding="16dp"
         android:clipToPadding="false"
-        android:paddingBottom="100dp" />
+        android:paddingBottom="180dp" />
 
 </FrameLayout>

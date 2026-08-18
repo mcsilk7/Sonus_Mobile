@@ -22,14 +22,16 @@
             android:padding="16dp"
             android:background="?attr/sonusPanelColor">
             <TextView
+                android:id="@+id/tvLoginTop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ACCESS CONTROL"
+                android:text="@string/access_control"
                 android:textColor="?attr/sonusTextDarkColor"
                 android:fontFamily="monospace"
                 android:textSize="10sp"
                 android:letterSpacing="0.3" />
             <TextView
+                android:id="@+id/tvLoginMain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -50,19 +52,21 @@
             android:background="?attr/sonusCardColor">
 
             <TextView
+                android:id="@+id/tvLoginStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="STATION_LOGIN_v2"
+                android:text="@string/station_login_v2"
                 android:textColor="?attr/sonusTextDarkColor"
                 android:fontFamily="monospace"
                 android:textSize="12sp" />
 
             <!-- Input Fields -->
             <TextView
+                android:id="@+id/tvLoginUserLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="USER_ID"
+                android:text="@string/user_id_label"
                 android:textColor="?attr/sonusTextPrimaryColor"
                 android:fontFamily="monospace"
                 android:textSize="13sp" />
@@ -74,17 +78,18 @@
                 android:background="@drawable/bg_auth_input"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:hint="enter id"
+                android:hint="@string/hint_enter_id"
                 android:textColor="?attr/sonusAccentColor"
                 android:textColorHint="?attr/sonusTextFaintColor"
                 android:fontFamily="monospace"
                 android:textSize="15sp" />
 
             <TextView
+                android:id="@+id/tvLoginPassLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="PASS_CODE"
+                android:text="@string/pass_code_label"
                 android:textColor="?attr/sonusTextPrimaryColor"
                 android:fontFamily="monospace"
                 android:textSize="13sp" />
@@ -96,7 +101,7 @@
                 android:background="@drawable/bg_auth_input"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:hint="********"
+                android:hint="@string/hint_stars"
                 android:inputType="textPassword"
                 android:textColor="?attr/sonusAccentColor"
                 android:textColorHint="?attr/sonusTextFaintColor"
@@ -110,7 +115,7 @@
                 android:layout_marginTop="32dp"
                 android:background="@drawable/bg_auth_button"
                 android:gravity="center"
-                android:text="AUTHORIZE"
+                android:text="@string/authorize"
                 android:textColor="?attr/sonusBackgroundColor"
                 android:fontFamily="monospace"
                 android:textSize="16sp"
@@ -123,7 +128,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="CREATE_NEW_STATION_ACCOUNT"
+            android:text="@string/create_new_station_account"
             android:textColor="?attr/sonusAccentDimColor"
             android:fontFamily="monospace"
             android:textSize="13sp"

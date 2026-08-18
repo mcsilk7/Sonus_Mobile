@@ -24,7 +24,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SYSTEM CONFIG"
+                android:text="@string/system_config"
                 android:textColor="?attr/sonusTextDarkColor"
                 android:textSize="10sp"
                 android:fontFamily="monospace"
@@ -32,7 +32,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="STATION_SETTINGS"
+                android:text="@string/station_settings"
                 android:textColor="?attr/sonusAccentColor"
                 android:textSize="18sp"
                 android:fontFamily="monospace"
@@ -48,7 +48,7 @@
         android:layout_marginTop="80dp"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingBottom="140dp">
+        android:paddingBottom="180dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -73,7 +73,7 @@
                     android:background="@drawable/bg_icon_circle"
                     android:fontFamily="monospace"
                     android:gravity="center"
-                    android:text="A"
+                    android:text="@string/default_avatar"
                     android:textColor="?attr/sonusAccentColor"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -84,30 +84,133 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
                     <TextView
-                        android:id="@+id/tvSettingsName"
+                        android:id="@+id/tvSettingsOpName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="OPERATOR_NAME"
+                        android:text="@string/operator_name"
                         android:textColor="?attr/sonusAccentColor"
                         android:fontFamily="monospace"
                         android:textSize="14sp"
                         android:textStyle="bold" />
                     <TextView
-                        android:id="@+id/tvSettingsEmail"
+                        android:id="@+id/tvSettingsIdLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="ID_LABEL"
+                        android:text="@string/id_label"
                         android:textColor="?attr/sonusTextDarkColor"
                         android:fontFamily="monospace"
                         android:textSize="12sp" />
                 </LinearLayout>
                 <TextView
+                    android:id="@+id/tvSettingsEditLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="::EDIT"
+                    android:text="@string/double_colon_edit"
                     android:textColor="?attr/sonusAccentDimColor"
                     android:fontFamily="monospace"
                     android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Visual Config Module -->
+            <TextView
+                android:id="@+id/tvSettingsVisualsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="monospace"
+                android:text="@string/visual_configuration"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Theme Selector Module -->
+            <LinearLayout
+                android:id="@+id/btnSelectTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_settings_item"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tvSettingsThemeEngineTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/theme_engine_selection"
+                        android:textColor="?attr/sonusAccentColor"
+                        android:fontFamily="monospace"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvCurrentThemeName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/active_theme_prefix"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:fontFamily="monospace"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvSettingsThemeSelectLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:text="@string/double_colon_select"
+                    android:textColor="?attr/sonusAccentDimColor"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnToggleReels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_settings_item"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tvSettingsReelsTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tape_reel_animation"
+                        android:textColor="?attr/sonusAccentColor"
+                        android:fontFamily="monospace"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvSettingsReelsDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/toggle_mechanical_visuals"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:fontFamily="monospace"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/reelsToggleStatus"
+                    android:layout_width="48dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/bg_settings_toggle" />
             </LinearLayout>
 
             <TextView
@@ -117,18 +220,19 @@
                 android:layout_marginTop="40dp"
                 android:background="@drawable/bg_settings_danger"
                 android:gravity="center"
-                android:text="TERMINATE_SESSION"
+                android:text="@string/terminate_session"
                 android:textColor="?attr/sonusStatusRed"
                 android:fontFamily="monospace"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvSettingsBuild"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:gravity="center"
-                android:text="SONUS STUDIO SYSTEM [BUILD_2025]"
+                android:text="@string/build_info"
                 android:textColor="?attr/sonusTextFaintColor"
                 android:fontFamily="monospace"
                 android:textSize="10sp" />

@@ -34,21 +34,23 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/tvFavCardLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:fontFamily="monospace"
-        android:text="FAV_DATA"
+        android:text="@string/fav_data"
         android:textColor="?attr/sonusAccentColor"
         android:textSize="14sp"
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/tvFavCardDesc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:fontFamily="monospace"
-        android:text="UNIT_01"
+        android:text="@string/unit_01"
         android:textColor="?attr/sonusTextDarkColor"
         android:textSize="10sp"
         android:letterSpacing="0.1" />
@@ -59,10 +61,11 @@
         android:layout_weight="1" />
 
     <TextView
+        android:id="@+id/tvFavCardAccess"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="monospace"
-        android:text="[ ACCESS ]"
+        android:text="@string/access_bracket"
         android:textColor="?attr/sonusAccentDimColor"
         android:textSize="11sp" />
 

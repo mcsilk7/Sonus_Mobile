@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.sonus.R
+import com.example.sonus.LabelProvider
 import com.example.sonus.network.LoginRequest
 import com.example.sonus.network.RetrofitClient
 import com.example.sonus.network.SessionManager
@@ -47,6 +48,24 @@ class LoginFragment : Fragment() {
         view.findViewById<View>(R.id.tvGoToRegister).setOnClickListener {
             findNavController().navigate(R.id.registerFragment)
         }
+        
+        applyThemeStrings(view)
+    }
+
+    private fun applyThemeStrings(view: View) {
+        val context = requireContext()
+        view.findViewById<TextView>(R.id.tvLoginTop).text = LabelProvider.getLabel(context, "auth_top")
+        view.findViewById<TextView>(R.id.tvLoginMain).text = LabelProvider.getLabel(context, "auth_main")
+        view.findViewById<TextView>(R.id.tvLoginUserLabel).text = LabelProvider.getLabel(context, "auth_user_label")
+        view.findViewById<TextView>(R.id.tvLoginPassLabel).text = LabelProvider.getLabel(context, "auth_pass_label")
+        
+        val etEmail = view.findViewById<EditText>(R.id.etLoginEmail)
+        val etPass = view.findViewById<EditText>(R.id.etLoginPassword)
+        etEmail.hint = LabelProvider.getLabel(context, "search_hint")
+        etPass.hint = getString(R.string.hint_stars)
+
+        view.findViewById<TextView>(R.id.btnLogin).text = LabelProvider.getLabel(context, "auth_authorize")
+        view.findViewById<TextView>(R.id.tvGoToRegister).text = LabelProvider.getLabel(context, "auth_create")
     }
 
     private fun performLogin() {
@@ -55,7 +74,7 @@ class LoginFragment : Fragment() {
         val loginButton = view?.findViewById<TextView>(R.id.btnLogin)
 
         if (username.isBlank() || password.isBlank()) {
-            Toast.makeText(requireContext(), "Wypełnij wszystkie pola", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_fill_all), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -76,16 +95,16 @@ class LoginFragment : Fragment() {
                         )
                         navigateToMain()
                     } else {
-                        showLoginError("Nieprawidłowa odpowiedź serwera")
+                        showLoginError(getString(R.string.error_invalid_server_res))
                     }
                 } else {
                     val errorMessage = response.errorBody()?.string() ?: response.message()
-                    showLoginError("Błąd logowania: $errorMessage")
+                    showLoginError(getString(R.string.error_login_failed, errorMessage))
                 }
             } catch (exception: java.io.IOException) {
-                showLoginError("Błąd sieci: sprawdź połączenie i serwer")
+                showLoginError(getString(R.string.error_network_check))
             } catch (exception: Exception) {
-                showLoginError("Wystąpił błąd: ${exception.localizedMessage}")
+                showLoginError(getString(R.string.error_generic, exception.localizedMessage))
             } finally {
                 withContext(Dispatchers.Main) {
                     loginButton?.isEnabled = true

@@ -22,7 +22,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:gravity="center"
-            android:text="ESC"
+            android:text="@string/nav_esc"
             android:textColor="?attr/sonusAccentColor"
             android:fontFamily="monospace"
             android:textSize="14sp"
@@ -38,17 +38,19 @@
             android:orientation="vertical"
             android:layout_marginStart="12dp">
             <TextView
+                android:id="@+id/tvProfileHeaderTop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="OPERATOR_PROFILE"
+                android:text="@string/operator_profile"
                 android:textColor="?attr/sonusTextDarkColor"
                 android:textSize="10sp"
                 android:fontFamily="monospace"
                 android:letterSpacing="0.2" />
             <TextView
+                android:id="@+id/tvProfileHeaderMain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="USER_ID_CONTROL"
+                android:text="@string/user_id_control"
                 android:textColor="?attr/sonusAccentColor"
                 android:textSize="18sp"
                 android:fontFamily="monospace"
@@ -60,7 +62,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:gravity="center"
-            android:text="SYS"
+            android:text="@string/nav_sys"
             android:textColor="?attr/sonusAccentColor"
             android:fontFamily="monospace"
             android:textSize="14sp"
@@ -76,7 +78,7 @@
         android:layout_marginTop="80dp"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingBottom="100dp">
+        android:paddingBottom="180dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -127,7 +129,7 @@
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/btnEditProfile"
+                android:id="@+id/tvProfileEditLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -136,7 +138,7 @@
                 android:paddingEnd="24dp"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
-                android:text=":: EDIT_IDENTITY"
+                android:text="@string/edit_identity"
                 android:textColor="?attr/sonusTextPrimaryColor"
                 android:textSize="12sp"
                 android:fontFamily="monospace"
@@ -161,9 +163,10 @@
                     android:orientation="vertical"
                     android:padding="10dp">
                     <TextView
+                        android:id="@+id/tvProfileUnits"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="UNITS"
+                        android:text="@string/units_label"
                         android:textColor="?attr/sonusTextFaintColor"
                         android:textSize="9sp"
                         android:fontFamily="monospace" />
@@ -172,14 +175,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="monospace"
-                        android:text="0"
+                        android:text="@string/zero"
                         android:textColor="?attr/sonusAccentColor"
                         android:textSize="22sp"
                         android:textStyle="bold" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PLAYLISTS"
+                        android:text="@string/playlists_caps"
                         android:textColor="?attr/sonusTextDarkColor"
                         android:textSize="11sp"
                         android:fontFamily="monospace" />
@@ -197,9 +200,10 @@
                     android:orientation="vertical"
                     android:padding="10dp">
                     <TextView
+                        android:id="@+id/tvProfileRuntime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="RUNTIME"
+                        android:text="@string/runtime_label"
                         android:textColor="?attr/sonusTextFaintColor"
                         android:textSize="9sp"
                         android:fontFamily="monospace" />
@@ -208,14 +212,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="monospace"
-                        android:text="0"
+                        android:text="@string/zero"
                         android:textColor="?attr/sonusAccentColor"
                         android:textSize="22sp"
                         android:textStyle="bold" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="HOURS"
+                        android:text="@string/hours_caps"
                         android:textColor="?attr/sonusTextDarkColor"
                         android:textSize="11sp"
                         android:fontFamily="monospace" />
@@ -232,9 +236,10 @@
                     android:orientation="vertical"
                     android:padding="10dp">
                     <TextView
+                        android:id="@+id/tvProfileSignals"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="SIGNALS"
+                        android:text="@string/signals_label"
                         android:textColor="?attr/sonusTextFaintColor"
                         android:textSize="9sp"
                         android:fontFamily="monospace" />
@@ -243,14 +248,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="monospace"
-                        android:text="0"
+                        android:text="@string/zero"
                         android:textColor="?attr/sonusAccentColor"
                         android:textSize="22sp"
                         android:textStyle="bold" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="FAVORITES"
+                        android:text="@string/favorites_caps"
                         android:textColor="?attr/sonusTextDarkColor"
                         android:textSize="11sp"
                         android:fontFamily="monospace" />
@@ -265,11 +270,12 @@
 
             <!-- Account Management -->
             <TextView
+                android:id="@+id/tvProfileAccAccess"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:fontFamily="monospace"
-                android:text="[ ACCOUNT_ACCESS ]"
+                android:text="@string/account_access_bracket"
                 android:textColor="?attr/sonusTextDarkColor"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -293,25 +299,28 @@
                     android:layout_marginStart="16dp"
                     android:orientation="vertical">
                     <TextView
+                        android:id="@+id/tvProfileDelete"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="DELETE_ACCOUNT"
+                        android:text="@string/delete_account"
                         android:textColor="?attr/sonusStatusRed"
                         android:textSize="14sp"
                         android:fontFamily="monospace"
                         android:textStyle="bold" />
                     <TextView
+                        android:id="@+id/tvProfileWipeDesc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="WIPE_ALL_USER_DATA"
+                        android:text="@string/wipe_all_user_data"
                         android:textColor="?attr/sonusTextDarkColor"
                         android:textSize="11sp"
                         android:fontFamily="monospace" />
                 </LinearLayout>
                 <TextView
+                    android:id="@+id/tvProfileWipeLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="::WIPE"
+                    android:text="@string/double_colon_wipe"
                     android:textColor="?attr/sonusStatusRed"
                     android:textSize="12sp"
                     android:fontFamily="monospace" />
@@ -324,19 +333,20 @@
                 android:layout_marginTop="28dp"
                 android:background="@drawable/bg_settings_danger"
                 android:gravity="center"
-                android:text="TERMINATE_SESSION"
+                android:text="@string/terminate_session"
                 android:textColor="?attr/sonusStatusRed"
                 android:textSize="14sp"
                 android:fontFamily="monospace"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvProfileBuild"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="16dp"
                 android:gravity="center"
-                android:text="SONUS STUDIO UNIT [ VER_1.0.0 ]"
+                android:text="@string/build_ver"
                 android:textColor="?attr/sonusTextFaintColor"
                 android:fontFamily="monospace"
                 android:textSize="10sp" />

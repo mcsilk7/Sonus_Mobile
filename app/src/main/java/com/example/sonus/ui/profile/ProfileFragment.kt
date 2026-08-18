@@ -47,12 +47,17 @@ class ProfileFragment : Fragment() {
     }
 
     private fun initViews(view: View) {
-        view.findViewById<View>(R.id.btnProfileBack).setOnClickListener {
-            findNavController().popBackStack()
+        val context = requireContext()
+        view.findViewById<TextView>(R.id.tvProfileHeaderTop).text = LabelProvider.getLabel(context, "profile_header_top")
+        view.findViewById<TextView>(R.id.tvProfileHeaderMain).text = LabelProvider.getLabel(context, "profile_header_main")
+        
+        view.findViewById<TextView>(R.id.tvProfileEditLabel).apply {
+            text = LabelProvider.getLabel(context, "profile_edit_id")
+            setOnClickListener { showEditProfileDialog() }
         }
 
-        view.findViewById<View>(R.id.btnEditProfile).setOnClickListener {
-            showEditProfileDialog()
+        view.findViewById<View>(R.id.btnProfileBack).setOnClickListener {
+            findNavController().popBackStack()
         }
 
         view.findViewById<View>(R.id.btnProfileSettings).setOnClickListener {
@@ -60,10 +65,23 @@ class ProfileFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        view.findViewById<View>(R.id.btnProfileLogout).setOnClickListener {
-            sessionManager.clearSession()
-            findNavController().navigate(R.id.loginFragment)
+        view.findViewById<TextView>(R.id.btnProfileLogout).apply {
+            text = LabelProvider.getLabel(context, "profile_terminate")
+            setOnClickListener {
+                sessionManager.clearSession()
+                findNavController().navigate(R.id.loginFragment)
+            }
         }
+        
+        view.findViewById<TextView>(R.id.tvProfileAccAccess).text = LabelProvider.getLabel(context, "profile_acc_access")
+        view.findViewById<TextView>(R.id.tvProfileDelete).text = LabelProvider.getLabel(context, "profile_delete")
+        view.findViewById<TextView>(R.id.tvProfileWipeDesc).text = LabelProvider.getLabel(context, "profile_wipe_desc")
+        view.findViewById<TextView>(R.id.tvProfileWipeLabel).text = LabelProvider.getLabel(context, "profile_wipe")
+        view.findViewById<TextView>(R.id.tvProfileBuild).text = LabelProvider.getLabel(context, "profile_build")
+
+        view.findViewById<TextView>(R.id.tvProfileUnits).text = LabelProvider.getLabel(context, "profile_units")
+        view.findViewById<TextView>(R.id.tvProfileRuntime).text = LabelProvider.getLabel(context, "profile_runtime")
+        view.findViewById<TextView>(R.id.tvProfileSignals).text = LabelProvider.getLabel(context, "profile_signals")
     }
 
     private fun displayUserData(view: View) {
@@ -128,9 +146,9 @@ class ProfileFragment : Fragment() {
             if (newName.isNotEmpty()) {
                 updateLocalUsername(newName)
                 dialog.dismiss()
-                Toast.makeText(requireContext(), "Profil zaktualizowany", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_profile_updated), Toast.LENGTH_SHORT).show()
             } else {
-                etUsername.error = "Nazwa nie może być pusta"
+                etUsername.error = getString(R.string.error_name_empty)
             }
         }
         dialog.show()

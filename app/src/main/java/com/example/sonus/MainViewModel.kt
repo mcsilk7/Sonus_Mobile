@@ -16,6 +16,10 @@ class MainViewModel : ViewModel() {
     private val _currentTabPage = MutableLiveData<Int>(0)
     val currentTabPage: LiveData<Int> = _currentTabPage
 
+    // Library Filter State (0: ALL, 1: PLAYLISTS, 2: ALBUMS)
+    private val _libraryFilter = MutableLiveData<Int>(0)
+    val libraryFilter: LiveData<Int> = _libraryFilter
+
     fun setBottomNavVisibility(visible: Boolean) {
         _isBottomNavVisible.value = visible
     }
@@ -28,5 +32,9 @@ class MainViewModel : ViewModel() {
         if (_currentTabPage.value != page) {
             _currentTabPage.value = page
         }
+    }
+
+    fun setLibraryFilter(filter: Int) {
+        _libraryFilter.value = filter
     }
 }

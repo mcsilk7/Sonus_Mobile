@@ -2,8 +2,10 @@ package com.example.sonus
 
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.NavHostFragment
 import com.example.sonus.network.SessionManager
 
@@ -65,41 +67,63 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupGlobalNavigation(navController: androidx.navigation.NavController) {
+        val navOptions = androidx.navigation.NavOptions.Builder()
+            .setPopUpTo(R.id.mainContainerFragment, false)
+            .setLaunchSingleTop(true)
+            .build()
+
         findViewById<View>(R.id.navHome).setOnClickListener {
-            if (navController.currentDestination?.id != R.id.mainContainerFragment) {
-                navController.navigate(R.id.mainContainerFragment)
-            }
             viewModel.setTabPage(0)
+            if (navController.currentDestination?.id != R.id.mainContainerFragment) {
+                navController.navigate(R.id.mainContainerFragment, null, navOptions)
+            }
         }
         findViewById<View>(R.id.navSearch).setOnClickListener {
-            if (navController.currentDestination?.id != R.id.mainContainerFragment) {
-                navController.navigate(R.id.mainContainerFragment)
-            }
             viewModel.setTabPage(1)
+            if (navController.currentDestination?.id != R.id.mainContainerFragment) {
+                navController.navigate(R.id.mainContainerFragment, null, navOptions)
+            }
         }
         findViewById<View>(R.id.navLibrary).setOnClickListener {
-            if (navController.currentDestination?.id != R.id.mainContainerFragment) {
-                navController.navigate(R.id.mainContainerFragment)
-            }
+            viewModel.setLibraryFilter(0) // Reset to ALL when clicking from bottom nav
             viewModel.setTabPage(2)
+            if (navController.currentDestination?.id != R.id.mainContainerFragment) {
+                navController.navigate(R.id.mainContainerFragment, null, navOptions)
+            }
         }
         findViewById<View>(R.id.navSettings).setOnClickListener {
-            if (navController.currentDestination?.id != R.id.mainContainerFragment) {
-                navController.navigate(R.id.mainContainerFragment)
-            }
             viewModel.setTabPage(3)
+            if (navController.currentDestination?.id != R.id.mainContainerFragment) {
+                navController.navigate(R.id.mainContainerFragment, null, navOptions)
+            }
         }
     }
 
     private fun updateNavIndicators(currentPageIndex: Int) {
-        findViewById<View>(R.id.indicatorHome).visibility = 
-            if (currentPageIndex == 0) View.VISIBLE else View.INVISIBLE
-        findViewById<View>(R.id.indicatorSearch).visibility = 
-            if (currentPageIndex == 1) View.VISIBLE else View.INVISIBLE
-        findViewById<View>(R.id.indicatorLibrary).visibility = 
-            if (currentPageIndex == 2) View.VISIBLE else View.INVISIBLE
-        findViewById<View>(R.id.indicatorSettings).visibility = 
-            if (currentPageIndex == 3) View.VISIBLE else View.INVISIBLE
+        val accent = ContextCompat.getColor(this, R.color.studio_amber)
+        val dark = ContextCompat.getColor(this, R.color.studio_text_dim)
+
+        // Indicators
+        findViewById<View>(R.id.indicatorHome).visibility = if (currentPageIndex == 0) View.VISIBLE else View.INVISIBLE
+        findViewById<View>(R.id.indicatorSearch).visibility = if (currentPageIndex == 1) View.VISIBLE else View.INVISIBLE
+        findViewById<View>(R.id.indicatorLibrary).visibility = if (currentPageIndex == 2) View.VISIBLE else View.INVISIBLE
+        findViewById<View>(R.id.indicatorSettings).visibility = if (currentPageIndex == 3) View.VISIBLE else View.INVISIBLE
+
+        // Text Labels and Content
+        val tvHome = findViewById<TextView>(R.id.tvNavHome)
+        val tvSearch = findViewById<TextView>(R.id.tvNavSearch)
+        val tvLibrary = findViewById<TextView>(R.id.tvNavLibrary)
+        val tvSettings = findViewById<TextView>(R.id.tvNavSettings)
+
+        tvHome.text = LabelProvider.getLabel(this, "nav_home")
+        tvSearch.text = LabelProvider.getLabel(this, "nav_search")
+        tvLibrary.text = LabelProvider.getLabel(this, "nav_library")
+        tvSettings.text = LabelProvider.getLabel(this, "nav_settings")
+
+        tvHome.setTextColor(if (currentPageIndex == 0) accent else dark)
+        tvSearch.setTextColor(if (currentPageIndex == 1) accent else dark)
+        tvLibrary.setTextColor(if (currentPageIndex == 2) accent else dark)
+        tvSettings.setTextColor(if (currentPageIndex == 3) accent else dark)
     }
 
     override fun onDestroy() {

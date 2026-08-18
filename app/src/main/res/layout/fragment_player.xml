@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/playerRoot"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,7 +26,7 @@
                 android:layout_width="48dp"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="ESC"
+                android:text="@string/nav_esc"
                 android:textColor="?attr/sonusAccentColor"
                 android:fontFamily="monospace"
                 android:textSize="14sp"
@@ -33,136 +36,144 @@
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
             <TextView
+                android:id="@+id/tvPlayerHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="STATION_MONITOR"
+                android:text="@string/station_monitor"
                 android:textColor="?attr/sonusTextPrimaryColor"
                 android:fontFamily="monospace"
                 android:textSize="12sp"
                 android:letterSpacing="0.1" />
 
-            <TextView
-                android:id="@+id/btnMore"
+            <ImageView
+                android:id="@+id/btnClosePlayer"
                 android:layout_width="48dp"
                 android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
-                android:gravity="center"
-                android:text="OPT"
-                android:textColor="?attr/sonusTextDarkColor"
-                android:fontFamily="monospace"
-                android:textSize="14sp" />
+                android:padding="14dp"
+                android:src="@drawable/ic_arrow_down"
+                app:tint="?attr/sonusAccentColor"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless" />
         </RelativeLayout>
 
-        <!-- Main Deck -->
-        <ScrollView
+        <!-- Main Deck (Fixed Content) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:fillViewport="true">
+            android:padding="24dp">
 
+            <!-- FIXED SIZE SQUARE CONTAINER -->
+            <FrameLayout
+                android:id="@+id/coverContainer"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?attr/sonusLineColor"
+                android:padding="2dp"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/metaData"
+                app:layout_constraintVertical_chainStyle="packed">
+
+                <ImageView
+                    android:id="@+id/imgPlayerCover"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/sonusCardColor"
+                    android:scaleType="centerCrop" />
+
+                <com.example.sonus.ui.player.RetroReelView
+                    android:id="@+id/retroReels"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:alpha="1.0" />
+            </FrameLayout>
+
+            <!-- Metadata Display -->
             <LinearLayout
+                android:id="@+id/metaData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
                 android:orientation="vertical"
-                android:padding="24dp">
-
-                <!-- Cover Art with industrial border and reels -->
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="320dp"
-                    android:background="?attr/sonusLineColor"
-                    android:padding="2dp">
-
-                    <ImageView
-                        android:id="@+id/imgPlayerCover"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="?attr/sonusCardColor"
-                        android:scaleType="centerCrop" />
-
-                    <com.example.sonus.ui.player.RetroReelView
-                        android:id="@+id/retroReels"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:alpha="1.0" />
-                </FrameLayout>
-
-                <!-- Metadata Display -->
-                <LinearLayout
+                android:gravity="center"
+                app:layout_constraintTop_toBottomOf="@id/coverContainer"
+                app:layout_constraintBottom_toTopOf="@+id/progressContainer">
+                <TextView
+                    android:id="@+id/tvPlayerSongTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <TextView
-                        android:id="@+id/tvPlayerSongTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:text="TRACK_NAME"
-                        android:textColor="?attr/sonusAccentColor"
-                        android:textSize="24sp"
-                        android:fontFamily="monospace"
-                        android:textStyle="bold" />
-                    <TextView
-                        android:id="@+id/tvPlayerArtist"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:ellipsize="end"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:text="ARTIST_ID"
-                        android:textColor="?attr/sonusTextDarkColor"
-                        android:textSize="14sp"
-                        android:fontFamily="monospace" />
-                </LinearLayout>
-
-                <!-- Meters / Progress -->
-                <LinearLayout
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="@string/track_name_placeholder"
+                    android:textColor="?attr/sonusAccentColor"
+                    android:textSize="24sp"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/tvPlayerArtist"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    android:orientation="vertical">
-
-                    <SeekBar
-                        android:id="@+id/seekBarPlayer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:progressTint="?attr/sonusAccentColor"
-                        android:thumbTint="?attr/sonusAccentColor"
-                        android:progressBackgroundTint="?attr/sonusLineSoftColor"
-                        android:splitTrack="false" />
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp">
-                        <TextView
-                            android:id="@+id/tvCurrentTime"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="00:00"
-                            android:textColor="?attr/sonusAccentColor"
-                            android:fontFamily="monospace"
-                            android:textSize="12sp" />
-                        <TextView
-                            android:id="@+id/tvTotalTime"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:text="00:00"
-                            android:textColor="?attr/sonusTextDarkColor"
-                            android:fontFamily="monospace"
-                            android:textSize="12sp" />
-                    </RelativeLayout>
-                </LinearLayout>
-
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="@string/artist_id_placeholder"
+                    android:textColor="?attr/sonusTextDarkColor"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace" />
             </LinearLayout>
-        </ScrollView>
+
+            <!-- Meters / Progress -->
+            <LinearLayout
+                android:id="@+id/progressContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@id/metaData"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <SeekBar
+                    android:id="@+id/seekBarPlayer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progressTint="?attr/sonusAccentColor"
+                    android:thumbTint="?attr/sonusAccentColor"
+                    android:progressBackgroundTint="?attr/sonusLineSoftColor"
+                    android:splitTrack="false" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+                    <TextView
+                        android:id="@+id/tvCurrentTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/time_placeholder"
+                        android:textColor="?attr/sonusAccentColor"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/tvTotalTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="@string/time_placeholder"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp" />
+                </RelativeLayout>
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Bottom Control Panel (Rack Unit Style) -->
         <LinearLayout
@@ -195,7 +206,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:text="SHF"
+                        android:text="@string/shf"
                         android:textColor="?attr/sonusTextDarkColor"
                         android:fontFamily="monospace"
                         android:textSize="12sp"
@@ -245,7 +256,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:text="RPT"
+                        android:text="@string/rpt"
                         android:textColor="?attr/sonusTextDarkColor"
                         android:fontFamily="monospace"
                         android:textSize="12sp"
@@ -260,7 +271,7 @@
                 android:layout_height="32dp"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:text="VIEW QUEUE"
+                android:text="@string/view_queue"
                 android:textColor="?attr/sonusAccentDimColor"
                 android:fontFamily="monospace"
                 android:textSize="11sp"

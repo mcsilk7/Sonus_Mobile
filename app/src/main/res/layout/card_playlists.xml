@@ -34,21 +34,23 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/tvPlCardLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:fontFamily="monospace"
-        android:text="PL_DATA"
+        android:text="@string/pl_data"
         android:textColor="?attr/sonusAccentColor"
         android:textSize="14sp"
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/tvPlCardDesc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:fontFamily="monospace"
-        android:text="UNIT_02"
+        android:text="@string/unit_02"
         android:textColor="?attr/sonusTextDarkColor"
         android:textSize="10sp"
         android:letterSpacing="0.1" />
@@ -59,10 +61,11 @@
         android:layout_weight="1" />
 
     <TextView
+        android:id="@+id/tvPlCardAccess"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="monospace"
-        android:text="[ ACCESS ]"
+        android:text="@string/access_bracket"
         android:textColor="?attr/sonusAccentDimColor"
         android:textSize="11sp" />
 

@@ -5,22 +5,90 @@
     android:layout_height="match_parent"
     android:background="?attr/sonusBackgroundColor">
 
-    <ScrollView
+    <!-- Top Rack Header -->
+    <LinearLayout
+        android:id="@+id/topRackPlaylist"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="?attr/sonusPanelColor"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:elevation="4dp">
+
+        <TextView
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="@string/nav_esc"
+            android:textColor="?attr/sonusAccentColor"
+            android:fontFamily="monospace"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+            <TextView
+                android:id="@+id/tvPlaylistHeaderTop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/storage_access_module"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.2" />
+            <TextView
+                android:id="@+id/tvPlaylistHeaderMain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/virtual_disk_management"
+                android:textColor="?attr/sonusAccentColor"
+                android:textSize="18sp"
+                android:fontFamily="monospace"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btnDeletePlaylist"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:src="@drawable/ic_delete"
+            app:tint="?attr/sonusStatusRed"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="80dp"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingBottom="100dp">
+        android:paddingBottom="180dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Header with Back Button and Cover -->
+            <!-- Header Deck -->
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="350dp">
+                android:layout_height="320dp"
+                android:layout_margin="16dp"
+                android:background="?attr/sonusLineColor"
+                android:padding="2dp">
 
                 <ImageView
                     android:id="@+id/imgPlaylistCoverLarge"
@@ -34,37 +102,12 @@
                     android:layout_height="match_parent"
                     android:background="@drawable/bg_gradient_overlay" />
 
-                <ImageButton
-                    android:id="@+id/btnBack"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:layout_margin="16dp"
-                    android:background="@drawable/bg_icon_circle"
-                    android:contentDescription="Powrót"
-                    android:padding="10dp"
-                    android:src="@drawable/ic_back"
-                    app:tint="@color/app_background"
-                    android:alpha="0.8" />
-
-                <ImageButton
-                    android:id="@+id/btnDeletePlaylist"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:layout_gravity="end"
-                    android:layout_margin="16dp"
-                    android:background="@drawable/bg_icon_circle"
-                    android:contentDescription="Usuń playlistę"
-                    android:padding="10dp"
-                    android:src="@drawable/ic_delete"
-                    app:tint="@color/app_background"
-                    android:alpha="0.8" />
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:padding="16dp"
                     android:gravity="bottom">
 
                     <LinearLayout
@@ -77,47 +120,73 @@
                             android:id="@+id/tvPlaylistNameDetail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-black"
-                            android:text="Nazwa Playlisty"
-                            android:textColor="@color/app_background"
-                            android:textSize="32sp"
-                            android:shadowColor="#80000000"
-                            android:shadowDx="2"
-                            android:shadowDy="2"
-                            android:shadowRadius="4" />
+                            android:fontFamily="monospace"
+                            android:text="@string/unit_id_prefix"
+                            android:textColor="?attr/sonusTextPrimaryColor"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/tvPlaylistDescription"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:text="Opis playlisty..."
-                            android:textColor="@color/app_background"
-                            android:textSize="15sp"
-                            android:alpha="0.9" />
+                            android:layout_marginTop="4dp"
+                            android:text="@string/description_pending"
+                            android:textColor="?attr/sonusTextPrimaryColor"
+                            android:textSize="14sp"
+                            android:fontFamily="monospace"
+                            android:alpha="0.8" />
                     </LinearLayout>
 
-                    <!-- Play FAB -->
+                    <!-- Industrial Play Button -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/fabPlayPlaylist"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:backgroundTint="@color/app_background"
+                        android:backgroundTint="?attr/sonusAccentColor"
                         android:src="@drawable/ic_play"
-                        app:tint="@color/text_dark"
+                        app:tint="?attr/sonusBackgroundColor"
                         app:fabSize="normal"
-                        app:elevation="6dp" />
+                        app:elevation="8dp" />
                 </LinearLayout>
             </FrameLayout>
 
+            <!-- Control Bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:background="?attr/sonusPanelColor"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvPlaylistDataStreamLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/data_stream_list"
+                    android:textColor="?attr/sonusTextDarkColor"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:background="?attr/sonusLineSoftColor" />
+            </LinearLayout>
 
             <!-- Songs List -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="12dp">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvPlaylistSongs"
@@ -128,6 +197,6 @@
             </LinearLayout>
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </FrameLayout>

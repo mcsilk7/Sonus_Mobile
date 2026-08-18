@@ -20,20 +20,22 @@
         android:gravity="bottom">
 
         <TextView
+            android:id="@+id/tvQueueTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="monospace"
-            android:text="STATION_QUEUE"
+            android:text="@string/station_queue"
             android:textColor="?attr/sonusAccentColor"
             android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/tvQueueDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
-            android:text="DRAG_TO_REORDER"
+            android:text="@string/drag_to_reorder"
             android:textColor="?attr/sonusTextFaintColor"
             android:textSize="10sp"
             android:letterSpacing="0.1" />

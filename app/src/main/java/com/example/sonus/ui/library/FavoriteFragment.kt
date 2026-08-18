@@ -51,7 +51,7 @@ class FavoriteFragment : Fragment() {
             songs = emptyList(),
             onItemClick = { song ->
                 PlayerState.play(requireContext(), song, songAdapter.getSongs())
-                Toast.makeText(requireContext(), "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_playing, song.title), Toast.LENGTH_SHORT).show()
             },
             onAddClick = { song ->
                 PlaylistHelper.showPlaylistSelectionDialog(requireActivity() as androidx.appcompat.app.AppCompatActivity, viewLifecycleOwner.lifecycleScope, sessionManager.getUserId(), song) {

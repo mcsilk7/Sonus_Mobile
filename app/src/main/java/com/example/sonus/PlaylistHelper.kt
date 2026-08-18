@@ -58,23 +58,23 @@ object PlaylistHelper {
                 if (response.isSuccessful) {
                     val playlists = response.body() ?: emptyList()
                     if (playlists.isEmpty()) {
-                        Toast.makeText(context, "Nie masz jeszcze żadnych playlist", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.toast_playlist_empty), Toast.LENGTH_SHORT).show()
                         return@launch
                     }
 
                     val names = playlists.map { it.name }.toTypedArray()
                     AlertDialog.Builder(context)
-                        .setTitle("Dodaj do playlisty")
+                        .setTitle(context.getString(R.string.init_new_unit))
                         .setItems(names) { _, which ->
                             val selectedPlaylist = playlists[which]
                             addSongToPlaylist(context, scope, selectedPlaylist.id!!, song, onAdded)
                         }
                         .show()
                 } else {
-                    Toast.makeText(context, "Błąd pobierania playlist", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.toast_playlist_fetch_error), Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.toast_network_error, e.message), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -90,14 +90,14 @@ object PlaylistHelper {
             try {
                 val response = RetrofitClient.playlistApi.addSongToPlaylist(playlistId, song.id)
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "Dodano do playlisty!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.toast_added_to_playlist), Toast.LENGTH_SHORT).show()
                     song.isInPlaylist = true
                     onAdded()
                 } else {
-                    Toast.makeText(context, "Błąd dodawania: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.toast_add_error, response.code()), Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, "Błąd sieci: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.toast_network_error, e.message), Toast.LENGTH_SHORT).show()
             }
         }
     }

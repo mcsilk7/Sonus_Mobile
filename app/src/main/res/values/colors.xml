@@ -14,6 +14,30 @@
     <color name="studio_red">#C0544A</color>
     <color name="studio_green">#6A9955</color>
 
+    <!-- Internal Component Colors -->
+    <color name="studio_metal">#3A3630</color>
+    <color name="studio_outline">#555048</color>
+    <color name="studio_tape">#1A1814</color>
+    <color name="studio_hub">#2A2620</color>
+    <color name="studio_sticker_bg">#E0F5F5F5</color>
+    <color name="studio_sticker_text">#14120F</color>
+
+    <!-- Utility Colors -->
+    <color name="studio_transparent">#00000000</color>
+    <color name="studio_black">#FF000000</color>
+    <color name="studio_white">#FFFFFFFF</color>
+    <color name="studio_gradient_end">#99000000</color>
+    <color name="studio_tab_bg">#20000000</color>
+    <color name="studio_danger">#CC4444</color>
+    <color name="studio_overlay_mask">#33AEB1B5</color>
+
+    <!-- Industrial Blue Palette -->
+    <color name="industrial_dark_bg">#030C13</color>
+    <color name="industrial_dark_panel">#252F38</color>
+    <color name="industrial_accent">#4B5862</color>
+    <color name="industrial_light_panel">#AEB1B5</color>
+    <color name="industrial_light_bg">#DBD3C8</color>
+
     <!-- Legacy Mappings (to fix layout/code references) -->
     <color name="app_background">@color/studio_bg</color>
     <color name="card_background">@color/studio_bg_card</color>

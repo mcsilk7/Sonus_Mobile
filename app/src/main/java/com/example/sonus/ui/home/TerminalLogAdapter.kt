@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sonus.R
+import com.example.sonus.SettingsManager
 
 class TerminalLogAdapter : RecyclerView.Adapter<TerminalLogAdapter.LogViewHolder>() {
 
@@ -22,13 +23,16 @@ class TerminalLogAdapter : RecyclerView.Adapter<TerminalLogAdapter.LogViewHolder
     }
 
     override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
-        holder.tvLine.text = logs[position]
+        val context = holder.itemView.context
+        val isTechnical = SettingsManager(context).getThemeId() == 0
+        val prefix = if (isTechnical) "> " else ""
+        holder.tvLine.text = "$prefix${logs[position]}"
     }
 
     override fun getItemCount() = logs.size
 
     fun addLog(line: String) {
-        logs.add("> $line")
+        logs.add(line)
         notifyItemInserted(logs.size - 1)
         if (logs.size > 50) { // Keep only last 50 lines
             logs.removeAt(0)
@@ -38,7 +42,7 @@ class TerminalLogAdapter : RecyclerView.Adapter<TerminalLogAdapter.LogViewHolder
 
     fun setLogs(newLogs: List<String>) {
         logs.clear()
-        logs.addAll(newLogs.map { "> $it" })
+        logs.addAll(newLogs)
         notifyDataSetChanged()
     }
 }

@@ -4,7 +4,7 @@
     android:id="@+id/albumItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_home_card"
+    android:background="@drawable/bg_settings_item"
     android:orientation="vertical"
     android:padding="10dp"
     android:layout_margin="6dp">
@@ -31,7 +31,7 @@
         android:ellipsize="end"
         android:fontFamily="monospace"
         android:maxLines="1"
-        android:text="ALBUM_ID"
+        android:text="@string/album_id_label"
         android:textColor="?attr/sonusAccentColor"
         android:textSize="14sp"
         android:textStyle="bold" />
@@ -43,7 +43,7 @@
         android:layout_marginTop="2dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="ARTIST_LABEL"
+        android:text="@string/artist_label"
         android:textColor="?attr/sonusTextDarkColor"
         android:textSize="12sp" />
 

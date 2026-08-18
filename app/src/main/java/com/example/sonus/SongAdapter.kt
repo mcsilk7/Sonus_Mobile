@@ -22,7 +22,10 @@ class SongAdapter(
     private val onLongClick: ((SongDTO) -> Unit)? = null
 ) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
 
+    private var activeSongId: Long? = null
+
     class SongViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val root: View = view
         val title: TextView = view.findViewById(R.id.tvSongTitle)
         val artist: TextView = view.findViewById(R.id.tvSongArtist)
         val duration: TextView = view.findViewById(R.id.tvSongDuration)
@@ -39,33 +42,43 @@ class SongAdapter(
 
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
         val song = songs[position]
+        val context = holder.itemView.context
+        
         holder.title.text = song.title
         holder.artist.text = song.artist
         
+        // Highlight active song
+        if (song.id == activeSongId) {
+            holder.title.setTextColor(ContextCompat.getColor(context, R.color.studio_amber))
+            holder.root.setBackgroundResource(R.drawable.bg_settings_item)
+        } else {
+            holder.title.setTextColor(ContextCompat.getColor(context, R.color.studio_text))
+            holder.root.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        }
+
         // Convert duration seconds to MM:SS
         val mins = (song.duration ?: 0) / 60
         val secs = (song.duration ?: 0) % 60
-        holder.duration.text = String.format("%d:%02d", mins, secs)
+        holder.duration.text = String.format(java.util.Locale.getDefault(), "%d:%02d", mins, secs)
 
         // Favorite state color
-        val context = holder.itemView.context
         if (song.isFavorite) {
-            holder.btnFavorite.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+            holder.btnFavorite.setColorFilter(ContextCompat.getColor(context, R.color.studio_red))
         } else {
-            holder.btnFavorite.setColorFilter(ContextCompat.getColor(context, android.R.color.white))
+            holder.btnFavorite.setColorFilter(ContextCompat.getColor(context, R.color.studio_text_dim))
         }
 
-        // Load cover image: use coverPath if it's a full URL, otherwise use dedicated endpoint
+        // Load cover image
         val coverUrl = if (song.coverPath?.startsWith("http") == true) {
             song.coverPath
         } else {
             RetrofitClient.BASE_URL + "api/songs/${song.id}/cover"
         }
-        val authenticatedUrl = GlideHelper.getAuthenticatedUrl(holder.itemView.context, coverUrl)
+        val authenticatedUrl = GlideHelper.getAuthenticatedUrl(context, coverUrl)
 
         val radius = (12 * context.resources.displayMetrics.density).toInt()
 
-        Glide.with(holder.itemView.context)
+        Glide.with(context)
             .load(authenticatedUrl)
             .placeholder(R.drawable.bg_cover_placeholder)
             .error(R.drawable.bg_cover_placeholder)
@@ -74,7 +87,6 @@ class SongAdapter(
 
         holder.itemView.setOnClickListener { onItemClick(song) }
         
-        // Always show the add to playlist button
         holder.btnAdd.visibility = View.VISIBLE
         holder.btnAdd.text = if (song.isInPlaylist) "✓" else "+"
         
@@ -104,6 +116,19 @@ class SongAdapter(
 
     fun updateData(newSongs: List<SongDTO>) {
         songs = newSongs
+        notifyDataSetChanged()
+    }
+
+    fun moveItem(fromPosition: Int, toPosition: Int) {
+        val mutableSongs = songs.toMutableList()
+        val song = mutableSongs.removeAt(fromPosition)
+        mutableSongs.add(toPosition, song)
+        songs = mutableSongs
+        notifyItemMoved(fromPosition, toPosition)
+    }
+
+    fun setActiveSongId(id: Long?) {
+        activeSongId = id
         notifyDataSetChanged()
     }
 }

@@ -7,9 +7,10 @@
     android:background="@drawable/bg_dialog">
 
     <TextView
+        android:id="@+id/tvCreatePlaylistTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="INIT_NEW_UNIT"
+        android:text="@string/init_new_unit"
         android:textColor="?attr/sonusAccentColor"
         android:textSize="20sp"
         android:fontFamily="monospace"
@@ -17,9 +18,10 @@
         android:layout_marginBottom="16dp"/>
 
     <TextView
+        android:id="@+id/tvCreatePlaylistSubtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ASSIGN_LABEL_IDENTIFIER"
+        android:text="@string/assign_label_identifier"
         android:textColor="?attr/sonusTextDarkColor"
         android:textSize="10sp"
         android:fontFamily="monospace"
@@ -30,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@drawable/bg_auth_input"
-        android:hint="ENTER_NAME..."
+        android:hint="@string/hint_enter_name_technical"
         android:textColor="?attr/sonusTextPrimaryColor"
         android:textColorHint="?attr/sonusTextFaintColor"
         android:paddingStart="20dp"
@@ -49,7 +51,7 @@
                 android:id="@+id/btnCancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="[ ABORT ]"
+                android:text="@string/abort_bracket"
                 android:textColor="?attr/sonusTextDarkColor"
                 android:textSize="14sp"
                 android:fontFamily="monospace"
@@ -63,7 +65,7 @@
                 android:id="@+id/btnConfirm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="INITIALIZE"
+                android:text="@string/initialize"
                 android:textColor="?attr/sonusBackgroundColor"
                 android:background="@drawable/bg_auth_button"
                 android:paddingStart="24dp"

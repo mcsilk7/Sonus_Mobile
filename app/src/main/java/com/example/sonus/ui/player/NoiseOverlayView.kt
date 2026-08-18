@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.ContextCompat
+import com.example.sonus.R
 import java.util.Random
 
 class NoiseOverlayView @JvmOverloads constructor(
@@ -15,7 +17,7 @@ class NoiseOverlayView @JvmOverloads constructor(
     }
     
     private val scanlinePaint = Paint().apply {
-        color = Color.BLACK
+        color = ContextCompat.getColor(context, R.color.studio_black)
         alpha = 10
         strokeWidth = 1f
     }

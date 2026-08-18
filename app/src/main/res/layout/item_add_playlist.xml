@@ -31,29 +31,32 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/tvAddPlaylistTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
-            android:text="INITIALIZE_PLAYLIST"
+            android:text="@string/initialize_playlist"
             android:textColor="?attr/sonusAccentColor"
             android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/tvAddPlaylistDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
-            android:text="CREATE_NEW_VIRTUAL_DISK"
+            android:text="@string/create_new_virtual_disk"
             android:textColor="?attr/sonusTextDarkColor"
             android:textSize="10sp"
             android:letterSpacing="0.1" />
     </LinearLayout>
 
     <TextView
+        android:id="@+id/tvAddPlaylistExe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="monospace"
-        android:text="[ EXE ]"
+        android:text="@string/exe_bracket"
         android:textColor="?attr/sonusAccentDimColor"
         android:textSize="11sp" />
 

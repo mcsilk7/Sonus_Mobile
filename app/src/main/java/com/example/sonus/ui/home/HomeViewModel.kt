@@ -17,9 +17,6 @@ class HomeViewModel : ViewModel() {
     private val _terminalLogs = MutableLiveData<List<String>>()
     val terminalLogs: LiveData<List<String>> = _terminalLogs
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
-
     init {
         _terminalLogs.value = listOf(
             "INITIALIZING_SYSTEM_CORE...",
@@ -41,10 +38,8 @@ class HomeViewModel : ViewModel() {
 
     fun loadRecentlyPlayed(userId: Long, localRecentSongs: List<SongDTO>) {
         viewModelScope.launch {
-            _isLoading.value = true
             val enrichedSongs = repository.enrichSongMetadata(userId, localRecentSongs)
             _recentlyPlayed.value = enrichedSongs
-            _isLoading.value = false
         }
     }
 }

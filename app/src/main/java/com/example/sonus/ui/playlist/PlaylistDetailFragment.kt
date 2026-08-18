@@ -27,8 +27,8 @@ class PlaylistDetailFragment : Fragment() {
     private lateinit var tvName: TextView
     private lateinit var tvDescription: TextView
     private lateinit var rvSongs: RecyclerView
-    private lateinit var btnBack: ImageButton
-    private lateinit var btnDelete: ImageButton
+    private lateinit var btnBack: View
+    private lateinit var btnDelete: ImageView
     private lateinit var imgCover: ImageView
     
     private lateinit var songAdapter: SongAdapter
@@ -57,6 +57,15 @@ class PlaylistDetailFragment : Fragment() {
         initViews(view)
         setupRecyclerView()
         fetchPlaylistDetails()
+        applyThemeStrings(view)
+    }
+
+    private fun applyThemeStrings(view: View) {
+        val context = requireContext()
+        view.findViewById<TextView>(R.id.tvPlaylistHeaderTop).text = LabelProvider.getLabel(context, "playlist_detail_top")
+        view.findViewById<TextView>(R.id.tvPlaylistHeaderMain).text = LabelProvider.getLabel(context, "playlist_detail_main")
+        view.findViewById<TextView>(R.id.tvPlaylistDataStreamLabel).text = LabelProvider.getLabel(context, "data_stream_list")
+        view.findViewById<TextView>(R.id.btnBack).text = LabelProvider.getLabel(context, "nav_back")
     }
 
     private fun initViews(view: View) {
@@ -77,7 +86,7 @@ class PlaylistDetailFragment : Fragment() {
 
     private fun playSong(song: SongDTO) {
         PlayerState.play(requireContext(), song, songAdapter.getSongs())
-        Toast.makeText(requireContext(), "Odtwarzanie: ${song.title}", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.toast_playing, song.title), Toast.LENGTH_SHORT).show()
     }
 
     private fun setupRecyclerView() {
@@ -145,10 +154,23 @@ class PlaylistDetailFragment : Fragment() {
     }
 
     private fun populateUI(playlist: PlaylistDTO) {
-        tvName.text = playlist.name
+        val context = requireContext()
+        val isTechnical = SettingsManager(context).getThemeId() == 0
+        
+        tvName.text = if (isTechnical) {
+            getString(R.string.unit_id_prefix, playlist.id?.toString(16)?.uppercase() ?: "00")
+        } else {
+            playlist.name
+        }
+        
         val songs = playlist.songs ?: emptyList()
         val count = if (songs.isNotEmpty()) songs.size else (playlist.songCount ?: 0)
-        tvDescription.text = playlist.description ?: formatSongCount(count)
+        
+        tvDescription.text = if (isTechnical) {
+            getString(R.string.log_prefix, "${playlist.name.uppercase()} (${formatSongCount(count)})")
+        } else {
+            getString(R.string.status_prefix_norm, formatSongCount(count))
+        }
 
         val firstSong = songs.firstOrNull()
         val coverUrl = if (firstSong?.coverPath?.startsWith("http") == true) {
@@ -172,11 +194,12 @@ class PlaylistDetailFragment : Fragment() {
     }
 
     private fun formatSongCount(count: Int): String {
-        return when {
-            count == 0 -> "Brak utworów"
-            count == 1 -> "1 utwór"
-            count % 10 in 2..4 && (count % 100 !in 12..14) -> "$count utwory"
-            else -> "$count utworów"
+        val context = requireContext()
+        val isTechnical = SettingsManager(context).getThemeId() == 0
+        return if (isTechnical) {
+            getString(R.string.data_slots_prefix, count)
+        } else {
+            getString(R.string.tracks_count_norm, count)
         }
     }
 
@@ -222,11 +245,19 @@ class PlaylistDetailFragment : Fragment() {
     }
 
     private fun confirmRemoveFromPlaylist(song: SongDTO) {
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("Usuń utwór")
-            .setMessage("Usunąć ${song.title} z tej playlisty?")
-            .setPositiveButton("Usuń") { _, _ -> removeSongFromPlaylist(song.id) }
-            .setNegativeButton("Anuluj", null)
+        val context = requireContext()
+        val isTechnical = SettingsManager(context).getThemeId() == 0
+        
+        val title = if (isTechnical) getString(R.string.confirm_remove_song_title).uppercase() else "Remove Track"
+        val message = if (isTechnical) getString(R.string.confirm_remove_song_msg, song.title) else "Remove ${song.title} from this playlist?"
+        val confirm = if (isTechnical) "::WIPE" else "Remove"
+        val cancel = if (isTechnical) "[ ABORT ]" else "Cancel"
+
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(confirm) { _, _ -> removeSongFromPlaylist(song.id) }
+            .setNegativeButton(cancel, null)
             .show()
     }
 
