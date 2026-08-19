@@ -213,6 +213,90 @@
                     android:background="@drawable/bg_settings_toggle" />
             </LinearLayout>
 
+            <!-- Storage Monitor Module -->
+            <TextView
+                android:id="@+id/tvSettingsStorageTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="monospace"
+                android:text="@string/storage_monitor"
+                android:textColor="?attr/sonusTextDarkColor"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_settings_item"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvDiskUsage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DISK_USAGE: 0.0 MB"
+                    android:textColor="?attr/sonusAccentColor"
+                    android:fontFamily="monospace"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <com.example.sonus.ui.settings.SectorMapView
+                    android:id="@+id/sectorMapView"
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp"
+                    android:layout_marginTop="12dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnManageDownloads"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_settings_item"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tvSettingsManageSignalsTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/manage_signals"
+                        android:textColor="?attr/sonusAccentColor"
+                        android:fontFamily="monospace"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvSettingsManageSignalsDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/manage_signals_desc"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:fontFamily="monospace"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvSettingsManageSignalsAction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:text="@string/double_colon_manage"
+                    android:textColor="?attr/sonusAccentDimColor"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
             <!-- Clear Cached Signals Module -->
             <LinearLayout
                 android:id="@+id/btnClearDownloads"

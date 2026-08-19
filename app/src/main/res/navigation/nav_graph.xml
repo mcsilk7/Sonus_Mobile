@@ -62,4 +62,10 @@
         android:label="Favorite Signals"
         tools:layout="@layout/fragment_favorite" />
 
+    <fragment
+        android:id="@+id/downloadedSongsFragment"
+        android:name="com.example.sonus.ui.settings.DownloadedSongsFragment"
+        android:label="Downloaded Signals"
+        tools:layout="@layout/fragment_downloaded_songs" />
+
 </navigation>

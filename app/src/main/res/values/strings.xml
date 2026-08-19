@@ -145,6 +145,17 @@
     <string name="id_label">ID_LABEL</string>
     <string name="double_colon_edit">::EDIT</string>
     <string name="visual_configuration">[ VISUAL_CONFIGURATION ]</string>
+    <string name="storage_monitor">[ STORAGE_MONITOR ]</string>
+    <string name="disk_usage_label">DISK_USAGE: %s</string>
+    <string name="manage_signals">MANAGE_CACHED_SIGNALS</string>
+    <string name="manage_signals_desc">VIEW_AND_DELETE_SPECIFIC_TRACKS</string>
+    <string name="manage_signals_desc_norm">Manage your offline tracks</string>
+    <string name="data_sector_management">DATA_SECTOR_MANAGEMENT</string>
+    <string name="local_data_cached">LOCAL_DATA_CACHED</string>
+    <string name="no_local_data">NO_LOCAL_DATA_FOUND</string>
+    <string name="storage_usage_norm">Storage Usage</string>
+    <string name="local_files_norm">Downloaded Files</string>
+    <string name="double_colon_manage">::MANAGE</string>
     <string name="theme_engine_selection">THEME_ENGINE_SELECTION</string>
     <string name="active_theme_prefix">ACTIVE: [ %s ]</string>
     <string name="select_theme_title">SELECT_THEME_ENGINE</string>

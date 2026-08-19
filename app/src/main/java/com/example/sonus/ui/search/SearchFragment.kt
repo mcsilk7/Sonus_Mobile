@@ -144,7 +144,7 @@ class SearchFragment : Fragment() {
             onDownloadClick = { song ->
                 if (!DownloadManager.isSongDownloaded(requireContext(), song.id)) {
                     viewLifecycleOwner.lifecycleScope.launch {
-                        DownloadManager.downloadSong(requireContext(), song.id)
+                        DownloadManager.downloadSong(requireContext(), song)
                         songAdapter.notifyDataSetChanged()
                     }
                 }

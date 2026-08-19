@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.sonus.network.RetrofitClient
+import com.example.sonus.network.SongDTO
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -26,6 +28,7 @@ object DownloadManager {
     val downloadProgress: LiveData<Map<Long, Int>> = _downloadProgress
 
     private val currentProgress = mutableMapOf<Long, Int>()
+    private val gson = Gson()
 
     fun isSongDownloaded(context: Context, songId: Long): Boolean {
         val file = getSongFile(context, songId)
@@ -38,7 +41,14 @@ object DownloadManager {
         return File(dir, "signal_$songId.mp3")
     }
 
-    suspend fun downloadSong(context: Context, songId: Long): Boolean = withContext(Dispatchers.IO) {
+    private fun getMetadataFile(context: Context, songId: Long): File {
+        val dir = File(context.filesDir, "signals")
+        if (!dir.exists()) dir.mkdirs()
+        return File(dir, "signal_$songId.json")
+    }
+
+    suspend fun downloadSong(context: Context, song: SongDTO): Boolean = withContext(Dispatchers.IO) {
+        val songId = song.id
         try {
             val response = RetrofitClient.songApi.downloadSong(songId)
             if (!response.isSuccessful) {
@@ -73,6 +83,10 @@ object DownloadManager {
             outputStream.close()
             inputStream.close()
             
+            // Save Metadata
+            val metaFile = getMetadataFile(context, songId)
+            metaFile.writeText(gson.toJson(song))
+
             updateProgress(songId, -1) // Clear from map
             _events.emit(DownloadEvent.Success(songId))
             true
@@ -81,6 +95,43 @@ object DownloadManager {
             _events.emit(DownloadEvent.Error(songId, e.message ?: "Unknown error"))
             false
         }
+    }
+
+    fun getDownloadedSongs(context: Context): List<SongDTO> {
+        val dir = File(context.filesDir, "signals")
+        if (!dir.exists()) return emptyList()
+        
+        val jsonSongs = dir.listFiles { _, name -> name.endsWith(".json") }?.mapNotNull { file ->
+            try {
+                gson.fromJson(file.readText(), SongDTO::class.java)
+            } catch (e: Exception) {
+                Log.e("DownloadManager", "Failed to parse metadata: ${e.message}")
+                null
+            }
+        } ?: emptyList()
+
+        // Fallback: If some .mp3 files exist but don't have .json, show them with dummy info
+        val mp3Ids = dir.listFiles { _, name -> name.endsWith(".mp3") }?.mapNotNull { file ->
+            file.name.removePrefix("signal_").removeSuffix(".mp3").toLongOrNull()
+        } ?: emptyList()
+
+        val foundIds = jsonSongs.map { it.id }.toSet()
+        val missingSongs = mp3Ids.filter { it !in foundIds }.map { id ->
+            SongDTO(id = id, title = "RECOVERED_SIGNAL_$id", artist = "UNKNOWN_SOURCE")
+        }
+
+        return jsonSongs + missingSongs
+    }
+
+    fun deleteSong(context: Context, songId: Long) {
+        getSongFile(context, songId).delete()
+        getMetadataFile(context, songId).delete()
+    }
+
+    fun getTotalBytesUsed(context: Context): Long {
+        val dir = File(context.filesDir, "signals")
+        if (!dir.exists()) return 0L
+        return dir.walkTopDown().filter { it.isFile }.sumOf { it.length() }
     }
 
     private fun updateProgress(songId: Long, progress: Int) {

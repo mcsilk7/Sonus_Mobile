@@ -34,15 +34,25 @@ class SettingsFragment : Fragment() {
         displayUserData(view)
         setupVisualSettings(view)
         setupThemeSettings(view)
+        updateStorageStats(view)
 
         view.findViewById<View>(R.id.btnProfile).setOnClickListener {
             findNavController().navigate(R.id.profileFragment)
+        }
+
+        view.findViewById<View>(R.id.btnManageDownloads).setOnClickListener {
+            findNavController().navigate(R.id.downloadedSongsFragment)
         }
 
         view.findViewById<View>(R.id.btnLogout).setOnClickListener {
             sessionManager.clearSession()
             findNavController().navigate(R.id.loginFragment)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        view?.let { updateStorageStats(it) }
     }
 
     private fun displayUserData(view: View) {
@@ -76,6 +86,11 @@ class SettingsFragment : Fragment() {
         view.findViewById<TextView>(R.id.tvSettingsClearDownloadsTitle).text = LabelProvider.getLabel(context, "settings_clear_downloads")
         view.findViewById<TextView>(R.id.tvSettingsClearDownloadsDesc).text = LabelProvider.getLabel(context, "settings_clear_downloads_desc")
         view.findViewById<TextView>(R.id.tvSettingsClearDownloadsAction).text = LabelProvider.getLabel(context, "profile_wipe")
+
+        view.findViewById<TextView>(R.id.tvSettingsStorageTitle).text = LabelProvider.getLabel(context, "settings_storage_monitor")
+        view.findViewById<TextView>(R.id.tvSettingsManageSignalsTitle).text = LabelProvider.getLabel(context, "settings_manage_signals")
+        view.findViewById<TextView>(R.id.tvSettingsManageSignalsDesc).text = LabelProvider.getLabel(context, "settings_manage_signals_desc")
+        view.findViewById<TextView>(R.id.tvSettingsManageSignalsAction).text = LabelProvider.getLabel(context, "settings_manage_action")
 
         updateToggleUI(statusView, settingsManager.isReelsEnabled())
 
@@ -115,6 +130,23 @@ class SettingsFragment : Fragment() {
 
     private fun updateToggleUI(view: View, isEnabled: Boolean) {
         view.setBackgroundResource(if (isEnabled) R.drawable.bg_settings_toggle_active else R.drawable.bg_settings_toggle)
+    }
+
+    private fun updateStorageStats(view: View) {
+        val context = requireContext()
+        val totalBytes = DownloadManager.getTotalBytesUsed(context)
+        val mbUsed = totalBytes / (1024f * 1024f)
+        
+        val isTechnical = settingsManager.getThemeId() == 0
+        val label = if (isTechnical) "DISK_USAGE" else getString(R.string.storage_usage_norm)
+        
+        val sizeStr = String.format(java.util.Locale.US, "%.1f MB", mbUsed)
+        view.findViewById<TextView>(R.id.tvDiskUsage).text = "$label: $sizeStr"
+        
+        // Mock max capacity for the visual bar (e.g. 500MB)
+        val maxMb = 500f
+        val progress = (mbUsed / maxMb).coerceIn(0f, 1f)
+        view.findViewById<SectorMapView>(R.id.sectorMapView).setProgress(progress)
     }
 
     private fun setupThemeSettings(view: View) {

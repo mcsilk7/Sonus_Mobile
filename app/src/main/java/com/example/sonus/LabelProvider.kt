@@ -80,6 +80,16 @@ object LabelProvider {
             "settings_select" -> context.getString(if (isTechnical) R.string.double_colon_select else R.string.theme_select_norm)
             "settings_reels" -> context.getString(if (isTechnical) R.string.tape_reel_animation else R.string.reels_norm)
             "settings_reels_desc" -> context.getString(if (isTechnical) R.string.toggle_mechanical_visuals else R.string.reels_desc_norm)
+            
+            "settings_storage_monitor" -> context.getString(if (isTechnical) R.string.storage_monitor else R.string.storage_usage_norm)
+            "settings_manage_signals" -> context.getString(if (isTechnical) R.string.manage_signals else R.string.local_files_norm)
+            "settings_manage_signals_desc" -> context.getString(if (isTechnical) R.string.manage_signals_desc else R.string.manage_signals_desc_norm)
+            "settings_manage_action" -> context.getString(if (isTechnical) R.string.double_colon_manage else R.string.edit_norm)
+            
+            "data_sector_management" -> context.getString(if (isTechnical) R.string.data_sector_management else R.string.storage_norm)
+            "local_data_cached" -> context.getString(if (isTechnical) R.string.local_data_cached else R.string.local_files_norm)
+            "no_local_data" -> context.getString(if (isTechnical) R.string.no_local_data else R.string.waiting_norm)
+
             "settings_clear_downloads" -> context.getString(if (isTechnical) R.string.wipe_downloads else R.string.clear_downloads_norm)
             "settings_clear_downloads_desc" -> context.getString(if (isTechnical) R.string.wipe_downloads_desc else R.string.clear_downloads_desc_norm)
             "settings_logout" -> context.getString(if (isTechnical) R.string.terminate_session else R.string.logout_norm)
