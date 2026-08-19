@@ -80,6 +80,8 @@ object LabelProvider {
             "settings_select" -> context.getString(if (isTechnical) R.string.double_colon_select else R.string.theme_select_norm)
             "settings_reels" -> context.getString(if (isTechnical) R.string.tape_reel_animation else R.string.reels_norm)
             "settings_reels_desc" -> context.getString(if (isTechnical) R.string.toggle_mechanical_visuals else R.string.reels_desc_norm)
+            "settings_clear_downloads" -> context.getString(if (isTechnical) R.string.wipe_downloads else R.string.clear_downloads_norm)
+            "settings_clear_downloads_desc" -> context.getString(if (isTechnical) R.string.wipe_downloads_desc else R.string.clear_downloads_desc_norm)
             "settings_logout" -> context.getString(if (isTechnical) R.string.terminate_session else R.string.logout_norm)
             "settings_build" -> context.getString(if (isTechnical) R.string.build_info else R.string.build_norm)
 

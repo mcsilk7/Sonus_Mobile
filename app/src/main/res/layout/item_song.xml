@@ -67,6 +67,30 @@
         android:textColor="?attr/sonusTextDarkColor"
         android:textSize="13sp" />
 
+    <!-- Download Control -->
+    <FrameLayout
+        android:layout_width="36dp"
+        android:layout_height="36dp">
+        <ImageView
+            android:id="@+id/btnDownload"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:src="@drawable/ic_arrow_down"
+            app:tint="?attr/sonusTextDarkColor"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+        <ProgressBar
+            android:id="@+id/downloadProgress"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:indeterminate="false"
+            style="?android:attr/progressBarStyleSmall" />
+    </FrameLayout>
+
     <!-- Controls -->
     <TextView
         android:id="@+id/btnAddToPlaylist"

@@ -44,4 +44,5 @@ object RetrofitClient {
     val searchApi: SearchApi by lazy { retrofit.create(SearchApi::class.java) }
     val favoriteApi: FavoriteApi by lazy { retrofit.create(FavoriteApi::class.java) }
     val albumApi: AlbumApi by lazy { retrofit.create(AlbumApi::class.java) }
+    val songApi: SongApi by lazy { retrofit.create(SongApi::class.java) }
 }

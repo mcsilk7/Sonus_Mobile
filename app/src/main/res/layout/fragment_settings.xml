@@ -213,6 +213,53 @@
                     android:background="@drawable/bg_settings_toggle" />
             </LinearLayout>
 
+            <!-- Clear Cached Signals Module -->
+            <LinearLayout
+                android:id="@+id/btnClearDownloads"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_settings_item"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tvSettingsClearDownloadsTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/wipe_downloads"
+                        android:textColor="?attr/sonusAccentColor"
+                        android:fontFamily="monospace"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvSettingsClearDownloadsDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/wipe_downloads_desc"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:fontFamily="monospace"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvSettingsClearDownloadsAction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:text="@string/double_colon_wipe"
+                    android:textColor="?attr/sonusStatusRed"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/btnLogout"
                 android:layout_width="match_parent"

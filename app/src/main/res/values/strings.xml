@@ -37,6 +37,7 @@
     <!-- Home - Normal -->
     <string name="welcome_norm">Welcome Operator</string>
     <string name="dashboard_norm">Dashboard</string>
+    <string name="offline_mode_tag">[ OFFLINE_MODE ]</string>
     <string name="favorites_norm">Favorites</string>
     <string name="favorites_desc_norm">Your saved signals</string>
     <string name="playlists_norm">Playlists</string>
@@ -81,6 +82,7 @@
 
     <!-- Library - Normal -->
     <string name="library_norm">Collection</string>
+    <string name="offline_archive_tag">OFFLINE_ARCHIVE</string>
     <string name="library_desc_norm">Media Library</string>
     <string name="favorites_full_norm">Favorite Tracks</string>
     <string name="storage_norm">Local Storage</string>
@@ -164,6 +166,8 @@
     <string name="theme_select_norm">Change theme</string>
     <string name="reels_norm">Mechanical Animations</string>
     <string name="reels_desc_norm">Toggle spinning reels in player</string>
+    <string name="clear_downloads_norm">Clear Downloaded Songs</string>
+    <string name="clear_downloads_desc_norm">Free up local storage space</string>
     <string name="logout_norm">Sign Out</string>
     <string name="build_norm">System Version 2025</string>
 
@@ -281,6 +285,13 @@
     <string name="terminal_buffering">BUFFERING_STREAM_0x%s</string>
     <string name="terminal_session_resumed">OPERATOR_ACTIVE: SESSION_RESUMED</string>
     <string name="terminal_reel_loaded">REEL_LOADED: %s</string>
+    <string name="terminal_buffering_to_disk">BUFFERING_TO_DISK: %d%%</string>
+    <string name="terminal_download_complete">SIGNAL_CACHED_LOCALLY: %s</string>
+    <string name="terminal_download_error">DOWNLOAD_FAILURE: %s</string>
+    <string name="local_source_label">LOCAL_SOURCE</string>
+    <string name="remote_source_label">REMOTE_STREAM</string>
+    <string name="wipe_downloads">WIPE_CACHED_SIGNALS</string>
+    <string name="wipe_downloads_desc">ERASE_ALL_LOCAL_DATA_STORAGE</string>
     <string name="mechanical_visuals_enabled">MECHANICAL_VISUALS: ENABLED</string>
     <string name="mechanical_visuals_disabled">MECHANICAL_VISUALS: DISABLED</string>
     <string name="playback_channel_name">Odtwarzanie muzyki</string>

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sonus.*
 import com.example.sonus.network.SessionManager
+import kotlinx.coroutines.launch
 
 class FavoriteFragment : Fragment() {
 
@@ -42,8 +43,15 @@ class FavoriteFragment : Fragment() {
         rvSongs = view.findViewById(R.id.rvFavoriteSongsFull)
         setupRecyclerView()
         observeViewModel()
+        observeDownloads()
         
-        viewModel.fetchLibraryData(sessionManager.getUserId())
+        viewModel.fetchLibraryData(requireContext(), sessionManager.getUserId())
+    }
+
+    private fun observeDownloads() {
+        DownloadManager.downloadProgress.observe(viewLifecycleOwner) { progressMap ->
+            songAdapter.setDownloadProgress(progressMap)
+        }
     }
 
     private fun setupRecyclerView() {
@@ -55,11 +63,19 @@ class FavoriteFragment : Fragment() {
             },
             onAddClick = { song ->
                 PlaylistHelper.showPlaylistSelectionDialog(requireActivity() as androidx.appcompat.app.AppCompatActivity, viewLifecycleOwner.lifecycleScope, sessionManager.getUserId(), song) {
-                    viewModel.fetchLibraryData(sessionManager.getUserId())
+                    viewModel.fetchLibraryData(requireContext(), sessionManager.getUserId())
                 }
             },
             onFavoriteClick = { song ->
-                viewModel.toggleFavorite(sessionManager.getUserId(), song)
+                viewModel.toggleFavorite(requireContext(), sessionManager.getUserId(), song)
+            },
+            onDownloadClick = { song ->
+                if (!DownloadManager.isSongDownloaded(requireContext(), song.id)) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        DownloadManager.downloadSong(requireContext(), song.id)
+                        songAdapter.notifyDataSetChanged()
+                    }
+                }
             }
         )
         rvSongs.layoutManager = LinearLayoutManager(requireContext())
@@ -71,7 +87,7 @@ class FavoriteFragment : Fragment() {
             sessionManager.getUserId(),
             viewLifecycleOwner.lifecycleScope
         ) {
-            viewModel.fetchLibraryData(sessionManager.getUserId())
+            viewModel.fetchLibraryData(requireContext(), sessionManager.getUserId())
         }
     }
 

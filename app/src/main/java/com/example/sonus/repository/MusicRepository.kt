@@ -1,5 +1,8 @@
 package com.example.sonus.repository
 
+import android.content.Context
+import com.example.sonus.LibraryCacheManager
+import com.example.sonus.NetworkHelper
 import com.example.sonus.network.PlaylistDTO
 import com.example.sonus.network.RetrofitClient
 import com.example.sonus.network.SongDTO
@@ -12,12 +15,16 @@ import kotlinx.coroutines.withContext
 
 class MusicRepository {
 
-    suspend fun getUserPlaylists(userId: Long): List<PlaylistDTO> = withContext(Dispatchers.IO) {
+    suspend fun getUserPlaylists(context: Context, userId: Long): List<PlaylistDTO> = withContext(Dispatchers.IO) {
+        if (!NetworkHelper.isNetworkAvailable(context)) {
+            return@withContext LibraryCacheManager.getCachedPlaylists(context)
+        }
+
         val response = RetrofitClient.playlistApi.getUserPlaylists(userId)
         if (response.isSuccessful) {
             val playlists = response.body() ?: emptyList()
             // Optimization: Fetch counts and first 4 songs for collage in parallel
-            coroutineScope {
+            val enriched = coroutineScope {
                 playlists.map { playlist ->
                     async {
                         try {
@@ -37,13 +44,23 @@ class MusicRepository {
                     }
                 }.awaitAll()
             }
-        } else emptyList()
+            LibraryCacheManager.cachePlaylists(context, enriched)
+            enriched
+        } else {
+            LibraryCacheManager.getCachedPlaylists(context)
+        }
     }
 
-    suspend fun getFavoriteSongs(userId: Long): List<SongDTO> = withContext(Dispatchers.IO) {
+    suspend fun getFavoriteSongs(context: Context, userId: Long): List<SongDTO> = withContext(Dispatchers.IO) {
+        if (!NetworkHelper.isNetworkAvailable(context)) {
+            val cached = LibraryCacheManager.getCachedFavorites(context)
+            // Filter to show only downloaded songs when offline, as per user request
+            return@withContext cached.filter { com.example.sonus.DownloadManager.isSongDownloaded(context, it.id) }
+        }
+
         val response = RetrofitClient.favoriteApi.getFavorites(userId)
         if (response.isSuccessful) {
-            response.body()?.mapNotNull { fav ->
+            val songs = response.body()?.mapNotNull { fav ->
                 val song = (fav.song ?: fav.songDto) ?: fav.songTitle?.let { title ->
                     SongDTO(
                         id = fav.songId,
@@ -56,16 +73,106 @@ class MusicRepository {
                 }
                 song?.apply { isFavorite = true }
             } ?: emptyList()
-        } else emptyList()
+            LibraryCacheManager.cacheFavorites(context, songs)
+            songs
+        } else {
+            LibraryCacheManager.getCachedFavorites(context)
+        }
     }
 
-    suspend fun getLibraryAlbums(userId: Long): List<AlbumDTO> = withContext(Dispatchers.IO) {
+    suspend fun getLibraryAlbums(context: Context, userId: Long): List<AlbumDTO> = withContext(Dispatchers.IO) {
+        if (!NetworkHelper.isNetworkAvailable(context)) return@withContext emptyList()
+        
         val response = RetrofitClient.albumApi.getLibraryAlbums(userId)
         if (response.isSuccessful) {
             response.body()?.onEach { it.isSaved = true } ?: emptyList()
         } else emptyList()
     }
-    
+
+    suspend fun getPlaylistDetails(context: Context, playlistId: Long, userId: Long): PlaylistDTO? = withContext(Dispatchers.IO) {
+        if (!NetworkHelper.isNetworkAvailable(context)) {
+            val cached = LibraryCacheManager.getCachedPlaylistDetail(context, playlistId)
+            // Filter to show only downloaded songs when offline
+            return@withContext cached?.copy(songs = cached.songs?.filter { com.example.sonus.DownloadManager.isSongDownloaded(context, it.id) })
+        }
+
+        try {
+            val response = RetrofitClient.playlistApi.getPlaylistById(playlistId)
+            if (response.isSuccessful) {
+                var playlist = response.body()
+                if (playlist != null) {
+                    val songsResponse = RetrofitClient.playlistApi.getSongsInPlaylist(playlistId)
+                    if (songsResponse.isSuccessful) {
+                        playlist = playlist.copy(songs = songsResponse.body())
+                    }
+                    
+                    // Enrich favorites status if userId provided
+                    if (userId != -1L) {
+                        val favoritesResponse = RetrofitClient.favoriteApi.getFavorites(userId)
+                        if (favoritesResponse.isSuccessful) {
+                            val favoriteIds = favoritesResponse.body()?.map { it.songId }?.toSet() ?: emptySet()
+                            playlist.songs?.forEach { it.isFavorite = favoriteIds.contains(it.id) }
+                        }
+                        
+                        val playlistSongsIds = com.example.sonus.PlaylistHelper.getAllSongsInUserPlaylists(userId)
+                        playlist.songs?.forEach { it.isInPlaylist = playlistSongsIds.contains(it.id) }
+                    }
+                    
+                    LibraryCacheManager.cachePlaylistDetail(context, playlist)
+                    return@withContext playlist
+                }
+            }
+        } catch (e: Exception) {
+            return@withContext LibraryCacheManager.getCachedPlaylistDetail(context, playlistId)
+        }
+        null
+    }
+
+    suspend fun getAlbumDetails(context: Context, albumId: Long, userId: Long): AlbumDTO? = withContext(Dispatchers.IO) {
+        if (!NetworkHelper.isNetworkAvailable(context)) {
+            val cached = LibraryCacheManager.getCachedAlbumDetail(context, albumId)
+            // Filter to show only downloaded songs when offline
+            return@withContext cached?.copy(songs = cached.songs?.filter { com.example.sonus.DownloadManager.isSongDownloaded(context, it.id) })
+        }
+
+        try {
+            val response = RetrofitClient.albumApi.getAlbumById(albumId)
+            if (response.isSuccessful) {
+                var album = response.body()
+                if (album != null) {
+                    val songsResponse = RetrofitClient.albumApi.getSongsInAlbum(albumId)
+                    if (songsResponse.isSuccessful) {
+                        album = album.copy(songs = songsResponse.body())
+                    }
+                    
+                    // Enrich favorites status if userId provided
+                    if (userId != -1L) {
+                        val favoritesResponse = RetrofitClient.favoriteApi.getFavorites(userId)
+                        if (favoritesResponse.isSuccessful) {
+                            val favoriteIds = favoritesResponse.body()?.map { it.songId }?.toSet() ?: emptySet()
+                            album.songs?.forEach { it.isFavorite = favoriteIds.contains(it.id) }
+                        }
+                        
+                        val libraryAlbumsResponse = RetrofitClient.albumApi.getLibraryAlbums(userId)
+                        if (libraryAlbumsResponse.isSuccessful) {
+                            val libraryIds = libraryAlbumsResponse.body()?.map { it.id }?.toSet() ?: emptySet()
+                            album.isSaved = libraryIds.contains(album.id)
+                        }
+                        
+                        val playlistSongsIds = com.example.sonus.PlaylistHelper.getAllSongsInUserPlaylists(userId)
+                        album.songs?.forEach { it.isInPlaylist = playlistSongsIds.contains(it.id) }
+                    }
+                    
+                    LibraryCacheManager.cacheAlbumDetail(context, album)
+                    return@withContext album
+                }
+            }
+        } catch (e: Exception) {
+            return@withContext LibraryCacheManager.getCachedAlbumDetail(context, albumId)
+        }
+        null
+    }
+
     suspend fun toggleFavorite(userId: Long, songId: Long): Boolean? = withContext(Dispatchers.IO) {
         try {
             val response = RetrofitClient.favoriteApi.toggleFavorite(userId, songId)

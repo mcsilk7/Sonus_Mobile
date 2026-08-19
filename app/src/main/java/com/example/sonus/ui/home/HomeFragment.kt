@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +21,7 @@ import androidx.fragment.app.viewModels
 import com.example.sonus.*
 import com.example.sonus.network.SessionManager
 import com.example.sonus.network.SongDTO
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
@@ -44,8 +46,8 @@ class HomeFragment : Fragment() {
         override fun onStateChanged() {
             val song = PlayerState.currentSong
             if (PlayerState.isPlaying && song != null) {
-                viewModel.addTerminalLog(getString(R.string.terminal_signal_locked, song.title))
-                viewModel.addTerminalLog(getString(R.string.terminal_buffering, song.id.toString(16).uppercase()))
+                mainViewModel.addTerminalLog(getString(R.string.terminal_signal_locked, song.title))
+                mainViewModel.addTerminalLog(getString(R.string.terminal_buffering, song.id.toString(16).uppercase()))
             }
             // AUTO-REFRESH ARCHIVE on any player state change (like new song played)
             viewModel.loadRecentlyPlayed(
@@ -88,6 +90,32 @@ class HomeFragment : Fragment() {
         setupTerminal()
         observeViewModel()
         applyThemeStrings(view)
+        observeDownloads()
+    }
+
+    private fun observeDownloads() {
+        DownloadManager.downloadProgress.observe(viewLifecycleOwner) { progressMap ->
+            progressMap.forEach { (_, progress) ->
+                if (progress in 0..100) {
+                    if (progress % 20 == 0) {
+                        mainViewModel.addTerminalLog(getString(R.string.terminal_buffering_to_disk, progress))
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            DownloadManager.events.collect { event ->
+                when (event) {
+                    is DownloadManager.DownloadEvent.Success -> {
+                        mainViewModel.addTerminalLog(getString(R.string.terminal_download_complete, "0x${event.songId.toString(16).uppercase()}"))
+                    }
+                    is DownloadManager.DownloadEvent.Error -> {
+                        mainViewModel.addTerminalLog(getString(R.string.terminal_download_error, event.message))
+                    }
+                }
+            }
+        }
     }
 
     private fun applyThemeStrings(view: View) {
@@ -126,7 +154,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        viewModel.terminalLogs.observe(viewLifecycleOwner) { logs ->
+        mainViewModel.terminalLogs.observe(viewLifecycleOwner) { logs ->
             terminalLogAdapter.setLogs(logs)
             rvTerminalLog.scrollToPosition(terminalLogAdapter.itemCount - 1)
         }
@@ -151,10 +179,20 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.addTerminalLog(getString(R.string.terminal_session_resumed))
+        
+        val isOffline = !NetworkHelper.isNetworkAvailable(requireContext())
+        view?.findViewById<View>(R.id.tvOfflineStatus)?.visibility = if (isOffline) View.VISIBLE else View.GONE
+        
+        if (isOffline) {
+            mainViewModel.addTerminalLog("CONNECTION_LOST: OPERATING_IN_OFFLINE_MODE")
+        } else {
+            mainViewModel.addTerminalLog(getString(R.string.terminal_session_resumed))
+        }
+
         viewModel.loadRecentlyPlayed(
             sessionManager.getUserId(),
-            RecentlyPlayedManager.getRecentSongs()
+            RecentlyPlayedManager.getRecentSongs(),
+            isOffline
         )
     }
 
@@ -177,7 +215,7 @@ class HomeFragment : Fragment() {
         RecentlyPlayedManager.addSong(song)
         val updatedRecentSongs = RecentlyPlayedManager.getRecentSongs()
         viewModel.loadRecentlyPlayed(sessionManager.getUserId(), updatedRecentSongs)
-        viewModel.addTerminalLog(getString(R.string.terminal_reel_loaded, song.title.uppercase()))
+        mainViewModel.addTerminalLog(getString(R.string.terminal_reel_loaded, song.title.uppercase()))
         
         PlayerState.play(requireContext(), song, updatedRecentSongs)
         Toast.makeText(requireContext(), getString(R.string.toast_playing, song.title), Toast.LENGTH_SHORT).show()

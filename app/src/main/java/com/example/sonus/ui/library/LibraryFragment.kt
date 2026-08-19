@@ -87,7 +87,7 @@ class LibraryFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.fetchLibraryData(sessionManager.getUserId())
+        viewModel.fetchLibraryData(requireContext(), sessionManager.getUserId())
     }
 
     private fun initViews(view: View) {
@@ -144,8 +144,18 @@ class LibraryFragment : Fragment() {
 
     private fun applyThemeStrings(view: View) {
         val context = requireContext()
+        val isOffline = !NetworkHelper.isNetworkAvailable(context)
+        
         view.findViewById<TextView>(R.id.tvLibHeaderTop).text = LabelProvider.getLabel(context, "library_header_top")
-        view.findViewById<TextView>(R.id.tvLibHeaderMain).text = LabelProvider.getLabel(context, "library_header_main")
+        
+        val headerMain = view.findViewById<TextView>(R.id.tvLibHeaderMain)
+        if (isOffline) {
+            headerMain.text = getString(R.string.offline_archive_tag)
+            headerMain.setTextColor(ContextCompat.getColor(context, R.color.studio_red))
+        } else {
+            headerMain.text = LabelProvider.getLabel(context, "library_header_main")
+            headerMain.setTextColor(ContextCompat.getColor(context, R.color.studio_amber))
+        }
         
         view.findViewById<TextView>(R.id.tabAll).text = LabelProvider.getLabel(context, "library_tab_all")
         view.findViewById<TextView>(R.id.tabPlaylists).text = LabelProvider.getLabel(context, "library_tab_playlists")
@@ -203,13 +213,13 @@ class LibraryFragment : Fragment() {
                     val response = RetrofitClient.albumApi.removeAlbumFromLibrary(album.id!!, userId)
                     if (response.isSuccessful) {
                         Toast.makeText(requireContext(), getString(R.string.toast_song_removed), Toast.LENGTH_SHORT).show()
-                        viewModel.fetchLibraryData(userId)
+                        viewModel.fetchLibraryData(requireContext(), userId)
                     }
                 } else {
                     val response = RetrofitClient.albumApi.addAlbumToLibrary(album.id!!, userId)
                     if (response.isSuccessful) {
                         Toast.makeText(requireContext(), getString(R.string.toast_added_to_playlist), Toast.LENGTH_SHORT).show()
-                        viewModel.fetchLibraryData(userId)
+                        viewModel.fetchLibraryData(requireContext(), userId)
                     }
                 }
             } catch (e: Exception) {
@@ -264,7 +274,7 @@ class LibraryFragment : Fragment() {
                 val response = RetrofitClient.playlistApi.createPlaylist(userId, PlaylistDTO(name = name))
                 if (response.isSuccessful) {
                     Toast.makeText(requireContext(), getString(R.string.toast_playlist_created), Toast.LENGTH_SHORT).show()
-                    viewModel.fetchLibraryData(userId)
+                    viewModel.fetchLibraryData(requireContext(), userId)
                 }
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), getString(R.string.toast_network_error, e.message), Toast.LENGTH_SHORT).show()
@@ -307,7 +317,7 @@ class LibraryFragment : Fragment() {
                 val response = RetrofitClient.playlistApi.deletePlaylist(id)
                 if (response.isSuccessful) {
                     Toast.makeText(requireContext(), getString(R.string.toast_playlist_deleted), Toast.LENGTH_SHORT).show()
-                    viewModel.fetchLibraryData(sessionManager.getUserId())
+                    viewModel.fetchLibraryData(requireContext(), sessionManager.getUserId())
                 }
             } catch (e: Exception) {
                 Log.e("SonusLibrary", "Error deleting playlist", e)

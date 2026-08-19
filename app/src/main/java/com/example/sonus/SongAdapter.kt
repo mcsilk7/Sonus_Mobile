@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -19,10 +20,12 @@ class SongAdapter(
     private val onItemClick: (SongDTO) -> Unit,
     private val onAddClick: ((SongDTO) -> Unit)? = null,
     private val onFavoriteClick: ((SongDTO) -> Unit)? = null,
-    private val onLongClick: ((SongDTO) -> Unit)? = null
+    private val onLongClick: ((SongDTO) -> Unit)? = null,
+    private val onDownloadClick: ((SongDTO) -> Unit)? = null
 ) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
 
     private var activeSongId: Long? = null
+    private var downloadProgressMap = mapOf<Long, Int>()
 
     class SongViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val root: View = view
@@ -32,6 +35,8 @@ class SongAdapter(
         val cover: ImageView = view.findViewById(R.id.imgCover)
         val btnAdd: TextView = view.findViewById(R.id.btnAddToPlaylist)
         val btnFavorite: ImageView = view.findViewById(R.id.btnFavorite)
+        val btnDownload: ImageView = view.findViewById(R.id.btnDownload)
+        val progressBar: ProgressBar = view.findViewById(R.id.downloadProgress)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
@@ -67,6 +72,28 @@ class SongAdapter(
         } else {
             holder.btnFavorite.setColorFilter(ContextCompat.getColor(context, R.color.studio_text_dim))
         }
+
+        // Download State
+        val progress = downloadProgressMap[song.id]
+        val isDownloaded = DownloadManager.isSongDownloaded(context, song.id)
+        
+        if (progress != null) {
+            holder.btnDownload.visibility = View.GONE
+            holder.progressBar.visibility = View.VISIBLE
+            holder.progressBar.progress = progress
+        } else {
+            holder.progressBar.visibility = View.GONE
+            holder.btnDownload.visibility = View.VISIBLE
+            if (isDownloaded) {
+                holder.btnDownload.setImageResource(R.drawable.ic_play) // or a checkmark
+                holder.btnDownload.setColorFilter(ContextCompat.getColor(context, R.color.studio_green))
+            } else {
+                holder.btnDownload.setImageResource(R.drawable.ic_arrow_down)
+                holder.btnDownload.setColorFilter(ContextCompat.getColor(context, R.color.studio_text_dim))
+            }
+        }
+
+        holder.btnDownload.setOnClickListener { onDownloadClick?.invoke(song) }
 
         // Load cover image
         val coverUrl = if (song.coverPath?.startsWith("http") == true) {
@@ -116,6 +143,11 @@ class SongAdapter(
 
     fun updateData(newSongs: List<SongDTO>) {
         songs = newSongs
+        notifyDataSetChanged()
+    }
+
+    fun setDownloadProgress(progressMap: Map<Long, Int>) {
+        this.downloadProgressMap = progressMap
         notifyDataSetChanged()
     }
 

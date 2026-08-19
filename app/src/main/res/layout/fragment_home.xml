@@ -41,6 +41,16 @@
                 android:textColor="?attr/sonusAccentColor"
                 android:textSize="20sp"
                 android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvOfflineStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/offline_mode_tag"
+                android:textColor="?attr/sonusStatusRed"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:visibility="gone" />
         </LinearLayout>
 
         <include layout="@layout/user_avatar" />

@@ -19,6 +19,7 @@ object PlayerState {
     var isPlaying: Boolean = false
     var isRepeatEnabled: Boolean = false
     var isShuffleEnabled: Boolean = false
+    var isLocalSource: Boolean = false
     private var isPreparing: Boolean = false
 
     private var mediaPlayer: MediaPlayer? = null
@@ -84,16 +85,26 @@ object PlayerState {
         stop()
         currentSong = song
         
-        val streamUrl = RetrofitClient.BASE_URL + "api/songs/${song.id}/stream"
-        Log.d("PlayerState", "Starting playback from: $streamUrl")
+        val isDownloaded = DownloadManager.isSongDownloaded(context, song.id)
+        isLocalSource = isDownloaded
+        
+        val streamUrl = if (isDownloaded) {
+            DownloadManager.getSongFile(context, song.id).absolutePath
+        } else {
+            RetrofitClient.BASE_URL + "api/songs/${song.id}/stream"
+        }
+        
+        Log.d("PlayerState", "Starting playback from: $streamUrl (Local: $isLocalSource)")
         
         val sessionManager = SessionManager(context)
         val token = sessionManager.getToken()
 
         val headers = mutableMapOf<String, String>()
-        token?.let {
-            headers["Authorization"] = "Bearer $it"
-            Log.d("PlayerState", "Auth token added to headers")
+        if (!isLocalSource) {
+            token?.let {
+                headers["Authorization"] = "Bearer $it"
+                Log.d("PlayerState", "Auth token added to headers")
+            }
         }
 
         try {
@@ -105,7 +116,11 @@ object PlayerState {
                         .setUsage(AudioAttributes.USAGE_MEDIA)
                         .build()
                 )
-                setDataSource(context, Uri.parse(streamUrl), headers)
+                if (isLocalSource) {
+                    setDataSource(streamUrl)
+                } else {
+                    setDataSource(context, Uri.parse(streamUrl), headers)
+                }
                 isLooping = isRepeatEnabled
                 setOnPreparedListener {
                     Log.d("PlayerState", "MediaPlayer prepared, starting playback")

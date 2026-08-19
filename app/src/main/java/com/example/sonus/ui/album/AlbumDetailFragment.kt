@@ -33,6 +33,7 @@ class AlbumDetailFragment : Fragment() {
     
     private lateinit var songAdapter: SongAdapter
     private lateinit var sessionManager: SessionManager
+    private val repository = com.example.sonus.repository.MusicRepository()
     
     private var albumId: Long = -1
     private var currentAlbum: AlbumDTO? = null
@@ -59,6 +60,13 @@ class AlbumDetailFragment : Fragment() {
         setupRecyclerView()
         fetchAlbumDetails()
         applyThemeStrings(view)
+        observeDownloads()
+    }
+
+    private fun observeDownloads() {
+        DownloadManager.downloadProgress.observe(viewLifecycleOwner) { progressMap ->
+            songAdapter.setDownloadProgress(progressMap)
+        }
     }
 
     private fun applyThemeStrings(view: View) {
@@ -103,6 +111,14 @@ class AlbumDetailFragment : Fragment() {
             },
             onFavoriteClick = { song ->
                 toggleFavorite(song)
+            },
+            onDownloadClick = { song ->
+                if (!DownloadManager.isSongDownloaded(requireContext(), song.id)) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        DownloadManager.downloadSong(requireContext(), song.id)
+                        songAdapter.notifyDataSetChanged()
+                    }
+                }
             }
         )
         rvSongs.layoutManager = LinearLayoutManager(requireContext())
@@ -121,44 +137,9 @@ class AlbumDetailFragment : Fragment() {
     private fun fetchAlbumDetails() {
         val userId = sessionManager.getUserId()
         viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val albumDeferred = async { RetrofitClient.albumApi.getAlbumById(albumId) }
-                val favoritesDeferred = if (userId != -1L) async { RetrofitClient.favoriteApi.getFavorites(userId) } else null
-                val libraryAlbumsDeferred = if (userId != -1L) async { RetrofitClient.albumApi.getLibraryAlbums(userId) } else null
-                val playlistSongsIdsDeferred = if (userId != -1L) async { PlaylistHelper.getAllSongsInUserPlaylists(userId) } else null
-
-                val albumResponse = albumDeferred.await()
-                val favoritesResponse = favoritesDeferred?.await()
-                val libraryAlbumsResponse = libraryAlbumsDeferred?.await()
-                val playlistSongsIds = playlistSongsIdsDeferred?.await() ?: emptySet()
-
-                if (albumResponse.isSuccessful) {
-                    var album = albumResponse.body()
-                    if (album != null) {
-                        if (album.songs.isNullOrEmpty()) {
-                            val songsResponse = RetrofitClient.albumApi.getSongsInAlbum(albumId)
-                            if (songsResponse.isSuccessful) {
-                                album = album.copy(songs = songsResponse.body())
-                            }
-                        }
-
-                        if (favoritesResponse?.isSuccessful == true) {
-                            val favoriteIds = favoritesResponse.body()?.map { it.songId }?.toSet() ?: emptySet()
-                            album.songs?.forEach { it.isFavorite = favoriteIds.contains(it.id) }
-                        }
-                        
-                        album.songs?.let { PlaylistHelper.enrichSongsWithPlaylistState(it, playlistSongsIds) }
-                        
-                        if (libraryAlbumsResponse?.isSuccessful == true) {
-                            val libraryIds = libraryAlbumsResponse.body()?.map { it.id }?.toSet() ?: emptySet()
-                            album.isSaved = libraryIds.contains(album.id)
-                        }
-                        
-                        populateUI(album)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("AlbumDetail", "Error", e)
+            val album = repository.getAlbumDetails(requireContext(), albumId, userId)
+            if (album != null) {
+                populateUI(album)
             }
         }
     }

@@ -66,11 +66,16 @@ class SettingsFragment : Fragment() {
     private fun setupVisualSettings(view: View) {
         val btnToggle = view.findViewById<View>(R.id.btnToggleReels)
         val statusView = view.findViewById<View>(R.id.reelsToggleStatus)
+        val btnClearDownloads = view.findViewById<View>(R.id.btnClearDownloads)
         val context = requireContext()
 
         view.findViewById<TextView>(R.id.tvSettingsVisualsTitle).text = LabelProvider.getLabel(context, "settings_visuals")
         view.findViewById<TextView>(R.id.tvSettingsReelsTitle).text = LabelProvider.getLabel(context, "settings_reels")
         view.findViewById<TextView>(R.id.tvSettingsReelsDesc).text = LabelProvider.getLabel(context, "settings_reels_desc")
+
+        view.findViewById<TextView>(R.id.tvSettingsClearDownloadsTitle).text = LabelProvider.getLabel(context, "settings_clear_downloads")
+        view.findViewById<TextView>(R.id.tvSettingsClearDownloadsDesc).text = LabelProvider.getLabel(context, "settings_clear_downloads_desc")
+        view.findViewById<TextView>(R.id.tvSettingsClearDownloadsAction).text = LabelProvider.getLabel(context, "profile_wipe")
 
         updateToggleUI(statusView, settingsManager.isReelsEnabled())
 
@@ -82,6 +87,30 @@ class SettingsFragment : Fragment() {
             val message = if (newState) getString(R.string.mechanical_visuals_enabled) else getString(R.string.mechanical_visuals_disabled)
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }
+
+        btnClearDownloads.setOnClickListener {
+            showClearDownloadsConfirmation()
+        }
+    }
+
+    private fun showClearDownloadsConfirmation() {
+        val context = requireContext()
+        val isTechnical = SettingsManager(context).getThemeId() == 0
+        
+        val title = if (isTechnical) "CONFIRM_WIPE_SEQUENCE" else "Clear Downloads"
+        val message = if (isTechnical) "ERASE_ALL_LOCAL_SIGNALS_FROM_DISK?" else "Do you want to delete all offline songs?"
+        val confirm = if (isTechnical) "::EXE_WIPE" else "Clear All"
+        val cancel = if (isTechnical) "[ ABORT ]" else "Cancel"
+
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(confirm) { _, _ ->
+                DownloadManager.clearAllDownloads(context)
+                Toast.makeText(context, LabelProvider.getLabel(context, "profile_wipe"), Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(cancel, null)
+            .show()
     }
 
     private fun updateToggleUI(view: View, isEnabled: Boolean) {

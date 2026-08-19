@@ -1,5 +1,6 @@
 package com.example.sonus.ui.library
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,27 +23,27 @@ class LibraryViewModel : ViewModel() {
     private val _libraryAlbums = MutableLiveData<List<AlbumDTO>>()
     val libraryAlbums: LiveData<List<AlbumDTO>> = _libraryAlbums
 
-    fun fetchLibraryData(userId: Long) {
+    fun fetchLibraryData(context: Context, userId: Long) {
         viewModelScope.launch {
             // Parallel execution
             launch {
-                _playlists.value = repository.getUserPlaylists(userId)
+                _playlists.value = repository.getUserPlaylists(context, userId)
             }
             launch {
-                _favoriteSongs.value = repository.getFavoriteSongs(userId)
+                _favoriteSongs.value = repository.getFavoriteSongs(context, userId)
             }
             launch {
-                _libraryAlbums.value = repository.getLibraryAlbums(userId)
+                _libraryAlbums.value = repository.getLibraryAlbums(context, userId)
             }
         }
     }
 
-    fun toggleFavorite(userId: Long, song: SongDTO) {
+    fun toggleFavorite(context: Context, userId: Long, song: SongDTO) {
         viewModelScope.launch {
             val added = repository.toggleFavorite(userId, song.id)
             if (added != null) {
                 // Refresh favorites
-                _favoriteSongs.value = repository.getFavoriteSongs(userId)
+                _favoriteSongs.value = repository.getFavoriteSongs(context, userId)
             }
         }
     }

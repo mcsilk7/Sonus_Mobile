@@ -56,6 +56,13 @@ class SearchFragment : Fragment() {
         setupSearchListener()
         showHistoryIfEmpty()
         applyThemeStrings(view)
+        observeDownloads()
+    }
+
+    private fun observeDownloads() {
+        DownloadManager.downloadProgress.observe(viewLifecycleOwner) { progressMap ->
+            songAdapter.setDownloadProgress(progressMap)
+        }
     }
 
     private fun applyThemeStrings(view: View) {
@@ -133,6 +140,14 @@ class SearchFragment : Fragment() {
                 if (etSearch.text.isEmpty()) {
                     showRemoveFromHistoryDialog(song)
                 }
+            },
+            onDownloadClick = { song ->
+                if (!DownloadManager.isSongDownloaded(requireContext(), song.id)) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        DownloadManager.downloadSong(requireContext(), song.id)
+                        songAdapter.notifyDataSetChanged()
+                    }
+                }
             }
         )
         rvSongs.layoutManager = LinearLayoutManager(requireContext())
@@ -176,6 +191,10 @@ class SearchFragment : Fragment() {
     }
 
     private fun performSearch(query: String) {
+        if (!NetworkHelper.isNetworkAvailable(requireContext())) {
+            Toast.makeText(requireContext(), "OFFLINE: SCANNER_DISABLED", Toast.LENGTH_SHORT).show()
+            return
+        }
         searchJob?.cancel()
         searchJob = viewLifecycleOwner.lifecycleScope.launch {
             delay(300) // Debounce
