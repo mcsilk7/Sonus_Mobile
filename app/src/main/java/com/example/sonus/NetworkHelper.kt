@@ -9,11 +9,15 @@ object NetworkHelper {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
-        return when {
-            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-            else -> false
-        }
+        
+        // Log detected transports for debugging
+        if (activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) android.util.Log.d("SonusNet", "Detected: WIFI")
+        if (activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) android.util.Log.d("SonusNet", "Detected: CELLULAR")
+        if (activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) android.util.Log.d("SonusNet", "Detected: VPN (Tailscale?)")
+
+        return activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+               activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+               activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ||
+               activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
     }
 }

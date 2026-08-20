@@ -6,8 +6,11 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
+import com.example.sonus.network.NetworkMonitor
 import com.example.sonus.network.SessionManager
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -64,6 +67,13 @@ class MainActivity : AppCompatActivity() {
         // Global Navigation Click Listeners (Bottom Nav)
         // Since we are not using standard BottomNavigationView menu, we handle clicks manually
         setupGlobalNavigation(navController)
+
+        // Observe Network Errors for Terminal
+        lifecycleScope.launch {
+            NetworkMonitor.networkErrors.collect { error ->
+                viewModel.addTerminalLog(error)
+            }
+        }
     }
 
     private fun setupGlobalNavigation(navController: androidx.navigation.NavController) {

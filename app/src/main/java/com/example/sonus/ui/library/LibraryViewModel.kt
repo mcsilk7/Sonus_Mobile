@@ -25,25 +25,33 @@ class LibraryViewModel : ViewModel() {
 
     fun fetchLibraryData(context: Context, userId: Long) {
         viewModelScope.launch {
-            // Parallel execution
-            launch {
-                _playlists.value = repository.getUserPlaylists(context, userId)
-            }
-            launch {
-                _favoriteSongs.value = repository.getFavoriteSongs(context, userId)
-            }
-            launch {
-                _libraryAlbums.value = repository.getLibraryAlbums(context, userId)
+            try {
+                // Parallel execution
+                launch {
+                    _playlists.value = repository.getUserPlaylists(context, userId)
+                }
+                launch {
+                    _favoriteSongs.value = repository.getFavoriteSongs(context, userId)
+                }
+                launch {
+                    _libraryAlbums.value = repository.getLibraryAlbums(context, userId)
+                }
+            } catch (e: Exception) {
+                // Errors are logged in repository
             }
         }
     }
 
     fun toggleFavorite(context: Context, userId: Long, song: SongDTO) {
         viewModelScope.launch {
-            val added = repository.toggleFavorite(userId, song.id)
-            if (added != null) {
-                // Refresh favorites
-                _favoriteSongs.value = repository.getFavoriteSongs(context, userId)
+            try {
+                val added = repository.toggleFavorite(userId, song.id)
+                if (added != null) {
+                    // Refresh favorites
+                    _favoriteSongs.value = repository.getFavoriteSongs(context, userId)
+                }
+            } catch (e: Exception) {
+                // Errors are logged in repository
             }
         }
     }

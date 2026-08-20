@@ -3,10 +3,7 @@ package com.example.sonus.repository
 import android.content.Context
 import com.example.sonus.LibraryCacheManager
 import com.example.sonus.NetworkHelper
-import com.example.sonus.network.PlaylistDTO
-import com.example.sonus.network.RetrofitClient
-import com.example.sonus.network.SongDTO
-import com.example.sonus.network.AlbumDTO
+import com.example.sonus.network.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -20,33 +17,40 @@ class MusicRepository {
             return@withContext LibraryCacheManager.getCachedPlaylists(context)
         }
 
-        val response = RetrofitClient.playlistApi.getUserPlaylists(userId)
-        if (response.isSuccessful) {
-            val playlists = response.body() ?: emptyList()
-            // Optimization: Fetch counts and first 4 songs for collage in parallel
-            val enriched = coroutineScope {
-                playlists.map { playlist ->
-                    async {
-                        try {
-                            val countDeferred = async { RetrofitClient.playlistApi.getSongCountInPlaylist(playlist.id!!) }
-                            val songsDeferred = async { RetrofitClient.playlistApi.getSongsInPlaylist(playlist.id!!) }
-                            
-                            val countRes = countDeferred.await()
-                            val songsRes = songsDeferred.await()
-                            
-                            val count = if (countRes.isSuccessful) countRes.body()?.toInt() ?: 0 else 0
-                            val songs = if (songsRes.isSuccessful) songsRes.body()?.take(4) else null
-                            
-                            playlist.copy(songCount = count, songs = songs)
-                        } catch (e: Exception) {
-                            playlist
+        try {
+            val response = RetrofitClient.playlistApi.getUserPlaylists(userId)
+            if (response.isSuccessful) {
+                val playlists = response.body() ?: emptyList()
+                // Optimization: Fetch counts and first 4 songs for collage in parallel
+                val enriched = coroutineScope {
+                    playlists.map { playlist ->
+                        async {
+                            try {
+                                val countDeferred = async { RetrofitClient.playlistApi.getSongCountInPlaylist(playlist.id!!) }
+                                val songsDeferred = async { RetrofitClient.playlistApi.getSongsInPlaylist(playlist.id!!) }
+                                
+                                val countRes = countDeferred.await()
+                                val songsRes = songsDeferred.await()
+                                
+                                val count = if (countRes.isSuccessful) countRes.body()?.toInt() ?: 0 else 0
+                                val songs = if (songsRes.isSuccessful) songsRes.body()?.take(4) else null
+                                
+                                playlist.copy(songCount = count, songs = songs)
+                            } catch (e: Exception) {
+                                NetworkMonitor.logError("UNIT_SCAN_ERR: ${playlist.id}")
+                                playlist
+                            }
                         }
-                    }
-                }.awaitAll()
+                    }.awaitAll()
+                }
+                LibraryCacheManager.cachePlaylists(context, enriched)
+                enriched
+            } else {
+                NetworkMonitor.logError("LIB_FETCH_FAIL: ${response.code()}")
+                LibraryCacheManager.getCachedPlaylists(context)
             }
-            LibraryCacheManager.cachePlaylists(context, enriched)
-            enriched
-        } else {
+        } catch (e: Exception) {
+            NetworkMonitor.logError("NET_ERR: ${e.message}")
             LibraryCacheManager.getCachedPlaylists(context)
         }
     }
@@ -58,24 +62,29 @@ class MusicRepository {
             return@withContext cached.filter { com.example.sonus.DownloadManager.isSongDownloaded(context, it.id) }
         }
 
-        val response = RetrofitClient.favoriteApi.getFavorites(userId)
-        if (response.isSuccessful) {
-            val songs = response.body()?.mapNotNull { fav ->
-                val song = (fav.song ?: fav.songDto) ?: fav.songTitle?.let { title ->
-                    SongDTO(
-                        id = fav.songId,
-                        title = title,
-                        artist = fav.songArtist ?: "Nieznany artysta",
-                        duration = fav.songDuration,
-                        coverPath = fav.coverPath,
-                        isFavorite = true
-                    )
-                }
-                song?.apply { isFavorite = true }
-            } ?: emptyList()
-            LibraryCacheManager.cacheFavorites(context, songs)
-            songs
-        } else {
+        try {
+            val response = RetrofitClient.favoriteApi.getFavorites(userId)
+            if (response.isSuccessful) {
+                val songs = response.body()?.mapNotNull { fav ->
+                    val song = (fav.song ?: fav.songDto) ?: fav.songTitle?.let { title ->
+                        SongDTO(
+                            id = fav.songId,
+                            title = title,
+                            artist = fav.songArtist ?: "Nieznany artysta",
+                            duration = fav.songDuration,
+                            coverPath = fav.coverPath,
+                            isFavorite = true
+                        )
+                    }
+                    song?.apply { isFavorite = true }
+                } ?: emptyList()
+                LibraryCacheManager.cacheFavorites(context, songs)
+                songs
+            } else {
+                LibraryCacheManager.getCachedFavorites(context)
+            }
+        } catch (e: Exception) {
+            NetworkMonitor.logError("NET_ERR: ${e.message}")
             LibraryCacheManager.getCachedFavorites(context)
         }
     }
@@ -83,10 +92,15 @@ class MusicRepository {
     suspend fun getLibraryAlbums(context: Context, userId: Long): List<AlbumDTO> = withContext(Dispatchers.IO) {
         if (!NetworkHelper.isNetworkAvailable(context)) return@withContext emptyList()
         
-        val response = RetrofitClient.albumApi.getLibraryAlbums(userId)
-        if (response.isSuccessful) {
-            response.body()?.onEach { it.isSaved = true } ?: emptyList()
-        } else emptyList()
+        try {
+            val response = RetrofitClient.albumApi.getLibraryAlbums(userId)
+            if (response.isSuccessful) {
+                response.body()?.onEach { it.isSaved = true } ?: emptyList()
+            } else emptyList()
+        } catch (e: Exception) {
+            NetworkMonitor.logError("NET_ERR: ${e.message}")
+            emptyList()
+        }
     }
 
     suspend fun getPlaylistDetails(context: Context, playlistId: Long, userId: Long): PlaylistDTO? = withContext(Dispatchers.IO) {
@@ -191,29 +205,43 @@ class MusicRepository {
     suspend fun enrichSongMetadata(userId: Long, songs: List<SongDTO>): List<SongDTO> = withContext(Dispatchers.IO) {
         if (userId == -1L) return@withContext songs
         
-        coroutineScope {
-            val favoritesDeferred = async { RetrofitClient.favoriteApi.getFavorites(userId) }
-            val playlistsResponse = RetrofitClient.playlistApi.getUserPlaylists(userId)
-            
-            val favorites = if (favoritesDeferred.await().isSuccessful) {
-                favoritesDeferred.await().body()?.map { it.songId }?.toSet() ?: emptySet()
-            } else emptySet()
-            
-            // This is still a bit heavy, ideally backend should return this
-            val songIdsInPlaylists = mutableSetOf<Long>()
-            if (playlistsResponse.isSuccessful) {
-                playlistsResponse.body()?.forEach { playlist ->
-                    val songsInPlaylist = RetrofitClient.playlistApi.getSongsInPlaylist(playlist.id!!)
-                    if (songsInPlaylist.isSuccessful) {
-                        songsInPlaylist.body()?.forEach { songIdsInPlaylists.add(it.id) }
+        try {
+            coroutineScope {
+                val favoritesDeferred = async { RetrofitClient.favoriteApi.getFavorites(userId) }
+                val playlistsResponse = RetrofitClient.playlistApi.getUserPlaylists(userId)
+                
+                val favorites = try {
+                    val favRes = favoritesDeferred.await()
+                    if (favRes.isSuccessful) {
+                        favRes.body()?.map { it.songId }?.toSet() ?: emptySet()
+                    } else emptySet()
+                } catch (e: Exception) {
+                    emptySet()
+                }
+                
+                // This is still a bit heavy, ideally backend should return this
+                val songIdsInPlaylists = mutableSetOf<Long>()
+                try {
+                    if (playlistsResponse.isSuccessful) {
+                        playlistsResponse.body()?.forEach { playlist ->
+                            val songsInPlaylist = RetrofitClient.playlistApi.getSongsInPlaylist(playlist.id!!)
+                            if (songsInPlaylist.isSuccessful) {
+                                songsInPlaylist.body()?.forEach { songIdsInPlaylists.add(it.id) }
+                            }
+                        }
                     }
+                } catch (e: Exception) {
+                    // Ignore and proceed with what we have
+                }
+
+                songs.onEach { song ->
+                    song.isFavorite = favorites.contains(song.id)
+                    song.isInPlaylist = songIdsInPlaylists.contains(song.id)
                 }
             }
-
-            songs.onEach { song ->
-                song.isFavorite = favorites.contains(song.id)
-                song.isInPlaylist = songIdsInPlaylists.contains(song.id)
-            }
+        } catch (e: Exception) {
+            NetworkMonitor.logError("ENRICH_ERR: ${e.message}")
+            songs
         }
     }
 }

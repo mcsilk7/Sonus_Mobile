@@ -163,7 +163,7 @@
     <string name="tape_reel_animation">TAPE_REEL_ANIMATION</string>
     <string name="toggle_mechanical_visuals">TOGGLE_MECHANICAL_VISUALS</string>
     <string name="terminate_session">TERMINATE_SESSION</string>
-    <string name="build_info">SONUS STUDIO SYSTEM [VER_2.0.1]</string>
+    <string name="build_info">SONUS STUDIO SYSTEM [VER_2.0.2]</string>
 
     <!-- Settings - Normal -->
     <string name="settings_norm">System Configuration</string>
@@ -180,7 +180,7 @@
     <string name="clear_downloads_norm">Clear Downloaded Songs</string>
     <string name="clear_downloads_desc_norm">Free up local storage space</string>
     <string name="logout_norm">Sign Out</string>
-    <string name="build_norm">System Version 2.0.1</string>
+    <string name="build_norm">System Version 2.0.2</string>
 
     <!-- Profile - Technical -->
     <string name="operator_profile">OPERATOR_PROFILE</string>
@@ -196,7 +196,7 @@
     <string name="delete_account">DELETE_ACCOUNT</string>
     <string name="wipe_all_user_data">WIPE_ALL_USER_DATA</string>
     <string name="double_colon_wipe">::WIPE</string>
-    <string name="build_ver">SONUS STUDIO UNIT [ VER_2.0.1 ]</string>
+    <string name="build_ver">SONUS STUDIO UNIT [ VER_2.0.2 ]</string>
 
     <!-- Profile - Normal -->
     <string name="profile_norm">Operator Profile</string>
@@ -308,9 +308,9 @@
     <string name="playback_channel_name">Odtwarzanie muzyki</string>
     <string name="playback_channel_desc">Powiadomienie o aktualnie odtwarzanym utworze</string>
     <string name="system_log_entry">> SYSTEM_LOG_ENTRY</string>
-    <string name="theme_amber_os">[ AMBER_OS ]</string>
-    <string name="theme_ind_dark">[ IND_DARK ]</string>
-    <string name="theme_ind_light">[ IND_LIGHT ]</string>
+    <string name="theme_amber_os">AMBER_OS</string>
+    <string name="theme_ind_dark">IND_DARK</string>
+    <string name="theme_ind_light">IND_LIGHT</string>
     <string name="theme_amber_os_norm">Amber OS</string>
     <string name="theme_ind_dark_norm">Industrial Dark</string>
     <string name="theme_ind_light_norm">Industrial Light</string>

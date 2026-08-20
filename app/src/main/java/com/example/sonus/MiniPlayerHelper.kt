@@ -80,6 +80,8 @@ object MiniPlayerHelper {
         progress: android.widget.ProgressBar?,
         viewModel: MainViewModel
     ) {
+        if (activity.isFinishing || activity.isDestroyed) return
+        
         val song = PlayerState.currentSong
         if (song == null) {
             miniPlayer.visibility = View.GONE

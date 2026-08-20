@@ -24,8 +24,13 @@ class HomeViewModel : ViewModel() {
                 // In offline mode, skip server enrichment
                 _recentlyPlayed.value = localRecentSongs
             } else {
-                val enrichedSongs = repository.enrichSongMetadata(userId, localRecentSongs)
-                _recentlyPlayed.value = enrichedSongs
+                try {
+                    val enrichedSongs = repository.enrichSongMetadata(userId, localRecentSongs)
+                    _recentlyPlayed.value = enrichedSongs
+                } catch (e: Exception) {
+                    // Fallback to local songs if enrichment fails
+                    _recentlyPlayed.value = localRecentSongs
+                }
             }
         }
     }

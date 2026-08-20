@@ -20,7 +20,22 @@ class AuthInterceptor(
             requestBuilder.addHeader("Authorization", "Bearer $it")
         } ?: Log.w("SonusAuth", "No token found in SessionManager for ${request.url}")
         
-        val response = chain.proceed(requestBuilder.build())
+        val response = try {
+            chain.proceed(requestBuilder.build())
+        } catch (e: Exception) {
+            val errorMsg = when (e) {
+                is java.net.SocketTimeoutException -> "NET_TIMEOUT"
+                is java.net.ConnectException -> "NET_REFUSED"
+                is java.net.UnknownHostException -> "DNS_FAIL"
+                else -> "NET_ERR: ${e.message}"
+            }
+            NetworkMonitor.logError(errorMsg)
+            throw e
+        }
+        
+        if (!response.isSuccessful) {
+            NetworkMonitor.logError("HTTP_ERR_${response.code}: ${request.url.encodedPath}")
+        }
         
         if (response.code == 401) {
             Log.e("SonusAuth", "401 Unauthorized - Redirecting to Login")

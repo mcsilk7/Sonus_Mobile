@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.sonus.R
 import com.example.sonus.LabelProvider
 import com.example.sonus.network.LoginRequest
+import com.example.sonus.network.NetworkMonitor
 import com.example.sonus.network.RetrofitClient
 import com.example.sonus.network.SessionManager
 import kotlinx.coroutines.Dispatchers
@@ -99,11 +100,14 @@ class LoginFragment : Fragment() {
                     }
                 } else {
                     val errorMessage = response.errorBody()?.string() ?: response.message()
+                    NetworkMonitor.logError("LOGIN_FAIL: $errorMessage")
                     showLoginError(getString(R.string.error_login_failed, errorMessage))
                 }
             } catch (exception: java.io.IOException) {
+                NetworkMonitor.logError("NET_UNREACHABLE: ${exception.message}")
                 showLoginError(getString(R.string.error_network_check))
             } catch (exception: Exception) {
+                NetworkMonitor.logError("SYSTEM_ERR: ${exception.message}")
                 showLoginError(getString(R.string.error_generic, exception.localizedMessage))
             } finally {
                 withContext(Dispatchers.Main) {

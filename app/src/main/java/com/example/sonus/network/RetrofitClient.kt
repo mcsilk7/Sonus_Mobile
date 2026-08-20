@@ -5,6 +5,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
@@ -22,12 +23,15 @@ object RetrofitClient {
 
     private val okHttpClient by lazy {
         val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = HttpLoggingInterceptor.Level.HEADERS // Lowered from BODY to avoid timeouts on slow VPN
         }
         
         OkHttpClient.Builder()
             .addInterceptor(logging)
             .addInterceptor(AuthInterceptor(appContext, sessionManager))
+            .connectTimeout(30, TimeUnit.SECONDS) // Reduced to 30s
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .build()
     }
 
