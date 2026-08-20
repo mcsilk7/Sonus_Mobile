@@ -38,6 +38,7 @@ class LibraryFragment : Fragment() {
     private lateinit var btnAddPlaylist: LinearLayout
     private lateinit var btnGoToFavorites: View
     private lateinit var sessionManager: SessionManager
+    private lateinit var settingsManager: SettingsManager
 
     private lateinit var sectionPlaylists: View
     private lateinit var sectionAlbums: View
@@ -45,6 +46,12 @@ class LibraryFragment : Fragment() {
     private lateinit var tabAll: TextView
     private lateinit var tabPlaylists: TextView
     private lateinit var tabAlbums: TextView
+    
+    private var playlistSortOrder = SortOrder.DEFAULT
+    private var albumSortOrder = SortOrder.DEFAULT
+    
+    private var originalPlaylists = emptyList<PlaylistDTO>()
+    private var originalAlbums = emptyList<com.example.sonus.network.AlbumDTO>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,6 +65,10 @@ class LibraryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         sessionManager = SessionManager(requireContext())
+        settingsManager = SettingsManager(requireContext())
+        playlistSortOrder = settingsManager.getSortOrder("lib_playlists")
+        albumSortOrder = settingsManager.getSortOrder("lib_albums")
+        
         UserAvatarHelper.setupAvatar(view, sessionManager, findNavController())
         initViews(view)
         setupRecyclerViews()
@@ -72,21 +83,88 @@ class LibraryFragment : Fragment() {
                 2 -> { updateTabSelection(tabAlbums); showSections(false, true) }
             }
         }
+
+        mainViewModel.isOfflineMode.observe(viewLifecycleOwner) { isOffline ->
+            view.findViewById<View>(R.id.tvLibOfflineStatus).visibility = if (isOffline) View.VISIBLE else View.GONE
+            val headerMain = view.findViewById<TextView>(R.id.tvLibHeaderMain)
+            if (isOffline) {
+                headerMain.text = getString(R.string.offline_archive_tag)
+                headerMain.setTextColor(ContextCompat.getColor(requireContext(), R.color.studio_red))
+            } else {
+                headerMain.text = LabelProvider.getLabel(requireContext(), "library_header_main")
+                headerMain.setTextColor(ContextCompat.getColor(requireContext(), R.color.studio_amber))
+            }
+        }
     }
 
     private fun observeViewModel() {
         viewModel.playlists.observe(viewLifecycleOwner) { playlists ->
-            playlistAdapter.updateData(playlists)
+            originalPlaylists = playlists
+            applyPlaylistSort()
         }
 
         viewModel.libraryAlbums.observe(viewLifecycleOwner) { albums ->
-            albumAdapter.updateData(albums)
+            originalAlbums = albums
+            applyAlbumSort()
             sectionAlbums.visibility = if (albums.isNotEmpty()) View.VISIBLE else View.GONE
         }
     }
 
+    private fun applyPlaylistSort() {
+        val sorted = SortHelper.sortPlaylists(originalPlaylists, playlistSortOrder)
+        playlistAdapter.updateData(sorted)
+    }
+
+    private fun applyAlbumSort() {
+        val sorted = SortHelper.sortAlbums(originalAlbums, albumSortOrder)
+        albumAdapter.updateData(sorted)
+    }
+
+    private fun showPlaylistSortDialog() {
+        val context = requireContext()
+        val isTechnical = SettingsManager(context).getThemeId() == 0
+        val options = if (isTechnical) {
+            arrayOf(getString(R.string.sort_default), getString(R.string.sort_title))
+        } else {
+            arrayOf(getString(R.string.sort_default_norm), getString(R.string.sort_title_norm))
+        }
+        
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle(if (isTechnical) "SORT_PLAYLISTS" else "Sort Playlists")
+            .setItems(options) { _, which ->
+                playlistSortOrder = if (which == 0) SortOrder.DEFAULT else SortOrder.TITLE
+                settingsManager.setSortOrder("lib_playlists", playlistSortOrder)
+                applyPlaylistSort()
+            }.show()
+    }
+
+    private fun showAlbumSortDialog() {
+        val context = requireContext()
+        val isTechnical = SettingsManager(context).getThemeId() == 0
+        val options = if (isTechnical) {
+            arrayOf(getString(R.string.sort_default), getString(R.string.sort_title), getString(R.string.sort_artist))
+        } else {
+            arrayOf(getString(R.string.sort_default_norm), getString(R.string.sort_title_norm), getString(R.string.sort_artist_norm))
+        }
+        
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle(if (isTechnical) "SORT_ALBUMS" else "Sort Albums")
+            .setItems(options) { _, which ->
+                albumSortOrder = when(which) {
+                    0 -> SortOrder.DEFAULT
+                    1 -> SortOrder.TITLE
+                    2 -> SortOrder.ARTIST
+                    else -> SortOrder.DEFAULT
+                }
+                settingsManager.setSortOrder("lib_albums", albumSortOrder)
+                applyAlbumSort()
+            }.show()
+    }
+
     override fun onResume() {
         super.onResume()
+        val isOffline = !NetworkHelper.isNetworkAvailable(requireContext())
+        mainViewModel.setOfflineMode(isOffline)
         viewModel.fetchLibraryData(requireContext(), sessionManager.getUserId())
     }
 
@@ -109,6 +187,14 @@ class LibraryFragment : Fragment() {
 
         btnGoToFavorites.setOnClickListener {
             findNavController().navigate(R.id.favoriteFragment)
+        }
+
+        view.findViewById<View>(R.id.btnSortPlaylists).setOnClickListener {
+            showPlaylistSortDialog()
+        }
+
+        view.findViewById<View>(R.id.btnSortAlbums).setOnClickListener {
+            showAlbumSortDialog()
         }
     }
 
@@ -144,18 +230,8 @@ class LibraryFragment : Fragment() {
 
     private fun applyThemeStrings(view: View) {
         val context = requireContext()
-        val isOffline = !NetworkHelper.isNetworkAvailable(context)
         
         view.findViewById<TextView>(R.id.tvLibHeaderTop).text = LabelProvider.getLabel(context, "library_header_top")
-        
-        val headerMain = view.findViewById<TextView>(R.id.tvLibHeaderMain)
-        if (isOffline) {
-            headerMain.text = getString(R.string.offline_archive_tag)
-            headerMain.setTextColor(ContextCompat.getColor(context, R.color.studio_red))
-        } else {
-            headerMain.text = LabelProvider.getLabel(context, "library_header_main")
-            headerMain.setTextColor(ContextCompat.getColor(context, R.color.studio_amber))
-        }
         
         view.findViewById<TextView>(R.id.tabAll).text = LabelProvider.getLabel(context, "library_tab_all")
         view.findViewById<TextView>(R.id.tabPlaylists).text = LabelProvider.getLabel(context, "library_tab_playlists")

@@ -177,7 +177,14 @@ object PlayerState {
         }
 
         if (isShuffleEnabled) {
-            currentIndex = (0 until currentPlaylist.size).random()
+            val randomIndex = (0 until currentPlaylist.size).random()
+            if (randomIndex != 0) {
+                val mutablePlaylist = currentPlaylist.toMutableList()
+                val randomSong = mutablePlaylist.removeAt(randomIndex)
+                mutablePlaylist.add(0, randomSong)
+                currentPlaylist = mutablePlaylist
+            }
+            currentIndex = 0
         }
 
         play(context, currentPlaylist[currentIndex])

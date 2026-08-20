@@ -33,10 +33,13 @@ class AlbumDetailFragment : Fragment() {
     
     private lateinit var songAdapter: SongAdapter
     private lateinit var sessionManager: SessionManager
+    private lateinit var settingsManager: SettingsManager
     private val repository = com.example.sonus.repository.MusicRepository()
     
     private var albumId: Long = -1
     private var currentAlbum: AlbumDTO? = null
+    private var currentSortOrder = SortOrder.DEFAULT
+    private var originalSongs = emptyList<SongDTO>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,6 +59,9 @@ class AlbumDetailFragment : Fragment() {
         }
 
         sessionManager = SessionManager(requireContext())
+        settingsManager = SettingsManager(requireContext())
+        currentSortOrder = settingsManager.getSortOrder("album_songs")
+        
         initViews(view)
         setupRecyclerView()
         fetchAlbumDetails()
@@ -71,6 +77,10 @@ class AlbumDetailFragment : Fragment() {
 
     private fun applyThemeStrings(view: View) {
         val context = requireContext()
+        val isOffline = !NetworkHelper.isNetworkAvailable(context)
+        
+        view.findViewById<View>(R.id.tvAlbumOfflineStatus).visibility = if (isOffline) View.VISIBLE else View.GONE
+
         view.findViewById<TextView>(R.id.tvAlbumHeaderTop).text = LabelProvider.getLabel(context, "album_detail_top")
         view.findViewById<TextView>(R.id.tvAlbumHeaderMain).text = LabelProvider.getLabel(context, "album_detail_main")
         view.findViewById<TextView>(R.id.tvAlbumDataStreamLabel).text = LabelProvider.getLabel(context, "data_stream_list")
@@ -87,6 +97,10 @@ class AlbumDetailFragment : Fragment() {
 
         btnBack.setOnClickListener { findNavController().popBackStack() }
         btnSaveAlbum.setOnClickListener { toggleAlbumSave() }
+        
+        view.findViewById<View>(R.id.btnSortAlbum).setOnClickListener {
+            showSortDialog()
+        }
 
         view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabPlayAlbum).setOnClickListener {
             currentAlbum?.songs?.firstOrNull()?.let { playSong(it) }
@@ -173,7 +187,49 @@ class AlbumDetailFragment : Fragment() {
             .transform(com.bumptech.glide.load.resource.bitmap.CenterCrop(), com.bumptech.glide.load.resource.bitmap.RoundedCorners(radius))
             .into(imgCover)
         
-        songAdapter.updateData(album.songs ?: emptyList())
+        originalSongs = album.songs ?: emptyList()
+        applyCurrentSort()
+    }
+
+    private fun applyCurrentSort() {
+        val sorted = SortHelper.sortSongs(originalSongs, currentSortOrder)
+        songAdapter.updateData(sorted)
+    }
+
+    private fun showSortDialog() {
+        val context = requireContext()
+        val isTechnical = SettingsManager(context).getThemeId() == 0
+        
+        val options = if (isTechnical) {
+            arrayOf(
+                getString(R.string.sort_default),
+                getString(R.string.sort_title),
+                getString(R.string.sort_artist),
+                getString(R.string.sort_duration)
+            )
+        } else {
+            arrayOf(
+                getString(R.string.sort_default_norm),
+                getString(R.string.sort_title_norm),
+                getString(R.string.sort_artist_norm),
+                getString(R.string.sort_duration_norm)
+            )
+        }
+
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle(if (isTechnical) getString(R.string.sort_order_label) else getString(R.string.sort_by_norm))
+            .setItems(options) { _, which ->
+                currentSortOrder = when (which) {
+                    0 -> SortOrder.DEFAULT
+                    1 -> SortOrder.TITLE
+                    2 -> SortOrder.ARTIST
+                    3 -> SortOrder.DURATION
+                    else -> SortOrder.DEFAULT
+                }
+                settingsManager.setSortOrder("album_songs", currentSortOrder)
+                applyCurrentSort()
+            }
+            .show()
     }
 
     private fun toggleAlbumSave() {

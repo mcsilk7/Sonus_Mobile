@@ -1,65 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/albumItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="6dp"
     android:background="@drawable/bg_settings_item"
-    android:orientation="vertical"
-    android:padding="10dp"
-    android:layout_margin="6dp">
+    android:clickable="true"
+    android:focusable="true"
+    android:padding="8dp">
 
-    <!-- Industry Style Cover Art -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="140dp"
-        android:background="?attr/sonusLineColor"
-        android:padding="1dp">
+    <!-- Square Cover Art -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/coverContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardBackgroundColor="?attr/sonusLineColor"
+        app:cardCornerRadius="?attr/sonusCornerRadius"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/sonusLineColor"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
         <ImageView
             android:id="@+id/imgAlbumCover"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="?attr/sonusCardColor"
             android:scaleType="centerCrop" />
-    </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
 
-    <TextView
-        android:id="@+id/tvAlbumName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:ellipsize="end"
-        android:fontFamily="monospace"
-        android:maxLines="1"
-        android:text="@string/album_id_label"
-        android:textColor="?attr/sonusAccentColor"
-        android:textSize="14sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/tvAlbumArtist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="@string/artist_label"
-        android:textColor="?attr/sonusTextDarkColor"
-        android:textSize="12sp" />
-
+    <!-- Library Status Overlay -->
     <TextView
         android:id="@+id/btnAddAlbumToLibrary"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_gravity="end"
-        android:layout_marginTop="8dp"
-        android:background="?attr/sonusLineSoftColor"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_margin="6dp"
+        android:background="@drawable/bg_icon_circle"
+        android:backgroundTint="?attr/sonusBackgroundColor"
+        android:clickable="true"
+        android:focusable="true"
         android:gravity="center"
         android:text="+"
         android:textColor="?attr/sonusAccentColor"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textStyle="bold"
-        android:clickable="true"
-        android:focusable="true" />
+        app:layout_constraintBottom_toBottomOf="@+id/coverContainer"
+        app:layout_constraintEnd_toEndOf="@+id/coverContainer" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/tvAlbumName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:ellipsize="end"
+        android:fontFamily="monospace"
+        android:maxLines="1"
+        android:textColor="?attr/sonusAccentColor"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/coverContainer" />
+
+    <TextView
+        android:id="@+id/tvAlbumArtist"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="?attr/sonusTextDarkColor"
+        android:textSize="11sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAlbumName" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

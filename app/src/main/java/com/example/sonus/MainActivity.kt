@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         // Control visibility based on destination
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.loginFragment, R.id.registerFragment, R.id.playerFragment -> {
+                R.id.splashFragment, R.id.loginFragment, R.id.registerFragment, R.id.playerFragment -> {
                     viewModel.setBottomNavVisibility(false)
                     viewModel.setMiniPlayerVisibility(false)
                 }

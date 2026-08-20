@@ -28,6 +28,17 @@ object LibraryCacheManager {
         return Gson().fromJson(json, type)
     }
 
+    fun cacheAlbums(context: Context, albums: List<AlbumDTO>) {
+        val json = Gson().toJson(albums)
+        getPrefs(context).edit().putString("cached_albums", json).apply()
+    }
+
+    fun getCachedAlbums(context: Context): List<AlbumDTO> {
+        val json = getPrefs(context).getString("cached_albums", null) ?: return emptyList()
+        val type = object : TypeToken<List<AlbumDTO>>() {}.type
+        return Gson().fromJson(json, type)
+    }
+
     fun cacheFavorites(context: Context, favorites: List<SongDTO>) {
         val json = Gson().toJson(favorites)
         getPrefs(context).edit().putString(KEY_FAVORITES, json).apply()

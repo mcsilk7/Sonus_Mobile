@@ -40,6 +40,16 @@
                 android:textSize="18sp"
                 android:fontFamily="monospace"
                 android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvLibOfflineStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/offline_mode_tag"
+                android:textColor="?attr/sonusStatusRed"
+                android:textSize="9sp"
+                android:fontFamily="monospace"
+                android:visibility="gone" />
         </LinearLayout>
 
         <include layout="@layout/user_avatar" />
@@ -169,15 +179,36 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:orientation="vertical">
-                <TextView
-                    android:id="@+id/tvLibSecPlaylists"
-                    android:layout_width="wrap_content"
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/storage_playlists"
-                    android:textColor="?attr/sonusTextDarkColor"
-                    android:textSize="14sp"
-                    android:fontFamily="monospace"
-                    android:textStyle="bold" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tvLibSecPlaylists"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/storage_playlists"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btnSortPlaylists"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sort_bracket"
+                        android:textColor="?attr/sonusAccentDimColor"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </LinearLayout>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvPlaylists"
                     android:layout_width="match_parent"
@@ -199,15 +230,36 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:orientation="vertical">
-                <TextView
-                    android:id="@+id/tvLibSecAlbums"
-                    android:layout_width="wrap_content"
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/storage_albums"
-                    android:textColor="?attr/sonusTextDarkColor"
-                    android:textSize="14sp"
-                    android:fontFamily="monospace"
-                    android:textStyle="bold" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tvLibSecAlbums"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/storage_albums"
+                        android:textColor="?attr/sonusTextDarkColor"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btnSortAlbums"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sort_bracket"
+                        android:textColor="?attr/sonusAccentDimColor"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </LinearLayout>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvAlbums"
                     android:layout_width="match_parent"

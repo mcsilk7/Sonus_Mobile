@@ -33,9 +33,12 @@ class PlaylistDetailFragment : Fragment() {
     
     private lateinit var songAdapter: SongAdapter
     private lateinit var sessionManager: SessionManager
+    private lateinit var settingsManager: SettingsManager
     private val repository = com.example.sonus.repository.MusicRepository()
     
     private var playlistId: Long = -1
+    private var currentSortOrder = SortOrder.DEFAULT
+    private var originalSongs = emptyList<SongDTO>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,6 +58,9 @@ class PlaylistDetailFragment : Fragment() {
         }
 
         sessionManager = SessionManager(requireContext())
+        settingsManager = SettingsManager(requireContext())
+        currentSortOrder = settingsManager.getSortOrder("playlist_songs")
+        
         initViews(view)
         setupRecyclerView()
         fetchPlaylistDetails()
@@ -70,6 +76,10 @@ class PlaylistDetailFragment : Fragment() {
 
     private fun applyThemeStrings(view: View) {
         val context = requireContext()
+        val isOffline = !NetworkHelper.isNetworkAvailable(context)
+        
+        view.findViewById<View>(R.id.tvPlaylistOfflineStatus).visibility = if (isOffline) View.VISIBLE else View.GONE
+
         view.findViewById<TextView>(R.id.tvPlaylistHeaderTop).text = LabelProvider.getLabel(context, "playlist_detail_top")
         view.findViewById<TextView>(R.id.tvPlaylistHeaderMain).text = LabelProvider.getLabel(context, "playlist_detail_main")
         view.findViewById<TextView>(R.id.tvPlaylistDataStreamLabel).text = LabelProvider.getLabel(context, "data_stream_list")
@@ -86,6 +96,10 @@ class PlaylistDetailFragment : Fragment() {
 
         btnBack.setOnClickListener { findNavController().popBackStack() }
         btnDelete.setOnClickListener { confirmDeletePlaylist() }
+        
+        view.findViewById<View>(R.id.btnSortPlaylist).setOnClickListener {
+            showSortDialog()
+        }
 
         view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabPlayPlaylist).setOnClickListener {
             songAdapter.getSongs().firstOrNull()?.let { playSong(it) }
@@ -183,7 +197,49 @@ class PlaylistDetailFragment : Fragment() {
             .into(imgCover)
         
         songs.forEach { it.isInPlaylist = true }
-        songAdapter.updateData(songs)
+        originalSongs = songs
+        applyCurrentSort()
+    }
+
+    private fun applyCurrentSort() {
+        val sorted = SortHelper.sortSongs(originalSongs, currentSortOrder)
+        songAdapter.updateData(sorted)
+    }
+
+    private fun showSortDialog() {
+        val context = requireContext()
+        val isTechnical = SettingsManager(context).getThemeId() == 0
+        
+        val options = if (isTechnical) {
+            arrayOf(
+                getString(R.string.sort_default),
+                getString(R.string.sort_title),
+                getString(R.string.sort_artist),
+                getString(R.string.sort_duration)
+            )
+        } else {
+            arrayOf(
+                getString(R.string.sort_default_norm),
+                getString(R.string.sort_title_norm),
+                getString(R.string.sort_artist_norm),
+                getString(R.string.sort_duration_norm)
+            )
+        }
+
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle(if (isTechnical) getString(R.string.sort_order_label) else getString(R.string.sort_by_norm))
+            .setItems(options) { _, which ->
+                currentSortOrder = when (which) {
+                    0 -> SortOrder.DEFAULT
+                    1 -> SortOrder.TITLE
+                    2 -> SortOrder.ARTIST
+                    3 -> SortOrder.DURATION
+                    else -> SortOrder.DEFAULT
+                }
+                settingsManager.setSortOrder("playlist_songs", currentSortOrder)
+                applyCurrentSort()
+            }
+            .show()
     }
 
     private fun formatSongCount(count: Int): String {

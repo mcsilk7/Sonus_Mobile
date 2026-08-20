@@ -55,6 +55,16 @@
                 android:textSize="18sp"
                 android:fontFamily="monospace"
                 android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvPlaylistOfflineStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/offline_mode_tag"
+                android:textColor="?attr/sonusStatusRed"
+                android:textSize="9sp"
+                android:fontFamily="monospace"
+                android:visibility="gone" />
         </LinearLayout>
 
         <ImageView
@@ -178,7 +188,19 @@
                     android:layout_height="1dp"
                     android:layout_weight="1"
                     android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
                     android:background="?attr/sonusLineSoftColor" />
+
+                <TextView
+                    android:id="@+id/btnSortPlaylist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sort_bracket"
+                    android:textColor="?attr/sonusAccentDimColor"
+                    android:textSize="11sp"
+                    android:fontFamily="monospace"
+                    android:clickable="true"
+                    android:focusable="true" />
             </LinearLayout>
 
             <!-- Songs List -->

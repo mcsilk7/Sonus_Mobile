@@ -14,7 +14,20 @@ class MusicRepository {
 
     suspend fun getUserPlaylists(context: Context, userId: Long): List<PlaylistDTO> = withContext(Dispatchers.IO) {
         if (!NetworkHelper.isNetworkAvailable(context)) {
-            return@withContext LibraryCacheManager.getCachedPlaylists(context)
+            val cached = LibraryCacheManager.getCachedPlaylists(context)
+            val downloadedSongs = com.example.sonus.DownloadManager.getDownloadedSongs(context)
+            val downloadedSongIds = downloadedSongs.map { it.id }.toSet()
+            
+            return@withContext cached.filter { playlist ->
+                // Check if we have any downloaded song that belongs to this playlist
+                // Since summary DTO might have take(4), we check those first
+                val hasSongsInSummary = playlist.songs?.any { it.id in downloadedSongIds } ?: false
+                if (hasSongsInSummary) return@filter true
+                
+                // If not in summary, check the cached full detail
+                val detail = LibraryCacheManager.getCachedPlaylistDetail(context, playlist.id ?: -1L)
+                detail?.songs?.any { it.id in downloadedSongIds } ?: false
+            }
         }
 
         try {
@@ -81,33 +94,50 @@ class MusicRepository {
                 LibraryCacheManager.cacheFavorites(context, songs)
                 songs
             } else {
-                LibraryCacheManager.getCachedFavorites(context)
+                val cached = LibraryCacheManager.getCachedFavorites(context)
+                filterDownloadedOnly(context, cached)
             }
         } catch (e: Exception) {
             NetworkMonitor.logError("NET_ERR: ${e.message}")
-            LibraryCacheManager.getCachedFavorites(context)
+            val cached = LibraryCacheManager.getCachedFavorites(context)
+            filterDownloadedOnly(context, cached)
         }
     }
 
+    private fun filterDownloadedOnly(context: Context, songs: List<SongDTO>?): List<SongDTO> {
+        return songs?.filter { com.example.sonus.DownloadManager.isSongDownloaded(context, it.id) } ?: emptyList()
+    }
+
     suspend fun getLibraryAlbums(context: Context, userId: Long): List<AlbumDTO> = withContext(Dispatchers.IO) {
-        if (!NetworkHelper.isNetworkAvailable(context)) return@withContext emptyList()
+        if (!NetworkHelper.isNetworkAvailable(context)) {
+            val cached = LibraryCacheManager.getCachedAlbums(context)
+            val downloadedSongs = com.example.sonus.DownloadManager.getDownloadedSongs(context)
+            val downloadedAlbumIds = downloadedSongs.mapNotNull { it.albumId }.toSet()
+            
+            return@withContext cached.filter { it.id in downloadedAlbumIds }
+        }
         
         try {
             val response = RetrofitClient.albumApi.getLibraryAlbums(userId)
             if (response.isSuccessful) {
-                response.body()?.onEach { it.isSaved = true } ?: emptyList()
-            } else emptyList()
+                val albums = response.body()?.onEach { it.isSaved = true } ?: emptyList()
+                LibraryCacheManager.cacheAlbums(context, albums)
+                albums
+            } else {
+                LibraryCacheManager.getCachedAlbums(context)
+            }
         } catch (e: Exception) {
             NetworkMonitor.logError("NET_ERR: ${e.message}")
-            emptyList()
+            LibraryCacheManager.getCachedAlbums(context)
         }
     }
 
     suspend fun getPlaylistDetails(context: Context, playlistId: Long, userId: Long): PlaylistDTO? = withContext(Dispatchers.IO) {
-        if (!NetworkHelper.isNetworkAvailable(context)) {
+        val isNetworkDown = !NetworkHelper.isNetworkAvailable(context)
+        
+        if (isNetworkDown) {
             val cached = LibraryCacheManager.getCachedPlaylistDetail(context, playlistId)
-            // Filter to show only downloaded songs when offline
-            return@withContext cached?.copy(songs = cached.songs?.filter { com.example.sonus.DownloadManager.isSongDownloaded(context, it.id) })
+            return@withContext cached?.copy(songs = filterDownloadedOnly(context, cached.songs))
         }
 
         try {
@@ -137,16 +167,19 @@ class MusicRepository {
                 }
             }
         } catch (e: Exception) {
-            return@withContext LibraryCacheManager.getCachedPlaylistDetail(context, playlistId)
+            NetworkMonitor.logError("NET_ERR: ${e.message}")
+            val cached = LibraryCacheManager.getCachedPlaylistDetail(context, playlistId)
+            return@withContext cached?.copy(songs = filterDownloadedOnly(context, cached.songs))
         }
         null
     }
 
     suspend fun getAlbumDetails(context: Context, albumId: Long, userId: Long): AlbumDTO? = withContext(Dispatchers.IO) {
-        if (!NetworkHelper.isNetworkAvailable(context)) {
+        val isNetworkDown = !NetworkHelper.isNetworkAvailable(context)
+
+        if (isNetworkDown) {
             val cached = LibraryCacheManager.getCachedAlbumDetail(context, albumId)
-            // Filter to show only downloaded songs when offline
-            return@withContext cached?.copy(songs = cached.songs?.filter { com.example.sonus.DownloadManager.isSongDownloaded(context, it.id) })
+            return@withContext cached?.copy(songs = filterDownloadedOnly(context, cached.songs))
         }
 
         try {
@@ -182,7 +215,9 @@ class MusicRepository {
                 }
             }
         } catch (e: Exception) {
-            return@withContext LibraryCacheManager.getCachedAlbumDetail(context, albumId)
+            NetworkMonitor.logError("NET_ERR: ${e.message}")
+            val cached = LibraryCacheManager.getCachedAlbumDetail(context, albumId)
+            return@withContext cached?.copy(songs = filterDownloadedOnly(context, cached.songs))
         }
         null
     }

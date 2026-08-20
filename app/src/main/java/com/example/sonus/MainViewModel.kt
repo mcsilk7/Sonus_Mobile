@@ -12,6 +12,9 @@ class MainViewModel : ViewModel() {
     private val _isMiniPlayerVisible = MutableLiveData<Boolean>(false)
     val isMiniPlayerVisible: LiveData<Boolean> = _isMiniPlayerVisible
 
+    private val _isOfflineMode = MutableLiveData<Boolean>(false)
+    val isOfflineMode: LiveData<Boolean> = _isOfflineMode
+
     // Tab Navigation State (0: DIR, 1: SRCH, 2: LIB, 3: SYS)
     private val _currentTabPage = MutableLiveData<Int>(0)
     val currentTabPage: LiveData<Int> = _currentTabPage
@@ -44,6 +47,10 @@ class MainViewModel : ViewModel() {
         if (_currentTabPage.value != page) {
             _currentTabPage.value = page
         }
+    }
+
+    fun setOfflineMode(offline: Boolean) {
+        _isOfflineMode.value = offline
     }
 
     fun setLibraryFilter(filter: Int) {

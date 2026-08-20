@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -17,10 +18,15 @@ import kotlinx.coroutines.launch
 
 class FavoriteFragment : Fragment() {
 
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: LibraryViewModel by viewModels()
     private lateinit var sessionManager: SessionManager
+    private lateinit var settingsManager: SettingsManager
     private lateinit var songAdapter: SongAdapter
     private lateinit var rvSongs: RecyclerView
+    
+    private var currentSortOrder = SortOrder.DEFAULT
+    private var originalSongs = emptyList<com.example.sonus.network.SongDTO>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,6 +40,13 @@ class FavoriteFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         sessionManager = SessionManager(requireContext())
+        settingsManager = SettingsManager(requireContext())
+        currentSortOrder = settingsManager.getSortOrder("favorites")
+        
+        mainViewModel.isOfflineMode.observe(viewLifecycleOwner) { isOffline ->
+            view.findViewById<View>(R.id.tvFavoriteOfflineStatus).visibility = if (isOffline) View.VISIBLE else View.GONE
+        }
+
         UserAvatarHelper.setupAvatar(view, sessionManager, findNavController())
         
         view.findViewById<View>(R.id.btnBackFavorite).setOnClickListener {
@@ -41,6 +54,11 @@ class FavoriteFragment : Fragment() {
         }
 
         rvSongs = view.findViewById(R.id.rvFavoriteSongsFull)
+        
+        view.findViewById<View>(R.id.btnSortFavorite).setOnClickListener {
+            showSortDialog()
+        }
+        
         setupRecyclerView()
         observeViewModel()
         observeDownloads()
@@ -93,7 +111,49 @@ class FavoriteFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.favoriteSongs.observe(viewLifecycleOwner) { songs ->
-            songAdapter.updateData(songs)
+            originalSongs = songs
+            applyCurrentSort()
         }
+    }
+
+    private fun applyCurrentSort() {
+        val sorted = SortHelper.sortSongs(originalSongs, currentSortOrder)
+        songAdapter.updateData(sorted)
+    }
+
+    private fun showSortDialog() {
+        val context = requireContext()
+        val isTechnical = SettingsManager(context).getThemeId() == 0
+        
+        val options = if (isTechnical) {
+            arrayOf(
+                getString(R.string.sort_default),
+                getString(R.string.sort_title),
+                getString(R.string.sort_artist),
+                getString(R.string.sort_duration)
+            )
+        } else {
+            arrayOf(
+                getString(R.string.sort_default_norm),
+                getString(R.string.sort_title_norm),
+                getString(R.string.sort_artist_norm),
+                getString(R.string.sort_duration_norm)
+            )
+        }
+
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle(if (isTechnical) getString(R.string.sort_order_label) else getString(R.string.sort_by_norm))
+            .setItems(options) { _, which ->
+                currentSortOrder = when (which) {
+                    0 -> SortOrder.DEFAULT
+                    1 -> SortOrder.TITLE
+                    2 -> SortOrder.ARTIST
+                    3 -> SortOrder.DURATION
+                    else -> SortOrder.DEFAULT
+                }
+                settingsManager.setSortOrder("favorites", currentSortOrder)
+                applyCurrentSort()
+            }
+            .show()
     }
 }

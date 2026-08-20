@@ -243,6 +243,11 @@
     <string name="signup_norm">Finish Registration</string>
     <string name="back_login_norm">Return to login screen</string>
 
+    <!-- Splash - Technical -->
+    <string name="sys_init">INITIALIZING_SYSTEM...</string>
+    <string name="conn_established">CONNECTIVITY_ESTABLISHED</string>
+    <string name="offline_detected">OFFLINE_MODE_DETECTED</string>
+
     <!-- Dialogs -->
     <string name="init_new_unit">INIT_NEW_UNIT</string>
     <string name="assign_label_identifier">ASSIGN_LABEL_IDENTIFIER</string>
@@ -316,5 +321,21 @@
     <string name="theme_ind_light_norm">Industrial Light</string>
     <string name="unknown_title">Unknown Track</string>
     <string name="unknown_artist">Unknown Artist</string>
+
+    <!-- Sorting - Technical -->
+    <string name="sort_bracket">[ SORT ]</string>
+    <string name="sort_order_label">SORT_ORDER</string>
+    <string name="sort_default">DEFAULT</string>
+    <string name="sort_title">TITLE_A_Z</string>
+    <string name="sort_artist">ARTIST_A_Z</string>
+    <string name="sort_duration">DURATION_ASC</string>
+
+    <!-- Sorting - Normal -->
+    <string name="sort_norm">Sort</string>
+    <string name="sort_by_norm">Sort by</string>
+    <string name="sort_default_norm">Date Added</string>
+    <string name="sort_title_norm">Title (A-Z)</string>
+    <string name="sort_artist_norm">Artist (A-Z)</string>
+    <string name="sort_duration_norm">Duration</string>
 
 </resources>

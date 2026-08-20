@@ -22,4 +22,17 @@ class SettingsManager(context: Context) {
     fun setThemeId(themeId: Int) {
         prefs.edit().putInt(KEY_THEME_ID, themeId).apply()
     }
+
+    fun getSortOrder(contextKey: String): SortOrder {
+        val name = prefs.getString("sort_order_$contextKey", SortOrder.DEFAULT.name)
+        return try {
+            SortOrder.valueOf(name ?: SortOrder.DEFAULT.name)
+        } catch (e: Exception) {
+            SortOrder.DEFAULT
+        }
+    }
+
+    fun setSortOrder(contextKey: String, order: SortOrder) {
+        prefs.edit().putString("sort_order_$contextKey", order.name).apply()
+    }
 }

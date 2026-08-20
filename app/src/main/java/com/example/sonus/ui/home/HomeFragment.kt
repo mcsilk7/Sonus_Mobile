@@ -121,7 +121,7 @@ class HomeFragment : Fragment() {
     private fun applyThemeStrings(view: View) {
         val context = requireContext()
         view.findViewById<TextView>(R.id.tvHomeHeaderTop).text = LabelProvider.getLabel(context, "home_header_top")
-        view.findViewById<TextView>(R.id.tvHomeHeaderMain).text = LabelProvider.getLabel(context, "home_header_main")
+        
         view.findViewById<TextView>(R.id.tvFavCardLabel).text = LabelProvider.getLabel(context, "home_fav_card")
         view.findViewById<TextView>(R.id.tvPlCardLabel).text = LabelProvider.getLabel(context, "home_pl_card")
         
@@ -158,6 +158,17 @@ class HomeFragment : Fragment() {
             terminalLogAdapter.setLogs(logs)
             rvTerminalLog.scrollToPosition(terminalLogAdapter.itemCount - 1)
         }
+
+        mainViewModel.isOfflineMode.observe(viewLifecycleOwner) { isOffline ->
+            view?.findViewById<View>(R.id.tvOfflineStatus)?.visibility = if (isOffline) View.VISIBLE else View.GONE
+            if (isOffline) {
+                view?.findViewById<TextView>(R.id.tvHomeHeaderMain)?.text = getString(R.string.offline_archive_tag)
+                view?.findViewById<TextView>(R.id.tvHomeHeaderMain)?.setTextColor(ContextCompat.getColor(requireContext(), R.color.studio_red))
+            } else {
+                view?.findViewById<TextView>(R.id.tvHomeHeaderMain)?.text = LabelProvider.getLabel(requireContext(), "home_header_main")
+                view?.findViewById<TextView>(R.id.tvHomeHeaderMain)?.setTextColor(ContextCompat.getColor(requireContext(), R.color.studio_amber))
+            }
+        }
     }
 
     private fun checkNotificationPermission() {
@@ -181,7 +192,7 @@ class HomeFragment : Fragment() {
         super.onResume()
         
         val isOffline = !NetworkHelper.isNetworkAvailable(requireContext())
-        view?.findViewById<View>(R.id.tvOfflineStatus)?.visibility = if (isOffline) View.VISIBLE else View.GONE
+        mainViewModel.setOfflineMode(isOffline)
         
         if (isOffline) {
             mainViewModel.addTerminalLog("CONNECTION_LOST: OPERATING_IN_OFFLINE_MODE")
