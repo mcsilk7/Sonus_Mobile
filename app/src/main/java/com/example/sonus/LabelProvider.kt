@@ -111,7 +111,6 @@ object LabelProvider {
 
             "theme_amber" -> context.getString(if (isTechnical) R.string.theme_amber_os else R.string.theme_amber_os_norm)
             "theme_dark" -> context.getString(if (isTechnical) R.string.theme_ind_dark else R.string.theme_ind_dark_norm)
-            "theme_light" -> context.getString(if (isTechnical) R.string.theme_ind_light else R.string.theme_ind_light_norm)
             
             else -> key
         }

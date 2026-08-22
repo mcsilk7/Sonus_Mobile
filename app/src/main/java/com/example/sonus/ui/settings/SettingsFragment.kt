@@ -169,7 +169,6 @@ class SettingsFragment : Fragment() {
         val context = requireContext()
         return when (id) {
             1 -> LabelProvider.getLabel(context, "theme_dark")
-            2 -> LabelProvider.getLabel(context, "theme_light")
             else -> LabelProvider.getLabel(context, "theme_amber")
         }
     }
@@ -178,8 +177,7 @@ class SettingsFragment : Fragment() {
         val context = requireContext()
         val themes = arrayOf(
             LabelProvider.getLabel(context, "theme_amber"),
-            LabelProvider.getLabel(context, "theme_dark"),
-            LabelProvider.getLabel(context, "theme_light")
+            LabelProvider.getLabel(context, "theme_dark")
         )
         
         AlertDialog.Builder(context)

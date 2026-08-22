@@ -36,10 +36,10 @@
         <item name="sonusCardColor">@color/industrial_dark_bg</item>
         <item name="sonusLineColor">@color/industrial_accent</item>
         <item name="sonusLineSoftColor">@color/industrial_dark_panel</item>
-        <item name="sonusAccentColor">@color/industrial_light_panel</item>
+        <item name="sonusAccentColor">@color/industrial_panel_accent</item>
         <item name="sonusAccentDimColor">@color/industrial_accent</item>
-        <item name="sonusTextPrimaryColor">@color/industrial_light_bg</item>
-        <item name="sonusTextDarkColor">@color/industrial_light_panel</item>
+        <item name="sonusTextPrimaryColor">@color/industrial_text_primary</item>
+        <item name="sonusTextDarkColor">@color/industrial_panel_accent</item>
         <item name="sonusTextFaintColor">@color/industrial_accent</item>
         <item name="sonusStatusRed">@color/studio_red</item>
         <item name="sonusStatusGreen">@color/studio_green</item>
@@ -47,30 +47,6 @@
 
         <item name="android:statusBarColor">?attr/sonusBackgroundColor</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:navigationBarColor">?attr/sonusBackgroundColor</item>
-        <item name="android:windowBackground">?attr/sonusBackgroundColor</item>
-        <item name="colorPrimary">?attr/sonusAccentColor</item>
-        <item name="colorSecondary">?attr/sonusStatusGreen</item>
-    </style>
-
-    <!-- Industrial Light Theme -->
-    <style name="Theme.Sonus.Industrial.Light" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="sonusBackgroundColor">@color/industrial_light_bg</item>
-        <item name="sonusPanelColor">@color/industrial_light_panel</item>
-        <item name="sonusCardColor">@color/industrial_light_bg</item>
-        <item name="sonusLineColor">@color/industrial_accent</item>
-        <item name="sonusLineSoftColor">@color/industrial_light_panel</item>
-        <item name="sonusAccentColor">@color/industrial_dark_panel</item>
-        <item name="sonusAccentDimColor">@color/industrial_accent</item>
-        <item name="sonusTextPrimaryColor">@color/industrial_dark_bg</item>
-        <item name="sonusTextDarkColor">@color/industrial_dark_panel</item>
-        <item name="sonusTextFaintColor">@color/industrial_accent</item>
-        <item name="sonusStatusRed">@color/studio_red</item>
-        <item name="sonusStatusGreen">@color/studio_green</item>
-        <item name="sonusCornerRadius">@dimen/studio_radius</item>
-
-        <item name="android:statusBarColor">?attr/sonusBackgroundColor</item>
-        <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">?attr/sonusBackgroundColor</item>
         <item name="android:windowBackground">?attr/sonusBackgroundColor</item>
         <item name="colorPrimary">?attr/sonusAccentColor</item>

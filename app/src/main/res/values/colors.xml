@@ -35,8 +35,8 @@
     <color name="industrial_dark_bg">#030C13</color>
     <color name="industrial_dark_panel">#252F38</color>
     <color name="industrial_accent">#4B5862</color>
-    <color name="industrial_light_panel">#AEB1B5</color>
-    <color name="industrial_light_bg">#DBD3C8</color>
+    <color name="industrial_panel_accent">#AEB1B5</color>
+    <color name="industrial_text_primary">#DBD3C8</color>
 
     <!-- Legacy Mappings (to fix layout/code references) -->
     <color name="app_background">@color/studio_bg</color>

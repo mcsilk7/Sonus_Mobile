@@ -318,10 +318,8 @@
     <string name="system_log_entry">> SYSTEM_LOG_ENTRY</string>
     <string name="theme_amber_os">AMBER_OS</string>
     <string name="theme_ind_dark">IND_DARK</string>
-    <string name="theme_ind_light">IND_LIGHT</string>
     <string name="theme_amber_os_norm">Amber OS</string>
     <string name="theme_ind_dark_norm">Industrial Dark</string>
-    <string name="theme_ind_light_norm">Industrial Light</string>
     <string name="unknown_title">Unknown Track</string>
     <string name="unknown_artist">Unknown Artist</string>
 

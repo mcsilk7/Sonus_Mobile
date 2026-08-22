@@ -17,10 +17,6 @@ object ThemeHelper {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                 activity.setTheme(R.style.Theme_Sonus_Industrial_Dark)
             }
-            2 -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                activity.setTheme(R.style.Theme_Sonus_Industrial_Light)
-            }
             else -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                 activity.setTheme(R.style.Theme_Sonus)

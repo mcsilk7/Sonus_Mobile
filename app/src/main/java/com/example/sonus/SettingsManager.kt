@@ -17,7 +17,7 @@ class SettingsManager(context: Context) {
         prefs.edit().putBoolean(KEY_REELS_ENABLED, enabled).apply()
     }
 
-    fun getThemeId(): Int = prefs.getInt(KEY_THEME_ID, 0) // 0: AMBER, 1: INDUSTRIAL_DARK, 2: INDUSTRIAL_LIGHT
+    fun getThemeId(): Int = prefs.getInt(KEY_THEME_ID, 0) // 0: AMBER, 1: INDUSTRIAL_DARK
 
     fun setThemeId(themeId: Int) {
         prefs.edit().putInt(KEY_THEME_ID, themeId).apply()
