@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.sonus.R
-import com.example.sonus.LabelProvider
 import com.example.sonus.network.RegisterRequest
 import com.example.sonus.network.RetrofitClient
 import kotlinx.coroutines.Dispatchers
@@ -38,39 +37,26 @@ class RegisterFragment : Fragment() {
         view.findViewById<View>(R.id.tvGoToLogin).setOnClickListener {
             findNavController().popBackStack()
         }
-
-        applyThemeStrings(view)
-    }
-
-    private fun applyThemeStrings(view: View) {
-        val context = requireContext()
-        view.findViewById<TextView>(R.id.tvRegTop).text = LabelProvider.getLabel(context, "reg_top")
-        view.findViewById<TextView>(R.id.tvRegMain).text = LabelProvider.getLabel(context, "reg_main")
-        view.findViewById<TextView>(R.id.tvRegData).text = LabelProvider.getLabel(context, "reg_data")
-        view.findViewById<TextView>(R.id.tvRegUserLabel).text = LabelProvider.getLabel(context, "reg_user_label")
-        view.findViewById<TextView>(R.id.tvRegPassLabel).text = LabelProvider.getLabel(context, "reg_pass_label")
-
-        val etUser = view.findViewById<EditText>(R.id.etRegisterName)
-        val etPass = view.findViewById<EditText>(R.id.etRegisterPassword)
-        etUser.hint = LabelProvider.getLabel(context, "search_hint")
-        etPass.hint = getString(R.string.hint_stars)
-
-        view.findViewById<TextView>(R.id.btnRegister).text = LabelProvider.getLabel(context, "reg_init")
-        view.findViewById<TextView>(R.id.tvGoToLogin).text = LabelProvider.getLabel(context, "reg_back")
     }
 
     private fun performRegistration() {
         val username = view?.findViewById<EditText>(R.id.etRegisterName)?.text.toString().trim() ?: ""
         val password = view?.findViewById<EditText>(R.id.etRegisterPassword)?.text.toString() ?: ""
+        val confirmPassword = view?.findViewById<EditText>(R.id.etRegisterConfirmPassword)?.text.toString() ?: ""
         val registerButton = view?.findViewById<TextView>(R.id.btnRegister)
 
-        if (username.isBlank() || password.isBlank()) {
+        if (username.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
             Toast.makeText(requireContext(), getString(R.string.toast_fill_all), Toast.LENGTH_SHORT).show()
             return
         }
 
         if (password.length < 6) {
             Toast.makeText(requireContext(), getString(R.string.error_password_short), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (password != confirmPassword) {
+            Toast.makeText(requireContext(), getString(R.string.error_password_mismatch), Toast.LENGTH_SHORT).show()
             return
         }
 

@@ -18,107 +18,137 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginTop="40dp"
-            android:padding="16dp"
-            android:background="?attr/sonusPanelColor">
+            android:layout_marginTop="40dp">
+
             <TextView
                 android:id="@+id/tvRegTop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/registration_unit"
+                android:text="@string/register_title_norm"
                 android:textColor="?attr/sonusTextDarkColor"
-                android:fontFamily="monospace"
-                android:textSize="10sp"
-                android:letterSpacing="0.3" />
+                android:textSize="12sp"
+                android:letterSpacing="0.2"
+                android:fontFamily="sans-serif-medium" />
+
             <TextView
                 android:id="@+id/tvRegMain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="monospace"
-                android:text="@string/new_identity"
+                android:layout_marginTop="4dp"
+                android:text="@string/register_norm"
                 android:textColor="?attr/sonusAccentColor"
                 android:textSize="32sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-black" />
         </LinearLayout>
 
         <!-- Register Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="48dp"
             android:orientation="vertical"
-            android:padding="24dp"
-            android:background="?attr/sonusCardColor">
+            android:padding="28dp"
+            android:background="@drawable/bg_auth_card_modern"
+            android:elevation="4dp">
 
             <TextView
                 android:id="@+id/tvRegData"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/data_entry"
+                android:text="@string/data_norm"
                 android:textColor="?attr/sonusTextDarkColor"
-                android:fontFamily="monospace"
-                android:textSize="12sp" />
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-medium" />
 
+            <!-- Username -->
             <TextView
                 android:id="@+id/tvRegUserLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/operator_id_label"
+                android:layout_marginTop="32dp"
+                android:text="@string/user_norm"
                 android:textColor="?attr/sonusTextPrimaryColor"
-                android:fontFamily="monospace"
                 android:textSize="13sp" />
+
             <EditText
                 android:id="@+id/etRegisterName"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_auth_input"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:hint="@string/hint_unique_name"
+                android:layout_height="54dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_auth_input_modern"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:hint="@string/id_norm"
                 android:textColor="?attr/sonusAccentColor"
                 android:textColorHint="?attr/sonusTextFaintColor"
-                android:fontFamily="monospace"
-                android:textSize="15sp" />
+                android:textSize="16sp"
+                android:maxLines="1"
+                android:inputType="textPersonName" />
 
+            <!-- Password -->
             <TextView
                 android:id="@+id/tvRegPassLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/secure_pass_label"
+                android:layout_marginTop="20dp"
+                android:text="@string/pass_norm"
                 android:textColor="?attr/sonusTextPrimaryColor"
-                android:fontFamily="monospace"
                 android:textSize="13sp" />
+
             <EditText
                 android:id="@+id/etRegisterPassword"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_auth_input"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:hint="@string/hint_stars"
+                android:layout_height="54dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_auth_input_modern"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:hint="@string/pass_secure_norm"
                 android:inputType="textPassword"
                 android:textColor="?attr/sonusAccentColor"
                 android:textColorHint="?attr/sonusTextFaintColor"
-                android:fontFamily="monospace"
-                android:textSize="15sp" />
+                android:textSize="16sp"
+                android:maxLines="1" />
+
+            <!-- Confirm Password -->
+            <TextView
+                android:id="@+id/tvRegPassConfirmLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/confirm_pass_norm"
+                android:textColor="?attr/sonusTextPrimaryColor"
+                android:textSize="13sp" />
+
+            <EditText
+                android:id="@+id/etRegisterConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_auth_input_modern"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:hint="@string/hint_confirm_pass"
+                android:inputType="textPassword"
+                android:textColor="?attr/sonusAccentColor"
+                android:textColorHint="?attr/sonusTextFaintColor"
+                android:textSize="16sp"
+                android:maxLines="1" />
 
             <TextView
                 android:id="@+id/btnRegister"
                 android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:layout_marginTop="32dp"
-                android:background="@drawable/bg_auth_button"
+                android:layout_height="56dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/bg_auth_button_modern"
                 android:gravity="center"
-                android:text="@string/initialize_account"
+                android:text="@string/signup_norm"
                 android:textColor="?attr/sonusBackgroundColor"
-                android:fontFamily="monospace"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true" />
 
         </LinearLayout>
 
@@ -126,14 +156,14 @@
             android:id="@+id/tvGoToLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/back_to_login_interface"
+            android:layout_marginTop="40dp"
+            android:text="@string/back_login_norm"
             android:textColor="?attr/sonusAccentDimColor"
-            android:fontFamily="monospace"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground" />
+            android:background="?attr/selectableItemBackground"
+            android:padding="8dp" />
 
     </LinearLayout>
 </ScrollView>

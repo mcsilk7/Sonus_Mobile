@@ -12,114 +12,117 @@
         android:orientation="vertical"
         android:padding="32dp">
 
-        <!-- Studio Branding Header -->
+        <!-- Branding Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginTop="40dp"
-            android:padding="16dp"
-            android:background="?attr/sonusPanelColor">
+            android:layout_marginTop="40dp">
+
             <TextView
                 android:id="@+id/tvLoginTop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/access_control"
+                android:text="@string/login_title_norm"
                 android:textColor="?attr/sonusTextDarkColor"
-                android:fontFamily="monospace"
-                android:textSize="10sp"
-                android:letterSpacing="0.3" />
+                android:textSize="12sp"
+                android:letterSpacing="0.2"
+                android:fontFamily="sans-serif-medium" />
+
             <TextView
                 android:id="@+id/tvLoginMain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="monospace"
+                android:layout_marginTop="4dp"
                 android:text="@string/app_name"
                 android:textColor="?attr/sonusAccentColor"
-                android:textSize="48sp"
-                android:textStyle="bold" />
+                android:textSize="56sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-black" />
         </LinearLayout>
 
         <!-- Login Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="48dp"
             android:orientation="vertical"
-            android:padding="24dp"
-            android:background="?attr/sonusCardColor">
+            android:padding="28dp"
+            android:background="@drawable/bg_auth_card_modern"
+            android:elevation="4dp">
 
             <TextView
                 android:id="@+id/tvLoginStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/station_login_v2"
+                android:text="@string/login_norm"
                 android:textColor="?attr/sonusTextDarkColor"
-                android:fontFamily="monospace"
-                android:textSize="12sp" />
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-medium" />
 
             <!-- Input Fields -->
             <TextView
                 android:id="@+id/tvLoginUserLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/user_id_label"
+                android:layout_marginTop="32dp"
+                android:text="@string/user_norm"
                 android:textColor="?attr/sonusTextPrimaryColor"
-                android:fontFamily="monospace"
                 android:textSize="13sp" />
+
             <EditText
                 android:id="@+id/etLoginEmail"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_auth_input"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:hint="@string/hint_enter_id"
+                android:layout_height="54dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_auth_input_modern"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:hint="@string/id_norm"
                 android:textColor="?attr/sonusAccentColor"
                 android:textColorHint="?attr/sonusTextFaintColor"
-                android:fontFamily="monospace"
-                android:textSize="15sp" />
+                android:textSize="16sp"
+                android:maxLines="1"
+                android:inputType="textEmailAddress" />
 
             <TextView
                 android:id="@+id/tvLoginPassLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/pass_code_label"
+                android:layout_marginTop="20dp"
+                android:text="@string/pass_norm"
                 android:textColor="?attr/sonusTextPrimaryColor"
-                android:fontFamily="monospace"
                 android:textSize="13sp" />
+
             <EditText
                 android:id="@+id/etLoginPassword"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_auth_input"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:layout_height="54dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_auth_input_modern"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:hint="@string/hint_stars"
                 android:inputType="textPassword"
                 android:textColor="?attr/sonusAccentColor"
                 android:textColorHint="?attr/sonusTextFaintColor"
-                android:fontFamily="monospace"
-                android:textSize="15sp" />
+                android:textSize="16sp"
+                android:maxLines="1" />
 
             <TextView
                 android:id="@+id/btnLogin"
                 android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:layout_marginTop="32dp"
-                android:background="@drawable/bg_auth_button"
+                android:layout_height="56dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/bg_auth_button_modern"
                 android:gravity="center"
-                android:text="@string/authorize"
+                android:text="@string/login_btn_norm"
                 android:textColor="?attr/sonusBackgroundColor"
-                android:fontFamily="monospace"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true" />
 
         </LinearLayout>
 
@@ -127,14 +130,14 @@
             android:id="@+id/tvGoToRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/create_new_station_account"
+            android:layout_marginTop="40dp"
+            android:text="@string/signup_btn_norm"
             android:textColor="?attr/sonusAccentDimColor"
-            android:fontFamily="monospace"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground" />
+            android:background="?attr/selectableItemBackground"
+            android:padding="8dp" />
 
     </LinearLayout>
 </ScrollView>

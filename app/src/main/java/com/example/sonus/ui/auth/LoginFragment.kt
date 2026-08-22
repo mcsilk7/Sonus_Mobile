@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.sonus.R
-import com.example.sonus.LabelProvider
 import com.example.sonus.network.LoginRequest
 import com.example.sonus.network.NetworkMonitor
 import com.example.sonus.network.RetrofitClient
@@ -49,24 +48,6 @@ class LoginFragment : Fragment() {
         view.findViewById<View>(R.id.tvGoToRegister).setOnClickListener {
             findNavController().navigate(R.id.registerFragment)
         }
-        
-        applyThemeStrings(view)
-    }
-
-    private fun applyThemeStrings(view: View) {
-        val context = requireContext()
-        view.findViewById<TextView>(R.id.tvLoginTop).text = LabelProvider.getLabel(context, "auth_top")
-        view.findViewById<TextView>(R.id.tvLoginMain).text = LabelProvider.getLabel(context, "auth_main")
-        view.findViewById<TextView>(R.id.tvLoginUserLabel).text = LabelProvider.getLabel(context, "auth_user_label")
-        view.findViewById<TextView>(R.id.tvLoginPassLabel).text = LabelProvider.getLabel(context, "auth_pass_label")
-        
-        val etEmail = view.findViewById<EditText>(R.id.etLoginEmail)
-        val etPass = view.findViewById<EditText>(R.id.etLoginPassword)
-        etEmail.hint = LabelProvider.getLabel(context, "search_hint")
-        etPass.hint = getString(R.string.hint_stars)
-
-        view.findViewById<TextView>(R.id.btnLogin).text = LabelProvider.getLabel(context, "auth_authorize")
-        view.findViewById<TextView>(R.id.tvGoToRegister).text = LabelProvider.getLabel(context, "auth_create")
     }
 
     private fun performLogin() {

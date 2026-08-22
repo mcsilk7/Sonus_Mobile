@@ -242,6 +242,9 @@
     <string name="pass_secure_norm">Create password</string>
     <string name="signup_norm">Finish Registration</string>
     <string name="back_login_norm">Return to login screen</string>
+    <string name="confirm_pass_norm">Confirm Password</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+    <string name="hint_confirm_pass">Re-enter password</string>
 
     <!-- Splash - Technical -->
     <string name="sys_init">INITIALIZING_SYSTEM...</string>
