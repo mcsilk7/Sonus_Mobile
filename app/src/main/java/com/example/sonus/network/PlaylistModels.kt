@@ -15,7 +15,7 @@ data class SongDTO(
     val duration: Int? = null,
     val coverPath: String? = null,
     val filePath: String? = null,
-    val albumId: Long? = null,
+    var albumId: Long? = null,
     var isFavorite: Boolean = false,
     var isInPlaylist: Boolean = false
 )

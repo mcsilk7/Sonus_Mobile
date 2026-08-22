@@ -99,28 +99,41 @@ object DownloadManager {
 
     fun getDownloadedSongs(context: Context): List<SongDTO> {
         val dir = File(context.filesDir, "signals")
-        if (!dir.exists()) return emptyList()
+        if (!dir.exists()) {
+            Log.d("DownloadManager", "Signals directory does not exist")
+            return emptyList()
+        }
         
-        val jsonSongs = dir.listFiles { _, name -> name.endsWith(".json") }?.mapNotNull { file ->
+        val files = dir.listFiles() ?: return emptyList()
+        Log.d("DownloadManager", "Found ${files.size} files in signals directory")
+
+        val jsonSongs = files.filter { it.name.endsWith(".json") }.mapNotNull { file ->
             try {
-                gson.fromJson(file.readText(), SongDTO::class.java)
+                val content = file.readText()
+                if (content.isEmpty()) {
+                    Log.w("DownloadManager", "Empty metadata file: ${file.name}")
+                    return@mapNotNull null
+                }
+                gson.fromJson(content, SongDTO::class.java)
             } catch (e: Exception) {
-                Log.e("DownloadManager", "Failed to parse metadata: ${e.message}")
+                Log.e("DownloadManager", "Failed to parse metadata ${file.name}: ${e.message}")
                 null
             }
-        } ?: emptyList()
+        }
 
         // Fallback: If some .mp3 files exist but don't have .json, show them with dummy info
-        val mp3Ids = dir.listFiles { _, name -> name.endsWith(".mp3") }?.mapNotNull { file ->
+        val mp3Ids = files.filter { it.name.endsWith(".mp3") }.mapNotNull { file ->
             file.name.removePrefix("signal_").removeSuffix(".mp3").toLongOrNull()
-        } ?: emptyList()
+        }
 
         val foundIds = jsonSongs.map { it.id }.toSet()
         val missingSongs = mp3Ids.filter { it !in foundIds }.map { id ->
             SongDTO(id = id, title = "RECOVERED_SIGNAL_$id", artist = "UNKNOWN_SOURCE")
         }
 
-        return jsonSongs + missingSongs
+        val total = jsonSongs + missingSongs
+        Log.d("DownloadManager", "Returning ${total.size} downloaded songs")
+        return total
     }
 
     fun deleteSong(context: Context, songId: Long) {

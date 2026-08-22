@@ -161,12 +161,9 @@ class HomeFragment : Fragment() {
 
         mainViewModel.isOfflineMode.observe(viewLifecycleOwner) { isOffline ->
             view?.findViewById<View>(R.id.tvOfflineStatus)?.visibility = if (isOffline) View.VISIBLE else View.GONE
-            if (isOffline) {
-                view?.findViewById<TextView>(R.id.tvHomeHeaderMain)?.text = getString(R.string.offline_archive_tag)
-                view?.findViewById<TextView>(R.id.tvHomeHeaderMain)?.setTextColor(ContextCompat.getColor(requireContext(), R.color.studio_red))
-            } else {
-                view?.findViewById<TextView>(R.id.tvHomeHeaderMain)?.text = LabelProvider.getLabel(requireContext(), "home_header_main")
-                view?.findViewById<TextView>(R.id.tvHomeHeaderMain)?.setTextColor(ContextCompat.getColor(requireContext(), R.color.studio_amber))
+            view?.findViewById<TextView>(R.id.tvHomeHeaderMain)?.apply {
+                text = LabelProvider.getLabel(requireContext(), "home_header_main")
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.studio_amber))
             }
         }
     }

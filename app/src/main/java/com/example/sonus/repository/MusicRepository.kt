@@ -110,11 +110,45 @@ class MusicRepository {
 
     suspend fun getLibraryAlbums(context: Context, userId: Long): List<AlbumDTO> = withContext(Dispatchers.IO) {
         if (!NetworkHelper.isNetworkAvailable(context)) {
-            val cached = LibraryCacheManager.getCachedAlbums(context)
             val downloadedSongs = com.example.sonus.DownloadManager.getDownloadedSongs(context)
-            val downloadedAlbumIds = downloadedSongs.mapNotNull { it.albumId }.toSet()
             
-            return@withContext cached.filter { it.id in downloadedAlbumIds }
+            // Collect all unique albumIds from downloaded songs
+            val downloadedAlbumIds = downloadedSongs.mapNotNull { it.albumId }.toMutableSet()
+            
+            val cachedLibraryAlbums = LibraryCacheManager.getCachedAlbums(context)
+            
+            // Build result list
+            val result = mutableListOf<AlbumDTO>()
+            
+            // 1. Add albums that are in the user's library AND have downloaded songs
+            cachedLibraryAlbums.forEach { album ->
+                if (album.id in downloadedAlbumIds) {
+                    result.add(album)
+                    downloadedAlbumIds.remove(album.id) // Mark as handled
+                }
+            }
+            
+            // 2. Add albums that have downloaded songs but aren't in the library cache
+            // We look them up in the general album detail cache
+            downloadedAlbumIds.forEach { id ->
+                val detail = LibraryCacheManager.getCachedAlbumDetail(context, id)
+                if (detail != null) {
+                    result.add(detail)
+                } else {
+                    // Try to reconstruct a placeholder from the songs we have
+                    val sampleSong = downloadedSongs.firstOrNull { it.albumId == id }
+                    if (sampleSong != null) {
+                        result.add(AlbumDTO(
+                            id = id,
+                            title = "ALBUM_$id",
+                            artist = sampleSong.artist,
+                            isSaved = false
+                        ))
+                    }
+                }
+            }
+            
+            return@withContext result.distinctBy { it.id }
         }
         
         try {
@@ -189,7 +223,8 @@ class MusicRepository {
                 if (album != null) {
                     val songsResponse = RetrofitClient.albumApi.getSongsInAlbum(albumId)
                     if (songsResponse.isSuccessful) {
-                        album = album.copy(songs = songsResponse.body())
+                        val songs = songsResponse.body()?.onEach { it.albumId = albumId }
+                        album = album.copy(songs = songs)
                     }
                     
                     // Enrich favorites status if userId provided

@@ -86,13 +86,9 @@ class LibraryFragment : Fragment() {
 
         mainViewModel.isOfflineMode.observe(viewLifecycleOwner) { isOffline ->
             view.findViewById<View>(R.id.tvLibOfflineStatus).visibility = if (isOffline) View.VISIBLE else View.GONE
-            val headerMain = view.findViewById<TextView>(R.id.tvLibHeaderMain)
-            if (isOffline) {
-                headerMain.text = getString(R.string.offline_archive_tag)
-                headerMain.setTextColor(ContextCompat.getColor(requireContext(), R.color.studio_red))
-            } else {
-                headerMain.text = LabelProvider.getLabel(requireContext(), "library_header_main")
-                headerMain.setTextColor(ContextCompat.getColor(requireContext(), R.color.studio_amber))
+            view.findViewById<TextView>(R.id.tvLibHeaderMain).apply {
+                text = LabelProvider.getLabel(requireContext(), "library_header_main")
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.studio_amber))
             }
         }
     }
