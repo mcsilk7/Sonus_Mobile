@@ -13,11 +13,9 @@ object NetworkHelper {
         // Log detected transports for debugging
         if (activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) android.util.Log.d("SonusNet", "Detected: WIFI")
         if (activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) android.util.Log.d("SonusNet", "Detected: CELLULAR")
-        if (activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) android.util.Log.d("SonusNet", "Detected: VPN (Tailscale?)")
 
         return activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-               activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ||
-               activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+               activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
     }
 }
