@@ -3,14 +3,43 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Three Music Notes - Refined for "Safe Zone" and Visual Weight -->
     <group
-        android:scaleX="0.55"
-        android:scaleY="0.55"
-        android:translateX="24.3"
-        android:translateY="24.3">
-        <!-- Professional Single Music Note (Quarter Note) -->
-        <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M65,15V65c0,0.1 0,0.2 0,0.3c-1.1,3.8 -4.5,6.8 -8.7,7.4c-5.8,0.9 -11.1,-2.6 -11.8,-7.8c-0.7,-5.2 3.4,-10.1 9.2,-11c3.1,-0.5 6.2,0.2 8.6,1.7V15H65z" />
+        android:scaleX="0.58"
+        android:scaleY="0.58"
+        android:translateX="22"
+        android:translateY="21">
+
+        <!-- Small Single Note (Left) -->
+        <group android:translateX="0" android:translateY="40" android:rotation="-25">
+            <path
+                android:fillColor="#E8A13A"
+                android:pathData="M16,0v24c0,0 -1.5,-1 -3.5,-1c-3.6,0 -6.5,2.2 -6.5,5s2.9,5 6.5,5s6.5,-2.2 6.5,-5V4c3,0 5,2 5,6v-2c0,-5 -4,-8 -8,-8z" />
+        </group>
+
+        <!-- BEAMED PAIR (Center) - Bold and Professional -->
+        <group android:translateX="38" android:translateY="28" android:rotation="-10">
+            <!-- The Thick Slanted Beam -->
+            <path
+                android:fillColor="#E8A13A"
+                android:pathData="M0,8 L32,0 L32,8 L0,16 Z" />
+            <!-- Left Note (Stem + Head) -->
+            <path
+                android:fillColor="#E8A13A"
+                android:pathData="M0,8 v32c0,0 -1.5,-1 -3.5,-1c-3.6,0 -6.5,2.2 -6.5,5s2.9,5 6.5,5s6.5,-2.2 6.5,-5V8z" />
+            <!-- Right Note (Stem + Head) -->
+            <path
+                android:fillColor="#E8A13A"
+                android:pathData="M32,0 v32c0,0 -1.5,-1 -3.5,-1c-3.6,0 -6.5,2.2 -6.5,5s2.9,5 6.5,5s6.5,-2.2 6.5,-5V0z" />
+        </group>
+
+        <!-- Small Single Note (Right) -->
+        <group android:translateX="75" android:translateY="52" android:rotation="10">
+            <path
+                android:fillColor="#E8A13A"
+                android:pathData="M12,0v24c0,0 -1.5,-1 -3.5,-1c-3.6,0 -6.5,2.2 -6.5,5s2.9,5 6.5,5s6.5,-2.2 6.5,-5V4c3,0 5,2 5,6v-2c0,-5 -4,-8 -8,-8z" />
+        </group>
+
     </group>
 </vector>
