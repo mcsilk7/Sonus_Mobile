@@ -1,5 +1,6 @@
 package com.example.sonus
 
+import android.net.VpnService
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -20,6 +21,49 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
     private lateinit var sessionManager: SessionManager
 
+    private val vpnPermissionLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            startVpn()
+        }
+    }
+
+    private fun checkVpnPermission() {
+        val vpnIntent = VpnService.prepare(this)
+        android.util.Log.d("SonusVPN", "VpnService.prepare() returned: $vpnIntent")
+        
+        if (vpnIntent != null) {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Wymagana Autoryzacja VPN")
+                .setMessage("Aplikacja Sonus musi utworzyć bezpieczny tunel, aby połączyć się z Twoim serwerem muzycznym. Kliknij OK i zaakceptuj prośbę systemową.")
+                .setPositiveButton("OK") { _, _ ->
+                    try {
+                        vpnPermissionLauncher.launch(vpnIntent)
+                    } catch (e: Exception) {
+                        android.util.Log.e("SonusVPN", "Launch failed", e)
+                    }
+                }
+                .setCancelable(false)
+                .show()
+        } else {
+            startVpn()
+        }
+    }
+
+    private fun startVpn() {
+        lifecycleScope.launch {
+            try {
+                com.example.sonus.network.WireGuardManager.startVpn()
+                android.widget.Toast.makeText(this@MainActivity, "VPN: Połączono pomyślnie", android.widget.Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                android.util.Log.e("SonusVPN", "StartVpn Error", e)
+                val errorMsg = e.message ?: e.toString()
+                android.widget.Toast.makeText(this@MainActivity, "Błąd VPN: $errorMsg", android.widget.Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         ThemeHelper.applyTheme(this)
@@ -33,6 +77,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         sessionManager = SessionManager(this)
+        
+        // Delay VPN request to avoid Realme/Oppo background block
+        findViewById<View>(android.R.id.content).postDelayed({
+            checkVpnPermission()
+        }, 1500)
 
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -149,5 +198,12 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         MiniPlayerHelper.onDestroy(this)
+        
+        // Rozłącz VPN tylko jeśli aplikacja jest naprawdę zamykana (nie przy obrocie ekranu)
+        if (isFinishing) {
+            lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                com.example.sonus.network.WireGuardManager.stopVpn()
+            }
+        }
     }
 }

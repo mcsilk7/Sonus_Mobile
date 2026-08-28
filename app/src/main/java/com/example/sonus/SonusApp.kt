@@ -1,6 +1,7 @@
 package com.example.sonus
 
 import android.app.Application
+import android.content.Context
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
@@ -11,13 +12,17 @@ class SonusApp : Application() {
 
     companion object {
         const val CHANNEL_ID = "playback_channel"
+        lateinit var appContext: Context
+            private set
     }
 
     override fun onCreate() {
         super.onCreate()
+        appContext = this
         RetrofitClient.init(this)
         RecentlyPlayedManager.init(this)
         SearchHistoryManager.init(this)
+        com.example.sonus.network.WireGuardManager.init(this)
 
         // Force dark mode for Retro Studio theme globally
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)

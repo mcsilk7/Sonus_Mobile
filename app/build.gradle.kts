@@ -1,12 +1,23 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.ksp)
 }
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+
 android {
     namespace = "com.example.sonus"
-    compileSdk {
-        version = release(37)
+    compileSdk = 37
+
+    buildFeatures {
+        buildConfig = true
     }
 
     defaultConfig {
@@ -15,6 +26,10 @@ android {
         targetSdk = 37
         versionCode = 3
         versionName = "2.1.0"
+
+        buildConfigField("String", "WG_SERVER_PUBLIC_KEY", "${localProperties.getProperty("WG_SERVER_PUBLIC_KEY") ?: "\"\""}")
+        buildConfigField("String", "WG_SERVER_ENDPOINT", "${localProperties.getProperty("WG_SERVER_ENDPOINT") ?: "\"\""}")
+        buildConfigField("String", "WG_CLIENT_PRIVATE_KEY", "${localProperties.getProperty("WG_CLIENT_PRIVATE_KEY") ?: "\"\""}")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -64,5 +79,5 @@ dependencies {
     implementation(libs.androidx.room.paging)
 
     // WireGuard
-    implementation(libs.wireguard.android)
+    implementation(libs.wireguard.tunnel)
 }

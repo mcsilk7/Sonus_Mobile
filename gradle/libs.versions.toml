@@ -10,7 +10,7 @@ room = "2.8.4"
 work = "2.11.2"
 lifecycle = "2.8.4"
 paging = "3.3.2"
-wireguard = "1.1.0"
+wireguard = "1.0.20260102"
 
 ksp = "2.1.10-1.0.30"
 [libraries]
@@ -28,7 +28,7 @@ androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx"
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
-wireguard-android = { group = "com.wireguard.android", name = "wireguard-android", version.ref = "wireguard" }
+wireguard-tunnel = { group = "com.wireguard.android", name = "tunnel", version.ref = "wireguard" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

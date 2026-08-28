@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -33,9 +34,15 @@
             android:foregroundServiceType="mediaPlayback" />
 
         <service
-            android:name=".network.SonusVpnService"
+            android:name=".network.VpnMonitorService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <service
+            android:name="com.wireguard.android.backend.GoBackend$VpnService"
+            android:exported="true"
             android:permission="android.permission.BIND_VPN_SERVICE"
-            android:exported="false">
+            tools:replace="android:exported">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
