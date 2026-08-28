@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sonus.*
 import com.example.sonus.network.SessionManager
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class FavoriteFragment : Fragment() {
@@ -22,11 +23,10 @@ class FavoriteFragment : Fragment() {
     private val viewModel: LibraryViewModel by viewModels()
     private lateinit var sessionManager: SessionManager
     private lateinit var settingsManager: SettingsManager
-    private lateinit var songAdapter: SongAdapter
+    private lateinit var songAdapter: SongPagingAdapter
     private lateinit var rvSongs: RecyclerView
     
     private var currentSortOrder = SortOrder.DEFAULT
-    private var originalSongs = emptyList<com.example.sonus.network.SongDTO>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,9 +42,18 @@ class FavoriteFragment : Fragment() {
         sessionManager = SessionManager(requireContext())
         settingsManager = SettingsManager(requireContext())
         currentSortOrder = settingsManager.getSortOrder("favorites")
+        viewModel.setFavoriteSortOrder(currentSortOrder)
         
         mainViewModel.isOfflineMode.observe(viewLifecycleOwner) { isOffline ->
             view.findViewById<View>(R.id.tvFavoriteOfflineStatus).visibility = if (isOffline) View.VISIBLE else View.GONE
+        }
+
+        val fabPlay = view.findViewById<View>(R.id.fabPlayFavorites)
+        mainViewModel.isMiniPlayerVisible.observe(viewLifecycleOwner) { isVisible ->
+            val params = fabPlay.layoutParams as ViewGroup.MarginLayoutParams
+            val marginDp = if (isVisible) 160 else 100
+            params.bottomMargin = (marginDp * resources.displayMetrics.density).toInt()
+            fabPlay.layoutParams = params
         }
 
         UserAvatarHelper.setupAvatar(view, sessionManager, findNavController())
@@ -57,6 +66,10 @@ class FavoriteFragment : Fragment() {
         
         view.findViewById<View>(R.id.btnSortFavorite).setOnClickListener {
             showSortDialog()
+        }
+        
+        view.findViewById<View>(R.id.fabPlayFavorites).setOnClickListener {
+            playAllFavorites()
         }
         
         setupRecyclerView()
@@ -73,11 +86,15 @@ class FavoriteFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        songAdapter = SongAdapter(
-            songs = emptyList(),
+        songAdapter = SongPagingAdapter(
             onItemClick = { song ->
-                PlayerState.play(requireContext(), song, songAdapter.getSongs())
-                Toast.makeText(requireContext(), getString(R.string.toast_playing, song.title), Toast.LENGTH_SHORT).show()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val userId = sessionManager.getUserId()
+                    val allFavorites = viewModel.getAllFavoriteSongs(userId)
+                    val sorted = SortHelper.sortSongs(allFavorites, currentSortOrder)
+                    PlayerState.play(requireContext(), song, sorted)
+                    Toast.makeText(requireContext(), getString(R.string.toast_playing, song.title), Toast.LENGTH_SHORT).show()
+                }
             },
             onAddClick = { song ->
                 PlaylistHelper.showPlaylistSelectionDialog(requireActivity() as androidx.appcompat.app.AppCompatActivity, viewLifecycleOwner.lifecycleScope, sessionManager.getUserId(), song) {
@@ -98,27 +115,28 @@ class FavoriteFragment : Fragment() {
         )
         rvSongs.layoutManager = LinearLayoutManager(requireContext())
         rvSongs.adapter = songAdapter
+    }
 
-        SongTouchHelper.attach(
-            rvSongs,
-            songAdapter,
-            sessionManager.getUserId(),
-            viewLifecycleOwner.lifecycleScope
-        ) {
-            viewModel.fetchLibraryData(requireContext(), sessionManager.getUserId())
+    private fun playAllFavorites() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val userId = sessionManager.getUserId()
+            val allFavorites = viewModel.getAllFavoriteSongs(userId)
+            if (allFavorites.isNotEmpty()) {
+                val sorted = SortHelper.sortSongs(allFavorites, currentSortOrder)
+                PlayerState.play(requireContext(), sorted.first(), sorted)
+                Toast.makeText(requireContext(), getString(R.string.toast_playing, sorted.first().title), Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Brak ulubionych utworów", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     private fun observeViewModel() {
-        viewModel.favoriteSongs.observe(viewLifecycleOwner) { songs ->
-            originalSongs = songs
-            applyCurrentSort()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.getFavoriteSongsPaging(sessionManager.getUserId()).collectLatest { pagingData ->
+                songAdapter.submitData(pagingData)
+            }
         }
-    }
-
-    private fun applyCurrentSort() {
-        val sorted = SortHelper.sortSongs(originalSongs, currentSortOrder)
-        songAdapter.updateData(sorted)
     }
 
     private fun showSortDialog() {
@@ -144,15 +162,16 @@ class FavoriteFragment : Fragment() {
         androidx.appcompat.app.AlertDialog.Builder(context)
             .setTitle(if (isTechnical) getString(R.string.sort_order_label) else getString(R.string.sort_by_norm))
             .setItems(options) { _, which ->
-                currentSortOrder = when (which) {
+                val order = when (which) {
                     0 -> SortOrder.DEFAULT
                     1 -> SortOrder.TITLE
                     2 -> SortOrder.ARTIST
                     3 -> SortOrder.DURATION
                     else -> SortOrder.DEFAULT
                 }
+                currentSortOrder = order
                 settingsManager.setSortOrder("favorites", currentSortOrder)
-                applyCurrentSort()
+                viewModel.setFavoriteSortOrder(order)
             }
             .show()
     }

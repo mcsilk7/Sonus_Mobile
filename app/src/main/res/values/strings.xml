@@ -284,6 +284,7 @@
     <string name="confirm_delete_playlist_msg_generic">Czy na pewno chcesz usunąć tę playlistę?</string>
     <string name="btn_delete">Usuń</string>
     <string name="btn_cancel">Anuluj</string>
+    <string name="btn_play">Graj wszystko</string>
     <string name="toast_song_removed">Utwór usunięty z playlisty</string>
     <string name="confirm_remove_song_title">Usuń utwór</string>
     <string name="confirm_remove_song_msg">Usunąć %s z tej playlisty?</string>

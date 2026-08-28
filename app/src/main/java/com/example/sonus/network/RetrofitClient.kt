@@ -1,16 +1,20 @@
 package com.example.sonus.network
 
 import android.content.Context
+import com.example.sonus.NetworkHelper
+import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
 //    const val BASE_URL = "http://192.168.1.77:8080/"//localhost
 //    const val BASE_URL = "http://192.168.1.59:8080/"//localnetwork
-      const val BASE_URL = "http://100.126.233.66:8080/"//tailcsale
+//    const val BASE_URL = "http://100.126.233.66:8080/"//tailscale
+      const val BASE_URL = "http://10.0.0.1:8080/"//wireguard internal ip
 
     private lateinit var sessionManager: SessionManager
     private lateinit var appContext: Context
@@ -25,9 +29,37 @@ object RetrofitClient {
             level = HttpLoggingInterceptor.Level.HEADERS // Lowered from BODY to avoid timeouts on slow VPN
         }
         
+        val cacheSize = (10 * 1024 * 1024).toLong() // 10 MB
+        val cache = Cache(appContext.cacheDir, cacheSize)
+        
         OkHttpClient.Builder()
+            .cache(cache)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(logging)
             .addInterceptor(AuthInterceptor(appContext, sessionManager))
+            .addInterceptor { chain ->
+                var request = chain.request()
+                if (!NetworkHelper.isNetworkAvailable(appContext)) {
+                    request = request.newBuilder()
+                        .header("Cache-Control", "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7) // 7 days
+                        .build()
+                }
+                chain.proceed(request)
+            }
+            .addInterceptor { chain ->
+                // Simple Retry Interceptor
+                var request = chain.request()
+                var response = chain.proceed(request)
+                var tryCount = 0
+                while (!response.isSuccessful && tryCount < 2) {
+                    tryCount++
+                    response.close()
+                    response = chain.proceed(request)
+                }
+                response
+            }
             .build()
     }
 

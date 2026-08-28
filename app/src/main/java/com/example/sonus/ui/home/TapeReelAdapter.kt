@@ -66,10 +66,11 @@ class TapeReelAdapter(
             RetrofitClient.BASE_URL + "api/songs/${song.id}/cover"
         }
         val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(holder.itemView.context, coverUrl)
+        val placeholder = com.example.sonus.network.GlideHelper.getBlurHashPlaceholder(holder.itemView.context, song.blurHash) ?: androidx.core.content.ContextCompat.getDrawable(holder.itemView.context, R.drawable.bg_cover_placeholder)
 
         Glide.with(holder.itemView.context)
             .load(authenticatedUrl)
-            .placeholder(R.drawable.bg_cover_placeholder)
+            .placeholder(placeholder)
             .error(R.drawable.bg_cover_placeholder)
             .transform(CenterCrop())
             .into(holder.imgCover)

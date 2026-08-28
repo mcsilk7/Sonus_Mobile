@@ -69,13 +69,17 @@ object DownloadManager {
 
             updateProgress(songId, 0)
 
+            var lastReportedProgress = -1
             while (inputStream.read(buffer).also { bytesRead = it } != -1) {
                 outputStream.write(buffer, 0, bytesRead)
                 bytesDownloaded += bytesRead
                 
                 if (totalBytes > 0) {
                     val progress = ((bytesDownloaded * 100) / totalBytes).toInt()
-                    updateProgress(songId, progress)
+                    if (progress != lastReportedProgress) {
+                        updateProgress(songId, progress)
+                        lastReportedProgress = progress
+                    }
                 }
             }
 

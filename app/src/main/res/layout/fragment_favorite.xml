@@ -120,4 +120,18 @@
         android:clipToPadding="false"
         android:paddingBottom="180dp" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabPlayFavorites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="100dp"
+        android:contentDescription="@string/btn_play"
+        android:backgroundTint="?attr/sonusAccentColor"
+        android:src="@drawable/ic_play"
+        app:tint="?attr/sonusBackgroundColor"
+        app:fabSize="normal"
+        app:elevation="8dp" />
+
 </FrameLayout>

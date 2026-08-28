@@ -9,7 +9,10 @@ interface PlaylistApi {
     suspend fun getAllPlaylists(): Response<List<PlaylistDTO>>
 
     @GET("api/playlists/user/{userId}")
-    suspend fun getUserPlaylists(@Path("userId") userId: Long): Response<List<PlaylistDTO>>
+    suspend fun getUserPlaylists(
+        @Path("userId") userId: Long,
+        @Header("If-Modified-Since") ifModifiedSince: String? = null
+    ): Response<List<PlaylistDTO>>
 
     @GET("api/playlists/{id}")
     suspend fun getPlaylistById(@Path("id") id: Long): Response<PlaylistDTO>

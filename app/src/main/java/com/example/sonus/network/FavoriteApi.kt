@@ -6,7 +6,12 @@ import retrofit2.http.*
 interface FavoriteApi {
 
     @GET("api/favorites/{userId}")
-    suspend fun getFavorites(@Path("userId") userId: Long): Response<List<FavoriteSongDTO>>
+    suspend fun getFavorites(
+        @Path("userId") userId: Long,
+        @Query("page") page: Int? = null,
+        @Query("size") size: Int? = null,
+        @Header("If-Modified-Since") ifModifiedSince: String? = null
+    ): Response<List<FavoriteSongDTO>>
 
     @GET("api/favorites/{userId}/songs/{songId}/check")
     suspend fun isFavorite(

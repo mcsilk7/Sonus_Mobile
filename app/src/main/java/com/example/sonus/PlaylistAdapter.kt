@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.sonus.network.PlaylistDTO
@@ -71,19 +72,16 @@ class PlaylistAdapter(
                     RetrofitClient.BASE_URL + "api/songs/${song.id}/cover"
                 }
                 val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(holder.itemView.context, coverUrl)
+                val placeholder = com.example.sonus.network.GlideHelper.getBlurHashPlaceholder(holder.itemView.context, song.blurHash) ?: androidx.core.content.ContextCompat.getDrawable(holder.itemView.context, R.drawable.bg_cover_placeholder)
 
                 Glide.with(holder.itemView.context)
                     .load(authenticatedUrl)
-                    .placeholder(R.drawable.bg_cover_placeholder)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(placeholder)
                     .error(R.drawable.bg_cover_placeholder)
                     .transform(CenterCrop())
                     .into(imageView)
             } else if (songs.isNotEmpty()) {
-                // If we have some songs but less than 4, reuse the first one or show placeholder
-                // Spotify style: if 1 song, show 1 large. If < 4, often just shows the first.
-                // For simplicity in a 2x2 grid, let's load the first song in all slots if only 1-3 songs exist
-                // Or just leave placeholders for the empty slots.
-                // Let's reuse the first song to make it look "full" if at least one exists.
                 val song = songs[0]
                 val coverUrl = if (song.coverPath?.startsWith("http") == true) {
                     song.coverPath
@@ -91,10 +89,12 @@ class PlaylistAdapter(
                     RetrofitClient.BASE_URL + "api/songs/${song.id}/cover"
                 }
                 val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(holder.itemView.context, coverUrl)
+                val placeholder = com.example.sonus.network.GlideHelper.getBlurHashPlaceholder(holder.itemView.context, song.blurHash) ?: androidx.core.content.ContextCompat.getDrawable(holder.itemView.context, R.drawable.bg_cover_placeholder)
 
                 Glide.with(holder.itemView.context)
                     .load(authenticatedUrl)
-                    .placeholder(R.drawable.bg_cover_placeholder)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(placeholder)
                     .error(R.drawable.bg_cover_placeholder)
                     .transform(CenterCrop())
                     .into(imageView)

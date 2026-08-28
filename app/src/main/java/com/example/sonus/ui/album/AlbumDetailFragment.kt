@@ -177,12 +177,13 @@ class AlbumDetailFragment : Fragment() {
             RetrofitClient.BASE_URL + "api/albums/$albumId/cover"
         }
         val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(requireContext(), coverUrl)
+        val placeholder = com.example.sonus.network.GlideHelper.getBlurHashPlaceholder(requireContext(), album.blurHash) ?: androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.bg_playlist_head)
 
         val radius = resources.getDimensionPixelSize(R.dimen.studio_radius)
 
         com.bumptech.glide.Glide.with(this)
             .load(authenticatedUrl)
-            .placeholder(R.drawable.bg_playlist_head)
+            .placeholder(placeholder)
             .error(R.drawable.bg_playlist_head)
             .transform(com.bumptech.glide.load.resource.bitmap.CenterCrop(), com.bumptech.glide.load.resource.bitmap.RoundedCorners(radius))
             .into(imgCover)
@@ -259,8 +260,13 @@ class AlbumDetailFragment : Fragment() {
     }
 
     private fun updateSaveButtonState(isSaved: Boolean) {
-        val color = if (isSaved) R.color.studio_red else R.color.studio_bg
-        btnSaveAlbum.setColorFilter(androidx.core.content.ContextCompat.getColor(requireContext(), color))
+        if (isSaved) {
+            btnSaveAlbum.setImageResource(R.drawable.ic_favorite)
+            btnSaveAlbum.setColorFilter(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.studio_red))
+        } else {
+            btnSaveAlbum.setImageResource(R.drawable.ic_favorite_border)
+            btnSaveAlbum.setColorFilter(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.studio_text_dim))
+        }
     }
 
     private fun toggleFavorite(song: SongDTO) {
@@ -269,9 +275,8 @@ class AlbumDetailFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val response = RetrofitClient.favoriteApi.toggleFavorite(userId, song.id)
-                if (response.isSuccessful) {
-                    val added = response.body()?.get("added") ?: false
+                val added = repository.toggleFavorite(requireContext(), userId, song)
+                if (added != null) {
                     song.isFavorite = added
                     songAdapter.notifyDataSetChanged()
                 }

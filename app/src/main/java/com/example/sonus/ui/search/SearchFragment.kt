@@ -77,7 +77,7 @@ class SearchFragment : Fragment() {
             val history = SearchHistoryManager.getHistory()
             if (history.isNotEmpty()) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    val enrichedHistory = repository.enrichSongMetadata(sessionManager.getUserId(), history)
+                    val enrichedHistory = repository.enrichSongMetadata(requireContext(), sessionManager.getUserId(), history)
                     songAdapter.updateData(enrichedHistory)
                     tvSongsHeader.text = getString(R.string.recently_searched)
                     tvSongsHeader.visibility = View.VISIBLE
@@ -129,7 +129,7 @@ class SearchFragment : Fragment() {
             },
             onFavoriteClick = { song ->
                 viewLifecycleOwner.lifecycleScope.launch {
-                    val added = repository.toggleFavorite(sessionManager.getUserId(), song.id)
+                    val added = repository.toggleFavorite(requireContext(), sessionManager.getUserId(), song)
                     if (added != null) {
                         song.isFavorite = added
                         songAdapter.notifyDataSetChanged()
@@ -204,7 +204,7 @@ class SearchFragment : Fragment() {
 
                 if (songsResponse.isSuccessful) {
                     val songs = songsResponse.body() ?: emptyList()
-                    val enrichedSongs = repository.enrichSongMetadata(sessionManager.getUserId(), songs)
+                    val enrichedSongs = repository.enrichSongMetadata(requireContext(), sessionManager.getUserId(), songs)
                     songAdapter.updateData(enrichedSongs)
                     tvSongsHeader.text = getString(R.string.search_results_songs)
                     tvSongsHeader.visibility = if (songs.isNotEmpty()) View.VISIBLE else View.GONE
@@ -212,8 +212,9 @@ class SearchFragment : Fragment() {
 
                 if (albumsResponse.isSuccessful) {
                     val albums = albumsResponse.body() ?: emptyList()
-                    albumAdapter.updateData(albums)
-                    tvAlbumsHeader.visibility = if (albums.isNotEmpty()) View.VISIBLE else View.GONE
+                    val enrichedAlbums = repository.enrichAlbumMetadata(requireContext(), albums)
+                    albumAdapter.updateData(enrichedAlbums)
+                    tvAlbumsHeader.visibility = if (enrichedAlbums.isNotEmpty()) View.VISIBLE else View.GONE
                 }
             } catch (e: Exception) {
                 // Ignore search errors

@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sonus.network.AlbumDTO
 import com.example.sonus.network.RetrofitClient
 
@@ -40,10 +41,12 @@ class AlbumAdapter(
             RetrofitClient.BASE_URL + "api/albums/${album.id}/cover"
         }
         val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(holder.itemView.context, coverUrl)
+        val placeholder = com.example.sonus.network.GlideHelper.getBlurHashPlaceholder(holder.itemView.context, album.blurHash) ?: androidx.core.content.ContextCompat.getDrawable(holder.itemView.context, R.drawable.bg_cover_placeholder)
 
         Glide.with(holder.itemView.context)
             .load(authenticatedUrl)
-            .placeholder(R.drawable.bg_cover_placeholder)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .placeholder(placeholder)
             .error(R.drawable.bg_cover_placeholder)
             .centerCrop()
             .into(holder.cover)

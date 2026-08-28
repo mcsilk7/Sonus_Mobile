@@ -1,10 +1,16 @@
 package com.example.sonus.repository
 
 import android.content.Context
-import com.example.sonus.LibraryCacheManager
 import com.example.sonus.NetworkHelper
+import com.example.sonus.SortOrder
+import com.example.sonus.db.*
 import com.example.sonus.network.*
 import kotlinx.coroutines.Dispatchers
+import androidx.paging.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -12,71 +18,122 @@ import kotlinx.coroutines.withContext
 
 class MusicRepository {
 
-    suspend fun getUserPlaylists(context: Context, userId: Long): List<PlaylistDTO> = withContext(Dispatchers.IO) {
-        if (!NetworkHelper.isNetworkAvailable(context)) {
-            val cached = LibraryCacheManager.getCachedPlaylists(context)
-            val downloadedSongs = com.example.sonus.DownloadManager.getDownloadedSongs(context)
-            val downloadedSongIds = downloadedSongs.map { it.id }.toSet()
-            
-            return@withContext cached.filter { playlist ->
-                // Check if we have any downloaded song that belongs to this playlist
-                // Since summary DTO might have take(4), we check those first
-                val hasSongsInSummary = playlist.songs?.any { it.id in downloadedSongIds } ?: false
-                if (hasSongsInSummary) return@filter true
-                
-                // If not in summary, check the cached full detail
-                val detail = LibraryCacheManager.getCachedPlaylistDetail(context, playlist.id ?: -1L)
-                detail?.songs?.any { it.id in downloadedSongIds } ?: false
+    private fun getDao(context: Context) = SonusDatabase.getDatabase(context).musicDao()
+    
+    private val httpDateFormat = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US).apply {
+        timeZone = TimeZone.getTimeZone("GMT")
+    }
+
+    private suspend fun getIfModifiedSince(dao: MusicDao, key: String): String? {
+        val metadata = dao.getSyncMetadata(key)
+        // Only return timestamp if last sync was more than 1 minute ago to avoid spamming
+        return if (metadata != null && System.currentTimeMillis() - metadata.lastSyncMillis > 60000) {
+            metadata.lastSyncTimestamp
+        } else null
+    }
+
+    private suspend fun updateSyncMetadata(dao: MusicDao, key: String) {
+        val now = System.currentTimeMillis()
+        dao.insertSyncMetadata(SyncMetadata(key, httpDateFormat.format(Date(now)), now))
+    }
+
+    fun getPlaylistsFlow(context: Context): Flow<List<PlaylistDTO>> {
+        return getDao(context).getAllPlaylistsFlow().map { list -> list.map { it.toDTO() } }
+    }
+
+    fun getFavoriteSongsFlow(context: Context): Flow<List<SongDTO>> {
+        return getDao(context).getFavoriteSongsFlow().map { list -> list.map { it.toDTO() } }
+    }
+
+    fun getAlbumsFlow(context: Context): Flow<List<AlbumDTO>> {
+        return getDao(context).getAllAlbumsFlow().map { list -> list.map { it.toDTO() } }
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
+    fun getFavoriteSongsPaging(context: Context, userId: Long, sortOrder: SortOrder = SortOrder.DEFAULT): Flow<PagingData<SongDTO>> {
+        val database = SonusDatabase.getDatabase(context)
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false,
+                prefetchDistance = 5
+            ),
+            remoteMediator = FavoriteRemoteMediator(database, userId),
+            pagingSourceFactory = { 
+                when (sortOrder) {
+                    SortOrder.DEFAULT -> database.musicDao().getFavoriteSongsPaging()
+                    SortOrder.TITLE -> database.musicDao().getFavoriteSongsPagingByTitle()
+                    SortOrder.ARTIST -> database.musicDao().getFavoriteSongsPagingByArtist()
+                    SortOrder.DURATION -> database.musicDao().getFavoriteSongsPagingByDuration()
+                }
             }
+        ).flow.map { pagingData ->
+            pagingData.map { it.toDTO() }
         }
+    }
+
+    suspend fun refreshUserPlaylists(context: Context, userId: Long) = withContext(Dispatchers.IO) {
+        if (!NetworkHelper.isNetworkAvailable(context)) return@withContext
+        val dao = getDao(context)
+        val ifModifiedSince = getIfModifiedSince(dao, "playlists")
 
         try {
-            val response = RetrofitClient.playlistApi.getUserPlaylists(userId)
+            val response = RetrofitClient.playlistApi.getUserPlaylists(userId, ifModifiedSince = ifModifiedSince)
+            
+            if (response.code() == 304) {
+                updateSyncMetadata(dao, "playlists")
+                return@withContext
+            }
+
             if (response.isSuccessful) {
                 val playlists = response.body() ?: emptyList()
-                // Optimization: Fetch counts and first 4 songs for collage in parallel
+                
                 val enriched = coroutineScope {
                     playlists.map { playlist ->
                         async {
                             try {
-                                val countDeferred = async { RetrofitClient.playlistApi.getSongCountInPlaylist(playlist.id!!) }
-                                val songsDeferred = async { RetrofitClient.playlistApi.getSongsInPlaylist(playlist.id!!) }
-                                
-                                val countRes = countDeferred.await()
-                                val songsRes = songsDeferred.await()
+                                val countRes = RetrofitClient.playlistApi.getSongCountInPlaylist(playlist.id!!)
+                                val songsRes = RetrofitClient.playlistApi.getSongsInPlaylist(playlist.id!!)
                                 
                                 val count = if (countRes.isSuccessful) countRes.body()?.toInt() ?: 0 else 0
                                 val songs = if (songsRes.isSuccessful) songsRes.body()?.take(4) else null
                                 
-                                playlist.copy(songCount = count, songs = songs)
+                                val result = playlist.copy(songCount = count, songs = songs)
+                                
+                                songs?.let { sList ->
+                                    dao.insertSongs(sList.map { it.toEntity() })
+                                    dao.insertPlaylistSongs(sList.map { PlaylistSongCrossRef(playlist.id, it.id) })
+                                }
+                                result
                             } catch (e: Exception) {
-                                NetworkMonitor.logError("UNIT_SCAN_ERR: ${playlist.id}")
                                 playlist
                             }
                         }
                     }.awaitAll()
                 }
-                LibraryCacheManager.cachePlaylists(context, enriched)
-                enriched
-            } else {
-                NetworkMonitor.logError("LIB_FETCH_FAIL: ${response.code()}")
-                LibraryCacheManager.getCachedPlaylists(context)
+                
+                dao.removeObsoletePlaylists(enriched.map { it.id ?: -1L })
+                dao.insertPlaylists(enriched.map { it.toEntity() })
+                updateSyncMetadata(dao, "playlists")
             }
         } catch (e: Exception) {
-            NetworkMonitor.logError("NET_ERR: ${e.message}")
-            LibraryCacheManager.getCachedPlaylists(context)
+            // Handled
         }
     }
 
-    suspend fun getFavoriteSongs(context: Context, userId: Long): List<SongDTO> = withContext(Dispatchers.IO) {
-        if (!NetworkHelper.isNetworkAvailable(context)) {
-            val cached = LibraryCacheManager.getCachedFavorites(context)
-            // Filter to show only downloaded songs when offline, as per user request
-            return@withContext cached.filter { com.example.sonus.DownloadManager.isSongDownloaded(context, it.id) }
-        }
+    suspend fun refreshFavoriteSongs(context: Context, userId: Long) = withContext(Dispatchers.IO) {
+        if (!NetworkHelper.isNetworkAvailable(context)) return@withContext
+        val dao = getDao(context)
+        val ifModifiedSince = getIfModifiedSince(dao, "favorites")
 
         try {
-            val response = RetrofitClient.favoriteApi.getFavorites(userId)
+            val response = RetrofitClient.favoriteApi.getFavorites(userId, ifModifiedSince = ifModifiedSince)
+            
+            if (response.code() == 304) {
+                updateSyncMetadata(dao, "favorites")
+                return@withContext
+            }
+
             if (response.isSuccessful) {
                 val songs = response.body()?.mapNotNull { fav ->
                     val song = (fav.song ?: fav.songDto) ?: fav.songTitle?.let { title ->
@@ -91,87 +148,64 @@ class MusicRepository {
                     }
                     song?.apply { isFavorite = true }
                 } ?: emptyList()
-                LibraryCacheManager.cacheFavorites(context, songs)
-                songs
-            } else {
-                val cached = LibraryCacheManager.getCachedFavorites(context)
-                filterDownloadedOnly(context, cached)
+                
+                dao.removeObsoleteFavorites(songs.map { it.id })
+                dao.insertSongs(songs.map { it.toEntity() })
+                updateSyncMetadata(dao, "favorites")
             }
         } catch (e: Exception) {
-            NetworkMonitor.logError("NET_ERR: ${e.message}")
-            val cached = LibraryCacheManager.getCachedFavorites(context)
-            filterDownloadedOnly(context, cached)
+            // Handled
         }
     }
 
-    private fun filterDownloadedOnly(context: Context, songs: List<SongDTO>?): List<SongDTO> {
-        return songs?.filter { com.example.sonus.DownloadManager.isSongDownloaded(context, it.id) } ?: emptyList()
+    suspend fun refreshLibraryAlbums(context: Context, userId: Long) = withContext(Dispatchers.IO) {
+        if (!NetworkHelper.isNetworkAvailable(context)) return@withContext
+        val dao = getDao(context)
+        val ifModifiedSince = getIfModifiedSince(dao, "albums")
+        
+        try {
+            val response = RetrofitClient.albumApi.getLibraryAlbums(userId, ifModifiedSince = ifModifiedSince)
+            
+            if (response.code() == 304) {
+                updateSyncMetadata(dao, "albums")
+                return@withContext
+            }
+
+            if (response.isSuccessful) {
+                val albums = response.body()?.onEach { it.isSaved = true } ?: emptyList()
+                dao.removeObsoleteAlbums(albums.map { it.id ?: -1L })
+                dao.insertAlbums(albums.map { it.toEntity() })
+                updateSyncMetadata(dao, "albums")
+            }
+        } catch (e: Exception) {
+            // Handled
+        }
+    }
+
+    suspend fun getUserPlaylists(context: Context, userId: Long): List<PlaylistDTO> = withContext(Dispatchers.IO) {
+        // Fallback to suspend version for compatibility if needed, but UI should use Flow
+        refreshUserPlaylists(context, userId)
+        getDao(context).getAllPlaylists().map { it.toDTO() }
+    }
+
+    suspend fun getFavoriteSongs(context: Context, userId: Long): List<SongDTO> = withContext(Dispatchers.IO) {
+        refreshFavoriteSongs(context, userId)
+        getDao(context).getFavoriteSongs().map { it.toDTO() }
     }
 
     suspend fun getLibraryAlbums(context: Context, userId: Long): List<AlbumDTO> = withContext(Dispatchers.IO) {
-        if (!NetworkHelper.isNetworkAvailable(context)) {
-            val downloadedSongs = com.example.sonus.DownloadManager.getDownloadedSongs(context)
-            
-            // Collect all unique albumIds from downloaded songs
-            val downloadedAlbumIds = downloadedSongs.mapNotNull { it.albumId }.toMutableSet()
-            
-            val cachedLibraryAlbums = LibraryCacheManager.getCachedAlbums(context)
-            
-            // Build result list
-            val result = mutableListOf<AlbumDTO>()
-            
-            // 1. Add albums that are in the user's library AND have downloaded songs
-            cachedLibraryAlbums.forEach { album ->
-                if (album.id in downloadedAlbumIds) {
-                    result.add(album)
-                    downloadedAlbumIds.remove(album.id) // Mark as handled
-                }
-            }
-            
-            // 2. Add albums that have downloaded songs but aren't in the library cache
-            // We look them up in the general album detail cache
-            downloadedAlbumIds.forEach { id ->
-                val detail = LibraryCacheManager.getCachedAlbumDetail(context, id)
-                if (detail != null) {
-                    result.add(detail)
-                } else {
-                    // Try to reconstruct a placeholder from the songs we have
-                    val sampleSong = downloadedSongs.firstOrNull { it.albumId == id }
-                    if (sampleSong != null) {
-                        result.add(AlbumDTO(
-                            id = id,
-                            title = "ALBUM_$id",
-                            artist = sampleSong.artist,
-                            isSaved = false
-                        ))
-                    }
-                }
-            }
-            
-            return@withContext result.distinctBy { it.id }
-        }
-        
-        try {
-            val response = RetrofitClient.albumApi.getLibraryAlbums(userId)
-            if (response.isSuccessful) {
-                val albums = response.body()?.onEach { it.isSaved = true } ?: emptyList()
-                LibraryCacheManager.cacheAlbums(context, albums)
-                albums
-            } else {
-                LibraryCacheManager.getCachedAlbums(context)
-            }
-        } catch (e: Exception) {
-            NetworkMonitor.logError("NET_ERR: ${e.message}")
-            LibraryCacheManager.getCachedAlbums(context)
-        }
+        refreshLibraryAlbums(context, userId)
+        getDao(context).getAllAlbums().map { it.toDTO() }
     }
 
     suspend fun getPlaylistDetails(context: Context, playlistId: Long, userId: Long): PlaylistDTO? = withContext(Dispatchers.IO) {
+        val dao = getDao(context)
         val isNetworkDown = !NetworkHelper.isNetworkAvailable(context)
         
         if (isNetworkDown) {
-            val cached = LibraryCacheManager.getCachedPlaylistDetail(context, playlistId)
-            return@withContext cached?.copy(songs = filterDownloadedOnly(context, cached.songs))
+            val cachedSongs = dao.getSongsForPlaylist(playlistId).map { it.toDTO() }
+            val playlistEntity = dao.getAllPlaylists().find { it.id == playlistId }
+            return@withContext playlistEntity?.toDTO()?.copy(songs = cachedSongs)
         }
 
         try {
@@ -184,36 +218,30 @@ class MusicRepository {
                         playlist = playlist.copy(songs = songsResponse.body())
                     }
                     
-                    // Enrich favorites status if userId provided
-                    if (userId != -1L) {
-                        val favoritesResponse = RetrofitClient.favoriteApi.getFavorites(userId)
-                        if (favoritesResponse.isSuccessful) {
-                            val favoriteIds = favoritesResponse.body()?.map { it.songId }?.toSet() ?: emptySet()
-                            playlist.songs?.forEach { it.isFavorite = favoriteIds.contains(it.id) }
-                        }
-                        
-                        val playlistSongsIds = com.example.sonus.PlaylistHelper.getAllSongsInUserPlaylists(userId)
-                        playlist.songs?.forEach { it.isInPlaylist = playlistSongsIds.contains(it.id) }
-                    }
+                    // Cache
+                    dao.insertPlaylists(listOf(playlist.toEntity()))
+                    val rawSongs = playlist.songs ?: emptyList()
+                    val songsWithMetadata = enrichSongMetadata(context, userId, rawSongs)
                     
-                    LibraryCacheManager.cachePlaylistDetail(context, playlist)
-                    return@withContext playlist
+                    dao.insertSongs(songsWithMetadata.map { it.toEntity() })
+                    dao.insertPlaylistSongs(songsWithMetadata.map { PlaylistSongCrossRef(playlistId, it.id) })
+                    
+                    return@withContext playlist.copy(songs = songsWithMetadata)
                 }
             }
         } catch (e: Exception) {
-            NetworkMonitor.logError("NET_ERR: ${e.message}")
-            val cached = LibraryCacheManager.getCachedPlaylistDetail(context, playlistId)
-            return@withContext cached?.copy(songs = filterDownloadedOnly(context, cached.songs))
+            null
         }
         null
     }
 
     suspend fun getAlbumDetails(context: Context, albumId: Long, userId: Long): AlbumDTO? = withContext(Dispatchers.IO) {
+        val dao = getDao(context)
         val isNetworkDown = !NetworkHelper.isNetworkAvailable(context)
 
         if (isNetworkDown) {
-            val cached = LibraryCacheManager.getCachedAlbumDetail(context, albumId)
-            return@withContext cached?.copy(songs = filterDownloadedOnly(context, cached.songs))
+            val albumEntity = dao.getAllAlbums().find { it.id == albumId }
+            return@withContext albumEntity?.toDTO()
         }
 
         try {
@@ -223,95 +251,77 @@ class MusicRepository {
                 if (album != null) {
                     val songsResponse = RetrofitClient.albumApi.getSongsInAlbum(albumId)
                     if (songsResponse.isSuccessful) {
-                        val songs = songsResponse.body()?.onEach { it.albumId = albumId }
-                        album = album.copy(songs = songs)
+                        album = album.copy(songs = songsResponse.body())
                     }
                     
-                    // Enrich favorites status if userId provided
-                    if (userId != -1L) {
-                        val favoritesResponse = RetrofitClient.favoriteApi.getFavorites(userId)
-                        if (favoritesResponse.isSuccessful) {
-                            val favoriteIds = favoritesResponse.body()?.map { it.songId }?.toSet() ?: emptySet()
-                            album.songs?.forEach { it.isFavorite = favoriteIds.contains(it.id) }
-                        }
-                        
-                        val libraryAlbumsResponse = RetrofitClient.albumApi.getLibraryAlbums(userId)
-                        if (libraryAlbumsResponse.isSuccessful) {
-                            val libraryIds = libraryAlbumsResponse.body()?.map { it.id }?.toSet() ?: emptySet()
-                            album.isSaved = libraryIds.contains(album.id)
-                        }
-                        
-                        val playlistSongsIds = com.example.sonus.PlaylistHelper.getAllSongsInUserPlaylists(userId)
-                        album.songs?.forEach { it.isInPlaylist = playlistSongsIds.contains(it.id) }
-                    }
+                    dao.insertAlbums(listOf(album.toEntity()))
+                    val rawSongs = album.songs?.onEach { it.albumId = albumId } ?: emptyList()
+                    val songsWithMetadata = enrichSongMetadata(context, userId, rawSongs)
                     
-                    LibraryCacheManager.cacheAlbumDetail(context, album)
-                    return@withContext album
+                    // Save to cache
+                    dao.insertSongs(songsWithMetadata.map { it.toEntity() })
+                    
+                    return@withContext album.copy(songs = songsWithMetadata)
                 }
             }
         } catch (e: Exception) {
-            NetworkMonitor.logError("NET_ERR: ${e.message}")
-            val cached = LibraryCacheManager.getCachedAlbumDetail(context, albumId)
-            return@withContext cached?.copy(songs = filterDownloadedOnly(context, cached.songs))
+            null
         }
         null
     }
 
-    suspend fun toggleFavorite(userId: Long, songId: Long): Boolean? = withContext(Dispatchers.IO) {
+    suspend fun toggleFavorite(context: Context, userId: Long, song: SongDTO): Boolean? = withContext(Dispatchers.IO) {
+        val dao = getDao(context)
+        
+        // Optimistic update in DB
+        val newStatus = !song.isFavorite
+        dao.updateFavorite(song.id, newStatus)
+        
         try {
-            val response = RetrofitClient.favoriteApi.toggleFavorite(userId, songId)
+            val response = RetrofitClient.favoriteApi.toggleFavorite(userId, song.id)
             if (response.isSuccessful) {
                 response.body()?.get("added")
-            } else null
+            } else {
+                dao.insertSyncAction(SyncAction(actionType = "TOGGLE_FAVORITE", songId = song.id))
+                newStatus
+            }
         } catch (e: Exception) {
-            null
+            dao.insertSyncAction(SyncAction(actionType = "TOGGLE_FAVORITE", songId = song.id))
+            newStatus
         }
     }
     
-    /**
-     * Centralized method to enrich songs with their favorite and playlist status.
-     * This reduces redundant code in Fragments.
-     */
-    suspend fun enrichSongMetadata(userId: Long, songs: List<SongDTO>): List<SongDTO> = withContext(Dispatchers.IO) {
-        if (userId == -1L) return@withContext songs
+    suspend fun enrichSongMetadata(context: Context, userId: Long, songs: List<SongDTO>): List<SongDTO> = withContext(Dispatchers.IO) {
+        val dao = getDao(context)
+        val favoriteIds = dao.getFavoriteSongs().map { it.id }.toSet()
+        val inPlaylistIds = dao.getAllSongIdsInPlaylists().toSet()
         
-        try {
-            coroutineScope {
-                val favoritesDeferred = async { RetrofitClient.favoriteApi.getFavorites(userId) }
-                val playlistsResponse = RetrofitClient.playlistApi.getUserPlaylists(userId)
-                
-                val favorites = try {
-                    val favRes = favoritesDeferred.await()
-                    if (favRes.isSuccessful) {
-                        favRes.body()?.map { it.songId }?.toSet() ?: emptySet()
-                    } else emptySet()
-                } catch (e: Exception) {
-                    emptySet()
-                }
-                
-                // This is still a bit heavy, ideally backend should return this
-                val songIdsInPlaylists = mutableSetOf<Long>()
-                try {
-                    if (playlistsResponse.isSuccessful) {
-                        playlistsResponse.body()?.forEach { playlist ->
-                            val songsInPlaylist = RetrofitClient.playlistApi.getSongsInPlaylist(playlist.id!!)
-                            if (songsInPlaylist.isSuccessful) {
-                                songsInPlaylist.body()?.forEach { songIdsInPlaylists.add(it.id) }
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    // Ignore and proceed with what we have
-                }
-
-                songs.onEach { song ->
-                    song.isFavorite = favorites.contains(song.id)
-                    song.isInPlaylist = songIdsInPlaylists.contains(song.id)
-                }
-            }
-        } catch (e: Exception) {
-            NetworkMonitor.logError("ENRICH_ERR: ${e.message}")
-            songs
+        songs.onEach { song ->
+            song.isFavorite = favoriteIds.contains(song.id)
+            song.isInPlaylist = inPlaylistIds.contains(song.id)
         }
+        songs
+    }
+
+    suspend fun enrichAlbumMetadata(context: Context, albums: List<AlbumDTO>): List<AlbumDTO> = withContext(Dispatchers.IO) {
+        val dao = getDao(context)
+        val savedAlbumIds = dao.getAllAlbums().filter { it.isSaved }.map { it.id }.toSet()
+        
+        albums.onEach { album ->
+            album.isSaved = savedAlbumIds.contains(album.id)
+        }
+        albums
+    }
+
+    // Mapper extensions
+    private fun SongDTO.toEntity() = SongEntity(id, title, artist, duration, coverPath, blurHash, filePath, albumId, isFavorite, isInPlaylist)
+    private fun SongEntity.toDTO() = SongDTO(id, title, artist, duration, coverPath, blurHash, filePath, albumId, isFavorite, isInPlaylist)
+    private fun AlbumDTO.toEntity() = AlbumEntity(id ?: -1L, title, artist, coverPath, blurHash, isSaved)
+    private fun AlbumEntity.toDTO() = AlbumDTO(id, title, artist, coverPath, blurHash, isSaved = isSaved)
+    private fun PlaylistDTO.toEntity() = PlaylistEntity(id ?: -1L, name, description, songCount)
+    private fun PlaylistEntity.toDTO() = PlaylistDTO(id, name, description, songCount = songCount)
+
+    private fun PlaylistWithSongs.toDTO(): PlaylistDTO {
+        return playlist.toDTO().copy(songs = songs.map { it.toDTO() })
     }
 }

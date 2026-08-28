@@ -51,6 +51,7 @@ class HomeFragment : Fragment() {
             }
             // AUTO-REFRESH ARCHIVE on any player state change (like new song played)
             viewModel.loadRecentlyPlayed(
+                requireContext(),
                 sessionManager.getUserId(),
                 RecentlyPlayedManager.getRecentSongs()
             )
@@ -198,6 +199,7 @@ class HomeFragment : Fragment() {
         }
 
         viewModel.loadRecentlyPlayed(
+            requireContext(),
             sessionManager.getUserId(),
             RecentlyPlayedManager.getRecentSongs(),
             isOffline
@@ -222,7 +224,7 @@ class HomeFragment : Fragment() {
     private fun playSong(song: SongDTO) {
         RecentlyPlayedManager.addSong(song)
         val updatedRecentSongs = RecentlyPlayedManager.getRecentSongs()
-        viewModel.loadRecentlyPlayed(sessionManager.getUserId(), updatedRecentSongs)
+        viewModel.loadRecentlyPlayed(requireContext(), sessionManager.getUserId(), updatedRecentSongs)
         mainViewModel.addTerminalLog(getString(R.string.terminal_reel_loaded, song.title.uppercase()))
         
         PlayerState.play(requireContext(), song, updatedRecentSongs)

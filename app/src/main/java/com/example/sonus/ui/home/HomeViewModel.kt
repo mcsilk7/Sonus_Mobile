@@ -17,7 +17,7 @@ class HomeViewModel : ViewModel() {
     private val _isOffline = MutableLiveData<Boolean>(false)
     val isOffline: LiveData<Boolean> = _isOffline
 
-    fun loadRecentlyPlayed(userId: Long, localRecentSongs: List<SongDTO>, offline: Boolean = false) {
+    fun loadRecentlyPlayed(context: android.content.Context, userId: Long, localRecentSongs: List<SongDTO>, offline: Boolean = false) {
         viewModelScope.launch {
             _isOffline.value = offline
             if (offline) {
@@ -25,7 +25,7 @@ class HomeViewModel : ViewModel() {
                 _recentlyPlayed.value = localRecentSongs
             } else {
                 try {
-                    val enrichedSongs = repository.enrichSongMetadata(userId, localRecentSongs)
+                    val enrichedSongs = repository.enrichSongMetadata(context, userId, localRecentSongs)
                     _recentlyPlayed.value = enrichedSongs
                 } catch (e: Exception) {
                     // Fallback to local songs if enrichment fails

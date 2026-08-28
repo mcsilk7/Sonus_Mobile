@@ -180,19 +180,21 @@ class PlaylistDetailFragment : Fragment() {
         }
 
         val firstSong = songs.firstOrNull()
-        val coverUrl = if (firstSong?.coverPath?.startsWith("http") == true) {
-            firstSong.coverPath
-        } else {
-            firstSong?.let { RetrofitClient.BASE_URL + "api/songs/${it.id}/cover" }
+        val coverUrl = when {
+            firstSong?.coverPath?.startsWith("http") == true -> firstSong.coverPath
+            firstSong != null -> RetrofitClient.BASE_URL + "api/songs/${firstSong.id}/cover"
+            else -> null
         }
+        
         val authenticatedUrl = com.example.sonus.network.GlideHelper.getAuthenticatedUrl(requireContext(), coverUrl)
+        val placeholder = com.example.sonus.network.GlideHelper.getBlurHashPlaceholder(requireContext(), firstSong?.blurHash) ?: androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.bg_cover_placeholder)
 
         val radius = resources.getDimensionPixelSize(R.dimen.studio_radius)
 
         com.bumptech.glide.Glide.with(this)
             .load(authenticatedUrl)
-            .placeholder(R.drawable.bg_playlist_head)
-            .error(R.drawable.bg_playlist_head)
+            .placeholder(placeholder)
+            .error(R.drawable.bg_cover_placeholder)
             .transform(com.bumptech.glide.load.resource.bitmap.CenterCrop(), com.bumptech.glide.load.resource.bitmap.RoundedCorners(radius))
             .into(imgCover)
         
@@ -258,9 +260,8 @@ class PlaylistDetailFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val response = RetrofitClient.favoriteApi.toggleFavorite(userId, song.id)
-                if (response.isSuccessful) {
-                    val added = response.body()?.get("added") ?: false
+                val added = repository.toggleFavorite(requireContext(), userId, song)
+                if (added != null) {
                     song.isFavorite = added
                     songAdapter.notifyDataSetChanged()
                 }

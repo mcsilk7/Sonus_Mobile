@@ -70,7 +70,8 @@
     <!-- Download Control -->
     <FrameLayout
         android:layout_width="36dp"
-        android:layout_height="36dp">
+        android:layout_height="36dp"
+        android:layout_marginEnd="4dp">
         <ImageView
             android:id="@+id/btnDownload"
             android:layout_width="match_parent"
@@ -83,12 +84,13 @@
             android:background="?attr/selectableItemBackgroundBorderless" />
         <ProgressBar
             android:id="@+id/downloadProgress"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:layout_gravity="center"
             android:visibility="gone"
             android:indeterminate="false"
-            style="?android:attr/progressBarStyleSmall" />
+            android:progressDrawable="@drawable/bg_download_progress"
+            style="?android:attr/progressBarStyleHorizontal" />
     </FrameLayout>
 
     <!-- Controls -->

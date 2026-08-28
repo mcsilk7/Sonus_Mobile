@@ -14,6 +14,7 @@ data class SongDTO(
     val artist: String,
     val duration: Int? = null,
     val coverPath: String? = null,
+    val blurHash: String? = null,
     val filePath: String? = null,
     var albumId: Long? = null,
     var isFavorite: Boolean = false,
@@ -25,6 +26,7 @@ data class AlbumDTO(
     val title: String,
     val artist: String,
     val coverPath: String? = null,
+    val blurHash: String? = null,
     val songIds: List<Long>? = null,
     val songs: List<SongDTO>? = null, // Added to support 1:M detail view
     var isSaved: Boolean = false
