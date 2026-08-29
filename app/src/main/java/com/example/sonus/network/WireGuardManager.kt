@@ -58,7 +58,7 @@ object WireGuardManager {
                     .build()
 
                 val peer = Peer.Builder()
-                    .addAllowedIp(InetNetwork.parse("0.0.0.0/0"))
+                    .addAllowedIp(InetNetwork.parse("10.0.0.0/24")) // Przekieruj tylko ruch do podsieci VPN (Split Tunneling)
                     .setEndpoint(InetEndpoint.parse(SERVER_ENDPOINT))
                     .parsePublicKey(SERVER_PUBLIC_KEY)
                     .setPersistentKeepalive(25)
