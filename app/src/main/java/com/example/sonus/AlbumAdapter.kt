@@ -17,6 +17,13 @@ class AlbumAdapter(
     private val onAddClick: ((AlbumDTO) -> Unit)? = null
 ) : RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder>() {
 
+    private var isOffline = false
+
+    fun setOfflineMode(offline: Boolean) {
+        this.isOffline = offline
+        notifyDataSetChanged()
+    }
+
     class AlbumViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.tvAlbumName)
         val artist: TextView = view.findViewById(R.id.tvAlbumArtist)
@@ -51,14 +58,29 @@ class AlbumAdapter(
             .centerCrop()
             .into(holder.cover)
 
-        holder.itemView.setOnClickListener { onItemClick(album) }
+        val context = holder.itemView.context
+        val isAlbumDownloaded = album.songIds?.any { id -> 
+            DownloadManager.isSongDownloaded(context, id) 
+        } ?: false
+        
+        val isUnavailable = isOffline && !isAlbumDownloaded
+        
+        if (isUnavailable) {
+            holder.itemView.alpha = 0.4f
+        } else {
+            holder.itemView.alpha = 1.0f
+        }
+
+        holder.itemView.setOnClickListener { 
+            if (!isUnavailable) onItemClick(album) 
+        }
         
         // Always show the add to library button for consistency with songs
         holder.btnAdd.visibility = View.VISIBLE
         holder.btnAdd.text = if (album.isSaved) "✓" else "+"
         
         holder.btnAdd.setOnClickListener {
-            onAddClick?.invoke(album)
+            if (!isUnavailable) onAddClick?.invoke(album)
         }
     }
 

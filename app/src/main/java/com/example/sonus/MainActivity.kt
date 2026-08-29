@@ -126,6 +126,7 @@ class MainActivity : AppCompatActivity() {
         // Global Navigation Click Listeners (Bottom Nav)
         // Since we are not using standard BottomNavigationView menu, we handle clicks manually
         setupGlobalNavigation(navController)
+        checkForUpdates()
 
         // Observe Network Errors for Terminal
         lifecycleScope.launch {
@@ -193,6 +194,38 @@ class MainActivity : AppCompatActivity() {
         tvSearch.setTextColor(if (currentPageIndex == 1) accent else dark)
         tvLibrary.setTextColor(if (currentPageIndex == 2) accent else dark)
         tvSettings.setTextColor(if (currentPageIndex == 3) accent else dark)
+    }
+
+    private fun checkForUpdates() {
+        lifecycleScope.launch {
+            try {
+                val response = com.example.sonus.network.RetrofitClient.githubApi.getLatestRelease()
+                if (response.isSuccessful) {
+                    val release = response.body()
+                    if (release != null) {
+                        val currentVersion = BuildConfig.VERSION_NAME
+                        val newVersion = release.tagName.removePrefix("v")
+                        
+                        if (newVersion != currentVersion) {
+                            viewModel.addTerminalLog("SYSTEM_UPDATE_AVAILABLE: v$newVersion")
+                            viewModel.addTerminalLog("INITIATING_OPERATOR_CHOICE...")
+                            
+                            androidx.appcompat.app.AlertDialog.Builder(this@MainActivity)
+                                .setTitle("Dostępna Aktualizacja v$newVersion")
+                                .setMessage("Nowa wersja systemu jest gotowa do instalacji. Pobrać teraz?")
+                                .setPositiveButton("::DOWNLOAD") { _, _ ->
+                                    viewModel.addTerminalLog("UPGRADE_SEQUENCE_STARTED")
+                                    com.example.sonus.network.UpdateManager.checkAndDownloadUpdate(this@MainActivity, release)
+                                }
+                                .setNegativeButton("[ ABORT ]", null)
+                                .show()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("SonusUpdate", "Update check failed", e)
+            }
+        }
     }
 
     override fun onDestroy() {

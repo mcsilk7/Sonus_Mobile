@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,12 +25,14 @@ import kotlinx.coroutines.launch
 
 class PlaylistDetailFragment : Fragment() {
 
+    private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var tvName: TextView
     private lateinit var tvDescription: TextView
     private lateinit var rvSongs: RecyclerView
     private lateinit var btnBack: View
     private lateinit var btnDelete: ImageView
     private lateinit var imgCover: ImageView
+    private lateinit var fabPlay: com.google.android.material.floatingactionbutton.FloatingActionButton
     
     private lateinit var songAdapter: SongAdapter
     private lateinit var sessionManager: SessionManager
@@ -65,20 +68,39 @@ class PlaylistDetailFragment : Fragment() {
         setupRecyclerView()
         fetchPlaylistDetails()
         applyThemeStrings(view)
+        
+        mainViewModel.isOfflineMode.observe(viewLifecycleOwner) { isOffline ->
+            view.findViewById<View>(R.id.tvPlaylistOfflineStatus).visibility = if (isOffline) View.VISIBLE else View.GONE
+            songAdapter.notifyDataSetChanged()
+            updateFabState()
+        }
+
         observeDownloads()
+    }
+
+    private fun updateFabState() {
+        val context = context ?: return
+        val isOffline = mainViewModel.isOfflineMode.value == true
+        val firstSong = songAdapter.getSongs().firstOrNull()
+        
+        if (isOffline && firstSong != null && !DownloadManager.isSongDownloaded(context, firstSong.id)) {
+            fabPlay.alpha = 0.5f
+            fabPlay.isClickable = false
+        } else {
+            fabPlay.alpha = 1.0f
+            fabPlay.isClickable = true
+        }
     }
 
     private fun observeDownloads() {
         DownloadManager.downloadProgress.observe(viewLifecycleOwner) { progressMap ->
             songAdapter.setDownloadProgress(progressMap)
+            updateFabState()
         }
     }
 
     private fun applyThemeStrings(view: View) {
         val context = requireContext()
-        val isOffline = !NetworkHelper.isNetworkAvailable(context)
-        
-        view.findViewById<View>(R.id.tvPlaylistOfflineStatus).visibility = if (isOffline) View.VISIBLE else View.GONE
 
         view.findViewById<TextView>(R.id.tvPlaylistHeaderTop).text = LabelProvider.getLabel(context, "playlist_detail_top")
         view.findViewById<TextView>(R.id.tvPlaylistHeaderMain).text = LabelProvider.getLabel(context, "playlist_detail_main")
@@ -93,6 +115,7 @@ class PlaylistDetailFragment : Fragment() {
         btnBack = view.findViewById(R.id.btnBack)
         btnDelete = view.findViewById(R.id.btnDeletePlaylist)
         imgCover = view.findViewById(R.id.imgPlaylistCoverLarge)
+        fabPlay = view.findViewById(R.id.fabPlayPlaylist)
 
         btnBack.setOnClickListener { findNavController().popBackStack() }
         btnDelete.setOnClickListener { confirmDeletePlaylist() }
@@ -101,7 +124,7 @@ class PlaylistDetailFragment : Fragment() {
             showSortDialog()
         }
 
-        view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabPlayPlaylist).setOnClickListener {
+        fabPlay.setOnClickListener {
             songAdapter.getSongs().firstOrNull()?.let { playSong(it) }
         }
     }
@@ -201,6 +224,7 @@ class PlaylistDetailFragment : Fragment() {
         songs.forEach { it.isInPlaylist = true }
         originalSongs = songs
         applyCurrentSort()
+        updateFabState()
     }
 
     private fun applyCurrentSort() {

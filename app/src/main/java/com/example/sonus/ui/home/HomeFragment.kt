@@ -92,6 +92,13 @@ class HomeFragment : Fragment() {
         observeViewModel()
         applyThemeStrings(view)
         observeDownloads()
+        
+        mainViewModel.isOfflineMode.observe(viewLifecycleOwner) { isOffline ->
+            view.findViewById<View>(R.id.tvOfflineStatus).visibility = if (isOffline) View.VISIBLE else View.GONE
+            if (::tapeAdapter.isInitialized) {
+                tapeAdapter.notifyDataSetChanged()
+            }
+        }
     }
 
     private fun observeDownloads() {

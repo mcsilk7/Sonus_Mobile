@@ -77,4 +77,12 @@ object RetrofitClient {
     val favoriteApi: FavoriteApi by lazy { retrofit.create(FavoriteApi::class.java) }
     val albumApi: AlbumApi by lazy { retrofit.create(AlbumApi::class.java) }
     val songApi: SongApi by lazy { retrofit.create(SongApi::class.java) }
+
+    val githubApi: GithubApi by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://api.github.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(GithubApi::class.java)
+    }
 }

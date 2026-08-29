@@ -86,6 +86,9 @@ class LibraryFragment : Fragment() {
 
         mainViewModel.isOfflineMode.observe(viewLifecycleOwner) { isOffline ->
             view.findViewById<View>(R.id.tvLibOfflineStatus).visibility = if (isOffline) View.VISIBLE else View.GONE
+            playlistAdapter.setOfflineMode(isOffline)
+            albumAdapter.setOfflineMode(isOffline)
+            
             view.findViewById<TextView>(R.id.tvLibHeaderMain).apply {
                 text = LabelProvider.getLabel(requireContext(), "library_header_main")
                 setTextColor(ContextCompat.getColor(requireContext(), R.color.studio_amber))

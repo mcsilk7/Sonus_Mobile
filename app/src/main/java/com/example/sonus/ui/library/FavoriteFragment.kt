@@ -46,6 +46,9 @@ class FavoriteFragment : Fragment() {
         
         mainViewModel.isOfflineMode.observe(viewLifecycleOwner) { isOffline ->
             view.findViewById<View>(R.id.tvFavoriteOfflineStatus).visibility = if (isOffline) View.VISIBLE else View.GONE
+            if (::songAdapter.isInitialized) {
+                songAdapter.notifyDataSetChanged()
+            }
         }
 
         val fabPlay = view.findViewById<View>(R.id.fabPlayFavorites)

@@ -20,6 +20,13 @@ class PlaylistAdapter(
     private val onLongClick: ((PlaylistDTO) -> Unit)? = null
 ) : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>() {
 
+    private var isOffline = false
+
+    fun setOfflineMode(offline: Boolean) {
+        this.isOffline = offline
+        notifyDataSetChanged()
+    }
+
     class PlaylistViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.tvPlaylistName)
         val count: TextView = view.findViewById(R.id.tvPlaylistCount)
@@ -104,12 +111,29 @@ class PlaylistAdapter(
             }
         }
 
-        holder.itemView.setOnClickListener { onItemClick(playlist) }
+        // Offline State
+        val isPlaylistDownloaded = playlist.songs?.any { song -> 
+            DownloadManager.isSongDownloaded(context, song.id) 
+        } ?: false
+        
+        val isUnavailable = isOffline && !isPlaylistDownloaded
+        
+        if (isUnavailable) {
+            holder.itemView.alpha = 0.4f
+        } else {
+            holder.itemView.alpha = 1.0f
+        }
+
+        holder.itemView.setOnClickListener { 
+            if (!isUnavailable) onItemClick(playlist) 
+        }
 
         if (onLongClick != null) {
             holder.itemView.setOnLongClickListener {
-                onLongClick.invoke(playlist)
-                true
+                if (!isUnavailable) {
+                    onLongClick.invoke(playlist)
+                    true
+                } else false
             }
         }
     }
