@@ -17,7 +17,7 @@ object WireGuardManager {
     private val SERVER_PUBLIC_KEY = BuildConfig.WG_SERVER_PUBLIC_KEY
     private val SERVER_ENDPOINT = BuildConfig.WG_SERVER_ENDPOINT
     private val CLIENT_PRIVATE_KEY = BuildConfig.WG_CLIENT_PRIVATE_KEY
-    private const val TUNNEL_NAME = "sonus_wg"
+    private const val TUNNEL_NAME = "SonusVPN"
     // ------------------------
 
     private var backend: Backend? = null

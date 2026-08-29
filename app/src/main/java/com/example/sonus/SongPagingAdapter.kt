@@ -75,6 +75,19 @@ class SongPagingAdapter(
 
         val progress = downloadProgressMap[song.id]
         val isDownloaded = DownloadManager.isSongDownloaded(context, song.id)
+        val isOnline = NetworkHelper.isNetworkAvailable(context)
+        
+        val isUnavailable = !isOnline && !isDownloaded
+        
+        if (isUnavailable) {
+            holder.root.alpha = 0.4f
+            holder.itemView.isClickable = false
+            holder.itemView.isFocusable = false
+        } else {
+            holder.root.alpha = 1.0f
+            holder.itemView.isClickable = true
+            holder.itemView.isFocusable = true
+        }
         
         if (progress != null) {
             if (holder.progressBar.visibility == View.GONE) {
@@ -110,7 +123,9 @@ class SongPagingAdapter(
             }
         }
 
-        holder.btnDownload.setOnClickListener { onDownloadClick?.invoke(song) }
+        holder.btnDownload.setOnClickListener { 
+            if (isOnline) onDownloadClick?.invoke(song) 
+        }
 
         val coverUrl = if (song.coverPath?.startsWith("http") == true) song.coverPath else RetrofitClient.BASE_URL + "api/songs/${song.id}/cover"
         val authenticatedUrl = GlideHelper.getAuthenticatedUrl(context, coverUrl)
@@ -126,13 +141,19 @@ class SongPagingAdapter(
             .transform(CenterCrop(), RoundedCorners(radius))
             .into(holder.cover)
 
-        holder.itemView.setOnClickListener { onItemClick(song) }
+        holder.itemView.setOnClickListener { 
+            if (!isUnavailable) onItemClick(song) 
+        }
         holder.btnAdd.visibility = View.VISIBLE
         holder.btnAdd.text = if (song.isInPlaylist) "✓" else "+"
-        holder.btnAdd.setOnClickListener { onAddClick?.invoke(song) }
+        holder.btnAdd.setOnClickListener { 
+            if (!isUnavailable) onAddClick?.invoke(song) 
+        }
 
         if (onFavoriteClick != null) {
-            holder.btnFavorite.setOnClickListener { onFavoriteClick(song) }
+            holder.btnFavorite.setOnClickListener { 
+                if (!isUnavailable) onFavoriteClick(song) 
+            }
         }
     }
 

@@ -24,8 +24,8 @@ android {
         applicationId = "com.example.sonus"
         minSdk = 24
         targetSdk = 37
-        versionCode = 3
-        versionName = "2.1.0"
+        versionCode = 4
+        versionName = "2.2.0"
 
         buildConfigField("String", "WG_SERVER_PUBLIC_KEY", "${localProperties.getProperty("WG_SERVER_PUBLIC_KEY") ?: "\"\""}")
         buildConfigField("String", "WG_SERVER_ENDPOINT", "${localProperties.getProperty("WG_SERVER_ENDPOINT") ?: "\"\""}")

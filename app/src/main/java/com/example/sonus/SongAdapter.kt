@@ -80,7 +80,20 @@ class SongAdapter(
         // Download State
         val progress = downloadProgressMap[song.id]
         val isDownloaded = DownloadManager.isSongDownloaded(context, song.id)
+        val isOnline = NetworkHelper.isNetworkAvailable(context)
         
+        val isUnavailable = !isOnline && !isDownloaded
+        
+        if (isUnavailable) {
+            holder.root.alpha = 0.4f
+            holder.itemView.isClickable = false
+            holder.itemView.isFocusable = false
+        } else {
+            holder.root.alpha = 1.0f
+            holder.itemView.isClickable = true
+            holder.itemView.isFocusable = true
+        }
+
         if (progress != null) {
             if (holder.progressBar.visibility == View.GONE) {
                 holder.btnDownload.visibility = View.GONE
@@ -116,7 +129,9 @@ class SongAdapter(
             }
         }
 
-        holder.btnDownload.setOnClickListener { onDownloadClick?.invoke(song) }
+        holder.btnDownload.setOnClickListener { 
+            if (isOnline) onDownloadClick?.invoke(song) 
+        }
 
         // Load cover image
         val coverUrl = if (song.coverPath?.startsWith("http") == true) {
@@ -137,25 +152,31 @@ class SongAdapter(
             .transform(CenterCrop(), RoundedCorners(radius))
             .into(holder.cover)
 
-        holder.itemView.setOnClickListener { onItemClick(song) }
+        holder.itemView.setOnClickListener { 
+            if (!isUnavailable) onItemClick(song) 
+        }
         
         holder.btnAdd.visibility = View.VISIBLE
         holder.btnAdd.text = if (song.isInPlaylist) "✓" else "+"
         
         holder.btnAdd.setOnClickListener {
-            onAddClick?.invoke(song)
+            if (!isUnavailable) onAddClick?.invoke(song)
         }
 
         if (onFavoriteClick != null) {
-            holder.btnFavorite.setOnClickListener { onFavoriteClick(song) }
+            holder.btnFavorite.setOnClickListener { 
+                if (!isUnavailable) onFavoriteClick(song) 
+            }
         } else {
             holder.btnFavorite.setOnClickListener(null)
         }
 
         if (onLongClick != null) {
             holder.itemView.setOnLongClickListener {
-                onLongClick(song)
-                true
+                if (!isUnavailable) {
+                    onLongClick(song)
+                    true
+                } else false
             }
         } else {
             holder.itemView.setOnLongClickListener(null)

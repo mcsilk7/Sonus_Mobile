@@ -75,7 +75,19 @@ class TapeReelAdapter(
             .transform(CenterCrop())
             .into(holder.imgCover)
 
-        holder.itemView.setOnClickListener { onItemClick(song) }
+        val isDownloaded = com.example.sonus.DownloadManager.isSongDownloaded(context, song.id)
+        val isOnline = com.example.sonus.NetworkHelper.isNetworkAvailable(context)
+        val isUnavailable = !isOnline && !isDownloaded
+        
+        if (isUnavailable) {
+            holder.itemView.alpha = 0.4f
+        } else {
+            holder.itemView.alpha = 1.0f
+        }
+
+        holder.itemView.setOnClickListener { 
+            if (!isUnavailable) onItemClick(song) 
+        }
     }
 
     override fun getItemCount() = songs.size
