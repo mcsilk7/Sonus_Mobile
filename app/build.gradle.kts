@@ -24,12 +24,12 @@ android {
         applicationId = "com.example.sonus"
         minSdk = 24
         targetSdk = 37
-        versionCode = 4
-        versionName = "2.2.0"
+        versionCode = 5
+        versionName = "2.2.1"
 
-        buildConfigField("String", "WG_SERVER_PUBLIC_KEY", "${localProperties.getProperty("WG_SERVER_PUBLIC_KEY") ?: "\"\""}")
-        buildConfigField("String", "WG_SERVER_ENDPOINT", "${localProperties.getProperty("WG_SERVER_ENDPOINT") ?: "\"\""}")
-        buildConfigField("String", "WG_CLIENT_PRIVATE_KEY", "${localProperties.getProperty("WG_CLIENT_PRIVATE_KEY") ?: "\"\""}")
+        buildConfigField("String", "WG_SERVER_PUBLIC_KEY", "\"${localProperties.getProperty("WG_SERVER_PUBLIC_KEY") ?: ""}\"")
+        buildConfigField("String", "WG_SERVER_ENDPOINT", "\"${localProperties.getProperty("WG_SERVER_ENDPOINT") ?: ""}\"")
+        buildConfigField("String", "WG_CLIENT_PRIVATE_KEY", "\"${localProperties.getProperty("WG_CLIENT_PRIVATE_KEY") ?: ""}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
