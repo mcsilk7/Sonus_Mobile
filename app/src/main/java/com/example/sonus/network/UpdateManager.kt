@@ -8,13 +8,20 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
-import androidx.core.content.FileProvider
+import androidx.core.content.ContextCompat
 import com.example.sonus.BuildConfig
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.io.File
 
 object UpdateManager {
     private const val TAG = "SonusUpdate"
     private var downloadId: Long = -1
+    private val updateScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    private val _downloadProgress = MutableStateFlow<Int>(-1)
+    val downloadProgress: StateFlow<Int> = _downloadProgress
 
     fun checkAndDownloadUpdate(context: Context, latestRelease: GithubRelease) {
         val currentVersion = BuildConfig.VERSION_NAME
@@ -43,48 +50,97 @@ object UpdateManager {
     }
 
     private fun startDownload(context: Context, url: String, version: String) {
+        _downloadProgress.value = 0
+        val fileName = "SonusUpdate.apk"
         val request = DownloadManager.Request(Uri.parse(url))
             .setTitle("Sonus System Update v$version")
             .setDescription("Downloading technical upgrade...")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "sonus_update_$version.apk")
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
             .setAllowedOverMetered(true)
             .setAllowedOverRoaming(true)
 
         val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         downloadId = dm.enqueue(request)
         
+        startProgressPolling(context, downloadId)
+        
         // Register receiver for when download is done
         val onComplete = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context, intent: Intent) {
                 val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+                Log.d(TAG, "Download complete received for ID: $id (expected: $downloadId)")
                 if (id == downloadId) {
-                    installApk(ctx, version)
+                    _downloadProgress.value = 100
+                    installApk(ctx, id)
                     ctx.unregisterReceiver(this)
                 }
             }
         }
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_EXPORTED)
-        } else {
-            context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+        ContextCompat.registerReceiver(
+            context,
+            onComplete,
+            IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
+            ContextCompat.RECEIVER_EXPORTED
+        )
+    }
+
+    private fun startProgressPolling(context: Context, id: Long) {
+        updateScope.launch {
+            val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            var downloading = true
+            while (downloading) {
+                val query = DownloadManager.Query().setFilterById(id)
+                val cursor = dm.query(query)
+                if (cursor != null && cursor.moveToFirst()) {
+                    val statusIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+                    if (statusIndex != -1) {
+                        val status = cursor.getInt(statusIndex)
+                        if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                            _downloadProgress.value = 100
+                            downloading = false
+                        } else if (status == DownloadManager.STATUS_FAILED) {
+                            _downloadProgress.value = -1
+                            downloading = false
+                        } else {
+                            val downloadedIndex = cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)
+                            val totalIndex = cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)
+                            if (downloadedIndex != -1 && totalIndex != -1) {
+                                val downloaded = cursor.getLong(downloadedIndex)
+                                val total = cursor.getLong(totalIndex)
+                                if (total > 0) {
+                                    val progress = ((downloaded * 100L) / total).toInt()
+                                    _downloadProgress.value = progress
+                                }
+                            }
+                        }
+                    }
+                }
+                cursor?.close()
+                delay(500) // Poll every 500ms
+            }
         }
     }
 
-    private fun installApk(context: Context, version: String) {
-        val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "sonus_update_$version.apk")
-        // Note: For public directory we need a different approach, let's use the safer one
-        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val apkFile = File(downloadsDir, "sonus_update_$version.apk")
+    private fun installApk(context: Context, id: Long) {
+        val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val uri = dm.getUriForDownloadedFile(id)
+        
+        Log.d(TAG, "Installing APK from URI: $uri")
 
-        if (apkFile.exists()) {
-            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", apkFile)
+        if (uri != null) {
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(uri, "application/vnd.android.package-archive")
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            context.startActivity(intent)
+            try {
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to start install activity", e)
+            }
+        } else {
+            Log.e(TAG, "Download URI is null, cannot install.")
         }
     }
 }

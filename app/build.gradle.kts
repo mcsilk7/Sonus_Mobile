@@ -80,4 +80,6 @@ dependencies {
 
     // WireGuard
     implementation(libs.wireguard.tunnel)
+
+    testImplementation(libs.junit)
 }

@@ -216,6 +216,7 @@ class MainActivity : AppCompatActivity() {
                                 .setPositiveButton("::DOWNLOAD") { _, _ ->
                                     viewModel.addTerminalLog("UPGRADE_SEQUENCE_STARTED")
                                     com.example.sonus.network.UpdateManager.checkAndDownloadUpdate(this@MainActivity, release)
+                                    showUpdateProgressDialog(newVersion)
                                 }
                                 .setNegativeButton("[ ABORT ]", null)
                                 .show()
@@ -224,6 +225,39 @@ class MainActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 android.util.Log.e("SonusUpdate", "Update check failed", e)
+            }
+        }
+    }
+
+    private fun showUpdateProgressDialog(version: String) {
+        val dialogView = android.view.LayoutInflater.from(this).inflate(R.layout.dialog_update_progress, null)
+        val progressBar = dialogView.findViewById<android.widget.ProgressBar>(R.id.updateProgressBar)
+        val statusText = dialogView.findViewById<android.widget.TextView>(R.id.tvUpdateStatus)
+        val titleText = dialogView.findViewById<android.widget.TextView>(R.id.tvUpdateTitle)
+        
+        titleText.text = "UPGRADING_TO_V$version"
+        
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+            
+        dialog.show()
+        
+        lifecycleScope.launch {
+            com.example.sonus.network.UpdateManager.downloadProgress.collect { progress ->
+                if (progress in 0..100) {
+                    progressBar.progress = progress
+                    statusText.text = "$progress%"
+                    if (progress == 100) {
+                        viewModel.addTerminalLog("UPGRADE_DOWNLOAD_COMPLETE")
+                        dialog.dismiss()
+                    }
+                } else if (progress == -1 && progressBar.progress > 0) {
+                    // Fallback if failed
+                    viewModel.addTerminalLog("UPGRADE_SEQUENCE_ERROR")
+                    dialog.dismiss()
+                }
             }
         }
     }

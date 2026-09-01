@@ -11,6 +11,7 @@ work = "2.11.2"
 lifecycle = "2.8.4"
 paging = "3.3.2"
 wireguard = "1.0.20260102"
+junit = "4.13.2"
 
 ksp = "2.1.10-1.0.30"
 [libraries]
@@ -29,6 +30,7 @@ androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecy
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
 wireguard-tunnel = { group = "com.wireguard.android", name = "tunnel", version.ref = "wireguard" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

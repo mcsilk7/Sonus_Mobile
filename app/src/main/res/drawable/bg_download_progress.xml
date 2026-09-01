@@ -1,26 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
-        <shape android:shape="ring"
-            android:thickness="2dp"
-            android:useLevel="false">
+        <shape>
             <solid android:color="#22FFFFFF" />
+            <corners android:radius="2dp" />
         </shape>
     </item>
     <item android:id="@android:id/progress">
-        <rotate
-            android:fromDegrees="270"
-            android:toDegrees="270">
-            <shape
-                android:shape="ring"
-                android:thickness="2dp"
-                android:useLevel="true">
-                <gradient
-                    android:type="sweep"
-                    android:useLevel="false"
-                    android:startColor="?attr/sonusAccentColor"
-                    android:endColor="?attr/sonusAccentColor" />
+        <clip>
+            <shape>
+                <solid android:color="#E8A13A" />
+                <corners android:radius="2dp" />
             </shape>
-        </rotate>
+        </clip>
     </item>
 </layer-list>

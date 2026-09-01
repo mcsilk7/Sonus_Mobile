@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="#14120F">
+
+    <TextView
+        android:id="@+id/tvUpdateTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SIGNAL_UPGRADE_IN_PROGRESS"
+        android:textColor="#E8A13A"
+        android:fontFamily="monospace"
+        android:textSize="14sp"
+        android:layout_marginBottom="16dp"/>
+
+    <ProgressBar
+        android:id="@+id/updateProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:progressDrawable="@drawable/bg_download_progress"
+        android:max="100"
+        android:progress="0" />
+
+    <TextView
+        android:id="@+id/tvUpdateStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="8dp"
+        android:text="0%"
+        android:textColor="#E8A13A"
+        android:fontFamily="monospace"
+        android:textSize="12sp" />
+
+</LinearLayout>
