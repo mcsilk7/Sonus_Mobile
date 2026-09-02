@@ -37,7 +37,7 @@ class PlaylistDetailFragment : Fragment() {
     private lateinit var songAdapter: SongAdapter
     private lateinit var sessionManager: SessionManager
     private lateinit var settingsManager: SettingsManager
-    private val repository = com.example.sonus.repository.MusicRepository()
+    private val repository = com.example.sonus.SonusApp.di.repository
     
     private var playlistId: Long = -1
     private var currentSortOrder = SortOrder.DEFAULT
@@ -174,9 +174,8 @@ class PlaylistDetailFragment : Fragment() {
     }
 
     private fun fetchPlaylistDetails() {
-        val userId = sessionManager.getUserId()
         viewLifecycleOwner.lifecycleScope.launch {
-            val playlist = repository.getPlaylistDetails(requireContext(), playlistId, userId)
+            val playlist = repository.getPlaylistDetails(playlistId)
             if (playlist != null) {
                 populateUI(playlist)
             }
@@ -284,7 +283,7 @@ class PlaylistDetailFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val added = repository.toggleFavorite(requireContext(), userId, song)
+                val added = repository.toggleFavorite(userId, song)
                 if (added != null) {
                     song.isFavorite = added
                     songAdapter.notifyDataSetChanged()

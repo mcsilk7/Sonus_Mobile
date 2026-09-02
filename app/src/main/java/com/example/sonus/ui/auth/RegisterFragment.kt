@@ -11,8 +11,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.sonus.R
+import com.example.sonus.SonusApp
 import com.example.sonus.network.RegisterRequest
-import com.example.sonus.network.RetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -65,16 +65,9 @@ class RegisterFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val response = RetrofitClient.authApi.register(RegisterRequest(username, password))
-                if (response.isSuccessful) {
-                    Toast.makeText(requireContext(), getString(R.string.toast_register_success), Toast.LENGTH_LONG).show()
-                    findNavController().popBackStack()
-                } else {
-                    val errorMessage = response.errorBody()?.string() ?: response.message()
-                    showRegistrationError(getString(R.string.error_registration_failed, errorMessage))
-                }
-            } catch (exception: java.io.IOException) {
-                showRegistrationError(getString(R.string.error_network_check))
+                SonusApp.di.apiService.register(RegisterRequest(username, password))
+                Toast.makeText(requireContext(), getString(R.string.toast_register_success), Toast.LENGTH_LONG).show()
+                findNavController().popBackStack()
             } catch (exception: Exception) {
                 showRegistrationError(getString(R.string.error_generic, exception.localizedMessage))
             } finally {

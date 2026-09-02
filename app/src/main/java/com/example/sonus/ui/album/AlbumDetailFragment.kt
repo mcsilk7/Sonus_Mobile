@@ -37,7 +37,7 @@ class AlbumDetailFragment : Fragment() {
     private lateinit var songAdapter: SongAdapter
     private lateinit var sessionManager: SessionManager
     private lateinit var settingsManager: SettingsManager
-    private val repository = com.example.sonus.repository.MusicRepository()
+    private val repository = com.example.sonus.SonusApp.di.repository
     
     private var albumId: Long = -1
     private var currentAlbum: AlbumDTO? = null
@@ -172,9 +172,8 @@ class AlbumDetailFragment : Fragment() {
     }
 
     private fun fetchAlbumDetails() {
-        val userId = sessionManager.getUserId()
         viewLifecycleOwner.lifecycleScope.launch {
-            val album = repository.getAlbumDetails(requireContext(), albumId, userId)
+            val album = repository.getAlbumDetails(albumId)
             if (album != null) {
                 populateUI(album)
             }
@@ -299,7 +298,7 @@ class AlbumDetailFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val added = repository.toggleFavorite(requireContext(), userId, song)
+                val added = repository.toggleFavorite(userId, song)
                 if (added != null) {
                     song.isFavorite = added
                     songAdapter.notifyDataSetChanged()

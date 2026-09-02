@@ -10,7 +10,7 @@ import com.example.sonus.network.PlaylistDTO
 import com.example.sonus.network.SongDTO
 import com.example.sonus.network.SyncWorker
 import com.example.sonus.SortOrder
-import com.example.sonus.repository.MusicRepository
+import com.example.sonus.SonusApp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,11 +19,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class LibraryViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = MusicRepository()
+    private val repository = SonusApp.di.repository
     
-    val playlists: LiveData<List<PlaylistDTO>> = repository.getPlaylistsFlow(getApplication()).asLiveData()
-    val favoriteSongs: LiveData<List<SongDTO>> = repository.getFavoriteSongsFlow(getApplication()).asLiveData()
-    val libraryAlbums: LiveData<List<AlbumDTO>> = repository.getAlbumsFlow(getApplication()).asLiveData()
+    val playlists: LiveData<List<PlaylistDTO>> = repository.getPlaylistsFlow().asLiveData()
+    val favoriteSongs: LiveData<List<SongDTO>> = repository.getFavoriteSongsFlow().asLiveData()
+    val libraryAlbums: LiveData<List<AlbumDTO>> = repository.getAlbumsFlow().asLiveData()
 
     private val _favoriteSortOrder = MutableStateFlow(SortOrder.DEFAULT)
     val favoriteSortOrder: StateFlow<SortOrder> = _favoriteSortOrder
@@ -35,31 +35,31 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getFavoriteSongsPaging(userId: Long): Flow<PagingData<SongDTO>> {
         return _favoriteSortOrder.flatMapLatest { order ->
-            repository.getFavoriteSongsPaging(getApplication(), userId, order)
+            repository.getFavoriteSongsPaging(userId, order)
         }.cachedIn(viewModelScope)
     }
 
     suspend fun getAllFavoriteSongs(userId: Long): List<SongDTO> {
-        return repository.getFavoriteSongs(getApplication(), userId)
+        return repository.getFavoriteSongs(userId)
     }
 
-    fun fetchLibraryData(context: Context, userId: Long) {
+    fun fetchLibraryData(userId: Long) {
         viewModelScope.launch {
             try {
                 // Trigger refreshes in parallel
-                launch { repository.refreshUserPlaylists(context, userId) }
-                launch { repository.refreshFavoriteSongs(context, userId) }
-                launch { repository.refreshLibraryAlbums(context, userId) }
+                launch { repository.refreshUserPlaylists(userId) }
+                launch { repository.refreshFavoriteSongs(userId) }
+                launch { repository.refreshLibraryAlbums(userId) }
             } catch (e: Exception) {
                 // Logged in repository
             }
         }
     }
 
-    fun toggleFavorite(context: Context, userId: Long, song: SongDTO) {
+    fun toggleFavorite(userId: Long, song: SongDTO) {
         viewModelScope.launch {
             try {
-                repository.toggleFavorite(context, userId, song)
+                repository.toggleFavorite(userId, song)
                 
                 val constraints = Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -69,7 +69,7 @@ class LibraryViewModel(application: Application) : AndroidViewModel(application)
                     .setConstraints(constraints)
                     .build()
                 
-                WorkManager.getInstance(context).enqueueUniqueWork(
+                WorkManager.getInstance(getApplication()).enqueueUniqueWork(
                     "sync_favorites",
                     ExistingWorkPolicy.APPEND_OR_REPLACE,
                     syncRequest

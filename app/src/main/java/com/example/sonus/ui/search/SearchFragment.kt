@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.sonus.*
 import com.example.sonus.network.RetrofitClient
 import com.example.sonus.network.SessionManager
-import com.example.sonus.repository.MusicRepository
+import com.example.sonus.SonusApp
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -35,7 +35,7 @@ class SearchFragment : Fragment() {
     private lateinit var albumAdapter: AlbumAdapter
     
     private lateinit var sessionManager: SessionManager
-    private val repository = MusicRepository()
+    private val repository = SonusApp.di.repository
     private var searchJob: Job? = null
 
     override fun onCreateView(
@@ -77,7 +77,7 @@ class SearchFragment : Fragment() {
             val history = SearchHistoryManager.getHistory()
             if (history.isNotEmpty()) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    val enrichedHistory = repository.enrichSongMetadata(requireContext(), sessionManager.getUserId(), history)
+                    val enrichedHistory = repository.enrichSongMetadata(history)
                     songAdapter.updateData(enrichedHistory)
                     tvSongsHeader.text = getString(R.string.recently_searched)
                     tvSongsHeader.visibility = View.VISIBLE
@@ -129,7 +129,7 @@ class SearchFragment : Fragment() {
             },
             onFavoriteClick = { song ->
                 viewLifecycleOwner.lifecycleScope.launch {
-                    val added = repository.toggleFavorite(requireContext(), sessionManager.getUserId(), song)
+                    val added = repository.toggleFavorite(sessionManager.getUserId(), song)
                     if (added != null) {
                         song.isFavorite = added
                         songAdapter.notifyDataSetChanged()
@@ -204,7 +204,7 @@ class SearchFragment : Fragment() {
 
                 if (songsResponse.isSuccessful) {
                     val songs = songsResponse.body() ?: emptyList()
-                    val enrichedSongs = repository.enrichSongMetadata(requireContext(), sessionManager.getUserId(), songs)
+                    val enrichedSongs = repository.enrichSongMetadata(songs)
                     songAdapter.updateData(enrichedSongs)
                     tvSongsHeader.text = getString(R.string.search_results_songs)
                     tvSongsHeader.visibility = if (songs.isNotEmpty()) View.VISIBLE else View.GONE
@@ -212,7 +212,7 @@ class SearchFragment : Fragment() {
 
                 if (albumsResponse.isSuccessful) {
                     val albums = albumsResponse.body() ?: emptyList()
-                    val enrichedAlbums = repository.enrichAlbumMetadata(requireContext(), albums)
+                    val enrichedAlbums = repository.enrichAlbumMetadata(albums)
                     albumAdapter.updateData(enrichedAlbums)
                     tvAlbumsHeader.visibility = if (enrichedAlbums.isNotEmpty()) View.VISIBLE else View.GONE
                 }

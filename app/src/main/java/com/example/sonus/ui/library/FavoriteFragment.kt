@@ -79,7 +79,7 @@ class FavoriteFragment : Fragment() {
         observeViewModel()
         observeDownloads()
         
-        viewModel.fetchLibraryData(requireContext(), sessionManager.getUserId())
+        viewModel.fetchLibraryData(sessionManager.getUserId())
     }
 
     private fun observeDownloads() {
@@ -101,11 +101,11 @@ class FavoriteFragment : Fragment() {
             },
             onAddClick = { song ->
                 PlaylistHelper.showPlaylistSelectionDialog(requireActivity() as androidx.appcompat.app.AppCompatActivity, viewLifecycleOwner.lifecycleScope, sessionManager.getUserId(), song) {
-                    viewModel.fetchLibraryData(requireContext(), sessionManager.getUserId())
+                    viewModel.fetchLibraryData(sessionManager.getUserId())
                 }
             },
             onFavoriteClick = { song ->
-                viewModel.toggleFavorite(requireContext(), sessionManager.getUserId(), song)
+                viewModel.toggleFavorite(sessionManager.getUserId(), song)
             },
             onDownloadClick = { song ->
                 if (!DownloadManager.isSongDownloaded(requireContext(), song.id)) {

@@ -3,11 +3,11 @@ package com.example.sonus.network
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.example.sonus.db.SonusDatabase
+import com.example.sonus.db.SonusDatabaseProvider
 
 class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
-        val database = SonusDatabase.getDatabase(applicationContext)
+        val database = SonusDatabaseProvider.getDatabase(applicationContext)
         val dao = database.musicDao()
         
         val pendingActions = dao.getPendingSyncActions()

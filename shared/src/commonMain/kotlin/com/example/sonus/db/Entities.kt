@@ -61,7 +61,7 @@ data class SyncAction(
     val songId: Long,
     val albumId: Long? = null,
     val playlistId: Long? = null,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = 0L // Changed to 0L, will handle in repo
 )
 
 @Entity(tableName = "sync_metadata")

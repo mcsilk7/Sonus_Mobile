@@ -1,0 +1,18 @@
+- [ ] Rozszerzenie Warstwy Platformowej (Shared)
+    - [ ] Implementacja DesktopNetworkMonitor w Platform.desktop.kt
+- [ ] Zarządzanie Sesją i Synchronizacja
+    - [ ] Utworzenie DesktopSessionManager.kt
+- [ ] Inicjalizacja Aplikacji (DI)
+    - [ ] Konfiguracja DependencyContainer w Main.kt
+- [ ] Logika Widoków (ViewModels)
+    - [ ] LoginViewModel
+    - [ ] HomeViewModel
+    - [ ] SearchViewModel
+    - [ ] LibraryViewModel
+- [ ] Silnik Audio
+    - [ ] Implementacja DesktopPlayer
+- [ ] Integracja UI z Logiką
+    - [ ] Podpięcie LoginScreen
+    - [ ] Podpięcie HomeScreen
+    - [ ] Podpięcie SearchScreen
+    - [ ] Podpięcie LibraryScreen

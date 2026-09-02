@@ -1,6 +1,7 @@
 package com.example.sonus.network
 
 import android.content.Context
+import com.example.sonus.Config
 import com.example.sonus.NetworkHelper
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -11,10 +12,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-//    const val BASE_URL = "http://192.168.1.77:8080/"//localhost
-//    const val BASE_URL = "http://192.168.1.59:8080/"//localnetwork
-//    const val BASE_URL = "http://100.126.233.66:8080/"//tailscale
-      const val BASE_URL = "http://10.0.0.1:8080/"//wireguard internal ip
+    const val BASE_URL = Config.BASE_URL
 
     private lateinit var sessionManager: SessionManager
     private lateinit var appContext: Context
@@ -26,7 +24,7 @@ object RetrofitClient {
 
     private val okHttpClient by lazy {
         val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.HEADERS // Lowered from BODY to avoid timeouts on slow VPN
+            level = HttpLoggingInterceptor.Level.HEADERS
         }
         
         val cacheSize = (10 * 1024 * 1024).toLong() // 10 MB
@@ -49,7 +47,6 @@ object RetrofitClient {
                 chain.proceed(request)
             }
             .addInterceptor { chain ->
-                // Simple Retry Interceptor
                 var request = chain.request()
                 var response = chain.proceed(request)
                 var tryCount = 0
