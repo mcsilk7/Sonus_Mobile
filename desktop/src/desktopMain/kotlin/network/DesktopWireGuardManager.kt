@@ -2,6 +2,7 @@ package network
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import ui.TerminalManager
 import java.io.File
 import java.util.Properties
 
@@ -32,10 +33,11 @@ object DesktopWireGuardManager {
 
     suspend fun hasPasswordlessAccess(): Boolean = withContext(Dispatchers.IO) {
         try {
+            // Sprawdzamy czy mcsilk może wywołać coś jako sonus bez hasła
             val command = if (isFlatpak()) {
-                listOf("flatpak-spawn", "--host", "sudo", "-n", "wg-quick", "--version")
+                listOf("flatpak-spawn", "--host", "sudo", "-u", "sonus", "-n", "true")
             } else {
-                listOf("sudo", "-n", "wg-quick", "--version")
+                listOf("sudo", "-u", "sonus", "-n", "true")
             }
             val process = ProcessBuilder(command).start()
             process.waitFor() == 0
@@ -45,21 +47,49 @@ object DesktopWireGuardManager {
     }
 
     /**
-     * Próbuje uruchomić skrypt konfiguracyjny
+     * Próbuje uruchomić skrypt konfiguracyjny i zwraca wynik
      */
-    fun runPermissionSetup() {
+    suspend fun runPermissionSetup(): Boolean = withContext(Dispatchers.IO) {
         try {
-            val script = File("scripts/setup_vpn_perms.sh")
-            if (script.exists()) {
-                val command = if (isFlatpak()) {
-                    listOf("flatpak-spawn", "--host", "pkexec", "sh", script.absolutePath)
-                } else {
-                    listOf("pkexec", "sh", script.absolutePath)
-                }
-                ProcessBuilder(command).start()
+            var script = File("scripts/setup_vpn_perms.sh")
+            if (!script.exists()) {
+                script = File("../scripts/setup_vpn_perms.sh")
             }
+            
+            if (!script.exists()) {
+                TerminalManager.addLog("ERROR: SCRIPT_NOT_FOUND")
+                println("VPN Setup Error: Script not found at ${script.absolutePath}")
+                return@withContext false
+            }
+
+            TerminalManager.addLog("SCRIPT_FOUND: ${script.name}")
+            val currentUser = System.getProperty("user.name") ?: "mcsilk"
+            
+            val command = if (isFlatpak()) {
+                listOf("flatpak-spawn", "--host", "pkexec", "sh", script.absolutePath, currentUser)
+            } else {
+                listOf("pkexec", "sh", script.absolutePath, currentUser)
+            }
+            
+            TerminalManager.addLog("AWAITING_AUTH...")
+            val process = ProcessBuilder(command).start()
+            
+            // Log output in background
+            val output = process.inputStream.bufferedReader().readText()
+            val error = process.errorStream.bufferedReader().readText()
+            
+            val exitCode = process.waitFor()
+            TerminalManager.addLog("SETUP_EXIT_CODE: $exitCode")
+            if (exitCode != 0) {
+                println("Output: $output")
+                println("Error: $error")
+            }
+            
+            return@withContext exitCode == 0
         } catch (e: Exception) {
             println("Setup Error: ${e.message}")
+            e.printStackTrace()
+            false
         }
     }
 
@@ -106,15 +136,14 @@ object DesktopWireGuardManager {
                 Runtime.getRuntime().exec(arrayOf("chmod", "600", configFilePath)).waitFor()
             }
 
-            // Używamy tylko sudo. Jeśli nie ma NOPASSWD, polecenie po prostu się nie uda
-            // zamiast pokazywać okno pkexec przy każdym starcie.
-            val sudoTool = "sudo"
+            // Delegujemy do użytkownika 'sonus', który ma uprawnienia do wg-quick
+            val sudoCommand = listOf("sudo", "-u", "sonus", "sudo", "wg-quick", "up", configFilePath)
 
             // Wyjście z piaskownicy Flatpak na hosta (jeśli w niej jesteśmy)
             val command = if (isFlatpak()) {
-                listOf("flatpak-spawn", "--host", sudoTool, "wg-quick", "up", configFilePath)
+                listOf("flatpak-spawn", "--host") + sudoCommand
             } else {
-                listOf(sudoTool, "wg-quick", "up", configFilePath)
+                sudoCommand
             }
 
             val process = ProcessBuilder(command)
@@ -135,12 +164,12 @@ object DesktopWireGuardManager {
     suspend fun stopVpn(): Boolean = withContext(Dispatchers.IO) {
         try {
             val configFilePath = "/tmp/$TUNNEL_NAME.conf"
-            val sudoTool = "sudo"
+            val sudoCommand = listOf("sudo", "-u", "sonus", "sudo", "wg-quick", "down", configFilePath)
 
             val command = if (isFlatpak()) {
-                listOf("flatpak-spawn", "--host", sudoTool, "wg-quick", "down", configFilePath)
+                listOf("flatpak-spawn", "--host") + sudoCommand
             } else {
-                listOf(sudoTool, "wg-quick", "down", configFilePath)
+                sudoCommand
             }
 
             val process = ProcessBuilder(command)

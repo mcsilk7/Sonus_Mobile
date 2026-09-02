@@ -18,54 +18,54 @@ import ui.theme.*
 
 @Composable
 fun VpnSetupDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onConfirm: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
+    Card(
         backgroundColor = StudioBgPanel,
         shape = RoundedCornerShape(16.dp),
-        title = {
+        modifier = Modifier.width(450.dp).padding(16.dp),
+        elevation = 8.dp
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Security, contentDescription = null, tint = StudioAmber)
                 Spacer(modifier = Modifier.width(12.dp))
-                Text("Konfiguracja Automatycznego VPN", color = StudioText, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text("Konfiguracja VPN", color = StudioText, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             }
-        },
-        text = {
-            Column {
-                Text(
-                    "Sonus wymaga uprawnień do zarządzania tunelem WireGuard. " +
-                    "Czy chcesz skonfigurować automatyczne logowanie VPN, aby nie wpisywać hasła przy każdym uruchomieniu aplikacji?",
-                    color = StudioTextDim,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    "Po kliknięciu 'Konfiguruj', system poprosi Cię o podanie hasła administratora raz, aby nadać niezbędne uprawnienia.",
-                    color = StudioTextFaint,
-                    fontSize = 12.sp
-                )
-            }
-        },
-        buttons = {
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(
+                "Sonus wymaga uprawnień do tunelu WireGuard. " +
+                "Skonfiguruj automatyczne logowanie, aby uniknąć haseł w przyszłości.",
+                color = StudioTextDim,
+                fontSize = 14.sp,
+                lineHeight = 20.sp
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(
+                "Po kliknięciu 'Konfiguruj', system poprosi o hasło administratora (tylko raz).",
+                color = StudioTextFaint,
+                fontSize = 12.sp
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             Row(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                horizontalArrangement = Arrangement.End
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
             ) {
-                TextButton(onClick = onDismiss) {
-                    Text("Pomiń", color = StudioTextDim)
-                }
-                Spacer(modifier = Modifier.width(12.dp))
                 Button(
                     onClick = onConfirm,
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = StudioAmber),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Konfiguruj", color = StudioBg, fontWeight = FontWeight.Bold)
+                    Text("KONFIGURUJ DOSTĘP", color = StudioBg, fontWeight = FontWeight.Bold)
                 }
             }
         }
-    )
+    }
 }

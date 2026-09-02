@@ -1,6 +1,7 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -54,88 +55,97 @@ fun main() {
         ) {
             
             SonusTheme {
+                val scope = rememberCoroutineScope()
                 var currentScreen by remember { 
                     mutableStateOf<Screen>(if (DesktopDI.sessionManager.isLoggedIn()) Screen.Home else Screen.Login) 
                 }
                 var isLoggedIn by remember { mutableStateOf(DesktopDI.sessionManager.isLoggedIn()) }
-                var showVpnSetup by remember { mutableStateOf(false) }
+                var showVpnSetup by remember { mutableStateOf(!DesktopDI.sessionManager.isVpnConfigured()) }
 
                 // Auto-connect VPN on startup
                 LaunchedEffect(Unit) {
                     TerminalManager.addLog("SYSTEM_BOOT_SEQUENCE_INITIATED")
                     
-                    val userSonusExists = DesktopWireGuardManager.checkSystemUserExists("sonus")
-                    if (!userSonusExists) {
-                        TerminalManager.addLog("ERROR: SYSTEM_USER 'sonus' NOT_FOUND")
-                        TerminalManager.addLog("VPN_AUTO_CONFIG_UNAVAILABLE")
-                    }
-
-                    val hasAccess = DesktopWireGuardManager.hasPasswordlessAccess()
-                    
-                    // Jeśli użytkownik 'sonus' istnieje, ale nie mamy uprawnień i nie pytaliśmy jeszcze
-                    if (userSonusExists && !hasAccess && !DesktopDI.sessionManager.isVpnConfigured()) {
-                        showVpnSetup = true
-                        TerminalManager.addLog("VPN_PERMISSIONS: SETUP_REQUIRED")
-                    } else if (hasAccess) {
-                        TerminalManager.addLog("VPN_PERMISSIONS: PASSWORDLESS_OK")
-                        TerminalManager.addLog("ESTABLISHING_SECURE_TUNNEL...")
-                        
-                        val success = DesktopWireGuardManager.startVpn()
-                        if (success) {
-                            TerminalManager.addLog("VPN_LINK_ESTABLISHED: ENCRYPTED")
+                    if (DesktopDI.sessionManager.isVpnConfigured()) {
+                        if (DesktopWireGuardManager.hasPasswordlessAccess()) {
+                            TerminalManager.addLog("VPN_PERMISSIONS: PASSWORDLESS_OK")
+                            TerminalManager.addLog("ESTABLISHING_SECURE_TUNNEL...")
+                            
+                            val success = DesktopWireGuardManager.startVpn()
+                            if (success) {
+                                TerminalManager.addLog("VPN_LINK_ESTABLISHED: ENCRYPTED")
+                            } else {
+                                TerminalManager.addLog("VPN_LINK_FAILED: CHECK_WIREGUARD_STATUS")
+                            }
                         } else {
-                            TerminalManager.addLog("VPN_LINK_FAILED: CHECK_WIREGUARD_STATUS")
+                            TerminalManager.addLog("VPN_PERMISSIONS: MISSING (Setup required again?)")
+                            showVpnSetup = true
                         }
                     } else {
-                        TerminalManager.addLog("VPN_LINK_SKIPPED: NO_AUTO_LOGIN_CONFIG")
+                        TerminalManager.addLog("VPN_PERMISSIONS: FIRST_RUN_SETUP_REQUIRED")
                     }
                 }
 
-                if (showVpnSetup) {
-                    VpnSetupDialog(
-                        onConfirm = {
-                            DesktopWireGuardManager.runPermissionSetup()
-                            DesktopDI.sessionManager.setVpnConfigured(true)
-                            showVpnSetup = false
-                        },
-                        onDismiss = {
-                            DesktopDI.sessionManager.setVpnConfigured(true)
-                            showVpnSetup = false
-                        }
-                    )
-                }
-
-                if (!isLoggedIn) {
-                    LoginScreen(onLoginSuccess = { 
-                        isLoggedIn = true 
-                        currentScreen = Screen.Home 
-                    })
-                } else {
-                    Column(modifier = Modifier.fillMaxSize().background(StudioBg)) {
-                        // Header Bar
-                        HeaderBar()
-
-                        Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                            // Left Sidebar
-                            Sidebar(currentScreen) { currentScreen = it }
-                            
-                            // Main Content
-                            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                                when (currentScreen) {
-                                    is Screen.Home -> HomeScreen()
-                                    is Screen.Search -> SearchScreen()
-                                    is Screen.Library -> LibraryScreen()
-                                    is Screen.Settings -> SettingsScreen()
-                                    else -> {}
+                Box(modifier = Modifier.fillMaxSize()) {
+                    if (!isLoggedIn) {
+                        LoginScreen(onLoginSuccess = { 
+                            isLoggedIn = true 
+                            currentScreen = Screen.Home 
+                        })
+                    } else {
+                        Column(modifier = Modifier.fillMaxSize().background(StudioBg)) {
+                            HeaderBar(onLogout = {
+                                DesktopDI.sessionManager.clearSession()
+                                isLoggedIn = false
+                                currentScreen = Screen.Login
+                            })
+                            Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                                Sidebar(currentScreen) { currentScreen = it }
+                                Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                                    when (currentScreen) {
+                                        is Screen.Home -> HomeScreen()
+                                        is Screen.Search -> SearchScreen()
+                                        is Screen.Library -> LibraryScreen()
+                                        is Screen.Settings -> SettingsScreen()
+                                        else -> {}
+                                    }
                                 }
+                                RightPanel()
                             }
-
-                            // Right Panel
-                            RightPanel()
+                            PlayerBar()
                         }
+                    }
 
-                        // Footer Player Bar
-                        PlayerBar()
+                    // VPN Setup Overlay (Brama wejściowa - "Tylko jedna droga")
+                    if (showVpnSetup) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.8f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            VpnSetupDialog(
+                                onConfirm = {
+                                    scope.launch {
+                                        TerminalManager.addLog("RUNNING_PERM_SETUP...")
+                                        val success = DesktopWireGuardManager.runPermissionSetup()
+                                        if (success) {
+                                            TerminalManager.addLog("KONFIGURACJA_UKONCZONA: SUKCES")
+                                            DesktopDI.sessionManager.setVpnConfigured(true)
+                                            
+                                            // Po sukcesie, od razu odpalamy VPN
+                                            if (DesktopWireGuardManager.hasPasswordlessAccess()) {
+                                                TerminalManager.addLog("ESTABLISHING_SECURE_TUNNEL...")
+                                                DesktopWireGuardManager.startVpn()
+                                            }
+                                            showVpnSetup = false
+                                        } else {
+                                            TerminalManager.addLog("ERROR: SCRIPT_FAILED_OR_NOT_FOUND")
+                                        }
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }

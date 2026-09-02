@@ -18,7 +18,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import ui.Screen
+import ui.DesktopDI
 import ui.theme.*
 
 @Composable
@@ -59,6 +61,11 @@ fun Sidebar(
         SidebarItem("Konto", Icons.Default.Person, false) { }
         SidebarItem("Jakość audio", Icons.Default.HighQuality, currentScreen is Screen.Settings) { onScreenSelected(Screen.Settings) }
         
+        // TEST ONLY: HARD RESET
+        SidebarItem("DEBUG: RESET VPN", Icons.Default.Refresh, false) {
+            DesktopDI.sessionManager.setVpnConfigured(false)
+        }
+        
         Spacer(modifier = Modifier.height(32.dp))
         
         // Terminal feed as small footer
@@ -74,7 +81,13 @@ fun Sidebar(
             if (!hasAccess.value) {
                 Spacer(modifier = Modifier.height(8.dp))
                 androidx.compose.material.TextButton(
-                    onClick = { network.DesktopWireGuardManager.runPermissionSetup() },
+                    onClick = {
+                        scope.launch {
+                            if (network.DesktopWireGuardManager.runPermissionSetup()) {
+                                hasAccess.value = network.DesktopWireGuardManager.hasPasswordlessAccess()
+                            }
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth().height(30.dp),
                     contentPadding = PaddingValues(0.dp)
                 ) {

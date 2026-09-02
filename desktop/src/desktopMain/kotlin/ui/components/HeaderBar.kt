@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import ui.theme.*
 
 @Composable
-fun HeaderBar() {
+fun HeaderBar(onLogout: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -74,8 +75,15 @@ fun HeaderBar() {
             IconButton(onClick = {}) {
                 Icon(Icons.Default.CropSquare, "Maximize", tint = StudioTextDim, modifier = Modifier.size(18.dp))
             }
-            IconButton(onClick = {}) {
-                Icon(Icons.Default.Close, "Close", tint = StudioRed, modifier = Modifier.size(20.dp))
+            
+            // Temporary Logout Button
+            TextButton(
+                onClick = onLogout,
+                colors = ButtonDefaults.textButtonColors(contentColor = StudioRed)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout", modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(4.dp))
+                Text("LOGOUT", fontSize = 12.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
