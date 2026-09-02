@@ -11,10 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ui.viewmodel.SettingsViewModel
 import ui.theme.*
 
 @Composable
 fun SettingsScreen() {
+    val scope = rememberCoroutineScope()
+    val viewModel = remember { SettingsViewModel(scope) }
     val scrollState = rememberScrollState()
 
     Column(
@@ -32,14 +35,20 @@ fun SettingsScreen() {
         )
 
         SettingsSection("INTERFACE_PROTOCOL") {
-            SettingsToggle("DARK_MODE_OVERRIDE", true)
-            SettingsToggle("HI_RES_COVERS", false)
-            SettingsToggle("TERMINAL_LOG_ENABLED", true)
+            SettingsToggle("DARK_MODE_OVERRIDE", true) {}
+            SettingsToggle("HI_RES_COVERS", false) {}
+            SettingsToggle("TERMINAL_LOG_ENABLED", true) {}
         }
 
         SettingsSection("NETWORK_LINK") {
             SettingsSlider("BUFFER_SIZE", 0.5f)
-            SettingsToggle("AUTO_VPN_CONNECT", true)
+            SettingsToggle(
+                label = "ESTABLISH_VPN_TUNNEL", 
+                checked = viewModel.isVpnConnected,
+                isLoading = viewModel.isVpnLoading
+            ) {
+                viewModel.toggleVpn()
+            }
         }
 
         SettingsSection("OPERATOR_DATA") {
@@ -64,18 +73,27 @@ private fun SettingsSection(title: String, content: @Composable ColumnScope.() -
 }
 
 @Composable
-private fun SettingsToggle(label: String, checked: Boolean) {
+private fun SettingsToggle(
+    label: String, 
+    checked: Boolean, 
+    isLoading: Boolean = false,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(label, color = StudioText, fontSize = 16.sp)
-        Switch(
-            checked = checked,
-            onCheckedChange = {},
-            colors = SwitchDefaults.colors(checkedThumbColor = StudioAmber)
-        )
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.size(24.dp), color = StudioAmber, strokeWidth = 2.dp)
+        } else {
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+                colors = SwitchDefaults.colors(checkedThumbColor = StudioAmber)
+            )
+        }
     }
 }
 

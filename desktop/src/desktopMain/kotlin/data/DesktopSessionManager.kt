@@ -10,6 +10,13 @@ class DesktopSessionManager {
         private const val KEY_USERNAME = "username"
         private const val KEY_USER_ID = "user_id"
         private const val KEY_ROLE = "role"
+        private const val KEY_VPN_CONFIGURED = "vpn_configured"
+    }
+
+    fun isVpnConfigured(): Boolean = prefs.getBoolean(KEY_VPN_CONFIGURED, false)
+    fun setVpnConfigured(value: Boolean) {
+        prefs.putBoolean(KEY_VPN_CONFIGURED, value)
+        prefs.flush()
     }
 
     fun saveSession(token: String, username: String, userId: Long, role: String?) {

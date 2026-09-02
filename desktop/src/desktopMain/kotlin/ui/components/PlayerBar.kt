@@ -2,11 +2,7 @@ package ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Slider
-import androidx.compose.material.SliderDefaults
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
@@ -25,82 +21,65 @@ fun PlayerBar() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
-            .background(StudioBgCard)
+            .height(80.dp)
+            .background(StudioBgPanel)
             .padding(horizontal = 24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Song Info
+        // 1. Controls (Left)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = {}) {
+                Icon(Icons.Default.SkipPrevious, "Prev", tint = StudioText, modifier = Modifier.size(28.dp))
+            }
+            IconButton(onClick = { player.togglePlay() }) {
+                Icon(
+                    if (player.isPlaying) Icons.Default.PauseCircleFilled else Icons.Default.PlayCircleFilled, 
+                    "Play", 
+                    tint = StudioAmber, 
+                    modifier = Modifier.size(44.dp)
+                )
+            }
+            IconButton(onClick = {}) {
+                Icon(Icons.Default.SkipNext, "Next", tint = StudioText, modifier = Modifier.size(28.dp))
+            }
+        }
+
+        Spacer(modifier = Modifier.width(32.dp))
+
+        // 2. Progress Center
         Row(
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .background(StudioLine)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(
-                    player.currentSong?.title ?: "STATION_IDLE", 
-                    color = StudioText, 
-                    fontSize = 16.sp, 
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    player.currentSong?.artist ?: "WAITING_FOR_SIGNAL", 
-                    color = StudioTextDim, 
-                    fontSize = 14.sp
-                )
-            }
-        }
-
-        // Controls
-        Column(
-            modifier = Modifier.weight(2f),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = {}) {
-                    Icon(Icons.Default.ArrowBack, "Prev", tint = StudioText, modifier = Modifier.size(32.dp))
-                }
-                IconButton(onClick = { player.togglePlay() }) {
-                    Icon(
-                        if (player.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow, 
-                        "Play", 
-                        tint = StudioAmber, 
-                        modifier = Modifier.size(48.dp)
-                    )
-                }
-                IconButton(onClick = {}) {
-                    Icon(Icons.Default.ArrowForward, "Next", tint = StudioText, modifier = Modifier.size(32.dp))
-                }
-            }
+            Text("01:45", color = StudioTextDim, fontSize = 12.sp)
+            Spacer(modifier = Modifier.width(12.dp))
             Slider(
                 value = player.progress,
                 onValueChange = { player.progress = it },
-                modifier = Modifier.width(400.dp),
+                modifier = Modifier.weight(1f),
                 colors = SliderDefaults.colors(
                     thumbColor = StudioAmber,
                     activeTrackColor = StudioAmber,
                     inactiveTrackColor = StudioLine
                 )
             )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text("04:20", color = StudioTextDim, fontSize = 12.sp)
         }
 
-        // Volume
+        Spacer(modifier = Modifier.width(32.dp))
+
+        // 3. Volume (Right)
         Row(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.width(180.dp)
         ) {
-            Icon(Icons.Default.Notifications, "Volume", tint = StudioTextDim)
+            Icon(Icons.Default.VolumeUp, "Volume", tint = StudioTextDim, modifier = Modifier.size(20.dp))
             Spacer(modifier = Modifier.width(8.dp))
             Slider(
                 value = player.volume,
                 onValueChange = { player.volume = it },
-                modifier = Modifier.width(100.dp),
+                modifier = Modifier.weight(1f),
                 colors = SliderDefaults.colors(
                     thumbColor = StudioText,
                     activeTrackColor = StudioText,
