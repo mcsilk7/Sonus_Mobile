@@ -6,6 +6,7 @@ interface PlatformNetworkMonitor {
 
 interface PlatformDateFormatter {
     fun formatHttpDate(timestamp: Long): String
+    fun now(): Long
 }
 
 expect fun getPlatformName(): String

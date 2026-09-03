@@ -13,6 +13,8 @@ class DesktopDateFormatter : PlatformDateFormatter {
     override fun formatHttpDate(timestamp: Long): String {
         return httpDateFormat.format(Date(timestamp))
     }
+
+    override fun now(): Long = System.currentTimeMillis()
 }
 
 class DesktopNetworkMonitor : PlatformNetworkMonitor {

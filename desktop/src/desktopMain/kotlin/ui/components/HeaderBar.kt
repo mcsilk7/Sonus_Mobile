@@ -3,22 +3,28 @@ package ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ui.theme.*
 
 @Composable
-fun HeaderBar(onLogout: () -> Unit = {}) {
+fun HeaderBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onProfileClick: () -> Unit,
+    onLogout: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -45,45 +51,85 @@ fun HeaderBar(onLogout: () -> Unit = {}) {
         Spacer(modifier = Modifier.width(48.dp))
 
         // Search Bar
-        var searchText by remember { mutableStateOf("") }
-        TextField(
-            value = searchText,
-            onValueChange = { searchText = it },
+        BasicTextField(
+            value = query,
+            onValueChange = onQueryChange,
             modifier = Modifier
                 .weight(1f)
                 .height(40.dp)
-                .clip(RoundedCornerShape(20.dp)),
-            placeholder = { Text("Szukaj utworów, wykonawców...", color = StudioTextDim, fontSize = 14.sp) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = StudioTextDim) },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = StudioBgCard,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = StudioAmber,
-                textColor = StudioText
-            ),
-            singleLine = true
+                .background(StudioBgCard, RoundedCornerShape(20.dp)),
+            textStyle = TextStyle(color = StudioText, fontSize = 14.sp),
+            cursorBrush = SolidColor(StudioAmber),
+            singleLine = true,
+            decorationBox = { innerTextField ->
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = null,
+                        tint = StudioTextDim,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Box(modifier = Modifier.weight(1f)) {
+                        if (query.isEmpty()) {
+                            Text(
+                                "Szukaj utworów, wykonawców...",
+                                color = StudioTextDim,
+                                fontSize = 14.sp
+                            )
+                        }
+                        innerTextField()
+                    }
+                    if (query.isNotEmpty()) {
+                        IconButton(
+                            onClick = { onQueryChange("") },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Clear",
+                                tint = StudioTextDim
+                            )
+                        }
+                    }
+                }
+            }
         )
 
         Spacer(modifier = Modifier.width(48.dp))
 
-        // Window Controls (Mockup)
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = {}) {
-                Icon(Icons.Default.Remove, "Minimize", tint = StudioTextDim, modifier = Modifier.size(20.dp))
+        // User Profile with Menu
+        var showMenu by remember { mutableStateOf(false) }
+        Box {
+            IconButton(onClick = { showMenu = true }) {
+                Icon(
+                    Icons.Default.AccountCircle,
+                    contentDescription = "Profile",
+                    tint = StudioText,
+                    modifier = Modifier.size(32.dp)
+                )
             }
-            IconButton(onClick = {}) {
-                Icon(Icons.Default.CropSquare, "Maximize", tint = StudioTextDim, modifier = Modifier.size(18.dp))
-            }
-            
-            // Temporary Logout Button
-            TextButton(
-                onClick = onLogout,
-                colors = ButtonDefaults.textButtonColors(contentColor = StudioRed)
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false },
+                modifier = Modifier.background(StudioBgPanel)
             ) {
-                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout", modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(4.dp))
-                Text("LOGOUT", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                DropdownMenuItem(onClick = { 
+                    showMenu = false
+                    onProfileClick()
+                }) {
+                    Text("Mój Profil", color = StudioText)
+                }
+                Divider(color = StudioLine)
+                DropdownMenuItem(onClick = { 
+                    showMenu = false
+                    onLogout()
+                }) {
+                    Text("Wyloguj się", color = StudioRed)
+                }
             }
         }
     }

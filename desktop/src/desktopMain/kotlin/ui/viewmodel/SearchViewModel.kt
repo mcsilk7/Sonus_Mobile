@@ -14,9 +14,22 @@ import ui.DesktopDI
 class SearchViewModel(private val scope: CoroutineScope) {
     var query by mutableStateOf("")
     var results by mutableStateOf<List<SongDTO>>(emptyList())
+    var history by mutableStateOf<List<String>>(emptyList())
     var isSearching by mutableStateOf(false)
     
     private var searchJob: Job? = null
+
+    init {
+        observeHistory()
+    }
+
+    private fun observeHistory() {
+        scope.launch {
+            DesktopDI.container.repository.getSearchHistoryFlow().collect {
+                history = it
+            }
+        }
+    }
 
     fun onQueryChange(newQuery: String) {
         query = newQuery
@@ -28,17 +41,30 @@ class SearchViewModel(private val scope: CoroutineScope) {
             }
             
             delay(500) // Debounce
+            
+            // Zapisz do historii
+            DesktopDI.container.repository.addSearchQuery(newQuery)
+            
             isSearching = true
             try {
-                // Assuming shared module will have search functionality or we use apiService directly
-                // For now, let's mock it or use apiService
-                // val songs = DesktopDI.container.apiService.searchSongs(newQuery)
-                // results = DesktopDI.container.repository.enrichSongMetadata(songs)
+                results = DesktopDI.container.repository.searchSongs(newQuery)
             } catch (e: Exception) {
                 // Handle error
             } finally {
                 isSearching = false
             }
+        }
+    }
+
+    fun clearHistory() {
+        scope.launch {
+            DesktopDI.container.repository.clearSearchHistory()
+        }
+    }
+
+    fun deleteHistoryItem(item: String) {
+        scope.launch {
+            DesktopDI.container.repository.deleteSearchQuery(item)
         }
     }
 }

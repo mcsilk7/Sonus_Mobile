@@ -25,19 +25,22 @@ object DesktopDI {
         
         if (localPropsFile.exists()) {
             localPropsFile.inputStream().use { props.load(it) }
-            TerminalManager.addLog("LOCAL_PROPERTIES_LOADED")
-        } else {
-            TerminalManager.addLog("MISSING_PROPERTIES: VPN_DISABLED (Checked: ${File("local.properties").absolutePath})")
         }
         DesktopWireGuardManager.init(props)
-        TerminalManager.addLog("SYSTEM_INITIALIZED")
-        TerminalManager.addLog("READY_FOR_OPERATOR")
 
         container = DependencyContainer(
             dao = database.musicDao(),
             networkMonitor = DesktopNetworkMonitor(),
             dateFormatter = DesktopDateFormatter(),
             getToken = { sessionManager.getToken() }
+        )
+
+        // Start background synchronization
+        network.DesktopSyncManager.startSyncCycle(
+            dao = container.dao,
+            apiService = container.apiService,
+            networkMonitor = container.networkMonitor,
+            sessionManager = sessionManager
         )
     }
 }

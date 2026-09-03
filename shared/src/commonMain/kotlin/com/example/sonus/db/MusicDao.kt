@@ -112,4 +112,28 @@ interface MusicDao {
     
     @Query("DELETE FROM remote_keys")
     suspend fun clearAllRemoteKeys()
+
+    // Recently Played
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRecentlyPlayed(recent: RecentlyPlayedEntity)
+
+    @Transaction
+    @Query("SELECT songs.* FROM songs INNER JOIN recently_played ON songs.id = recently_played.songId ORDER BY timestamp DESC LIMIT 20")
+    fun getRecentlyPlayedFlow(): Flow<List<SongEntity>>
+
+    @Query("DELETE FROM recently_played WHERE songId NOT IN (SELECT songId FROM recently_played ORDER BY timestamp DESC LIMIT 20)")
+    suspend fun trimRecentlyPlayed()
+
+    // Search History
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSearchHistory(search: SearchHistoryEntity)
+
+    @Query("SELECT * FROM search_history ORDER BY timestamp DESC LIMIT 10")
+    fun getSearchHistoryFlow(): Flow<List<SearchHistoryEntity>>
+
+    @Query("DELETE FROM search_history WHERE `query` = :query")
+    suspend fun deleteSearchHistory(query: String)
+
+    @Query("DELETE FROM search_history")
+    suspend fun clearSearchHistory()
 }

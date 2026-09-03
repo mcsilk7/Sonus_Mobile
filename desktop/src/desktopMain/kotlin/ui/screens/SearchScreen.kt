@@ -1,65 +1,75 @@
 package ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ui.viewmodel.SearchViewModel
 import ui.theme.*
+import ui.components.NetworkImage
+import audio.DesktopPlayer
 
 @Composable
-fun SearchScreen() {
-    val scope = rememberCoroutineScope()
-    val viewModel = remember { SearchViewModel(scope) }
-
+fun SearchScreen(viewModel: SearchViewModel) {
     Column(modifier = Modifier.fillMaxSize().padding(32.dp)) {
-        OutlinedTextField(
-            value = viewModel.query,
-            onValueChange = { viewModel.onQueryChange(it) },
-            placeholder = { Text("SCAN_FOR_SIGNALS...", color = StudioTextFaint) },
-            modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(Icons.Default.Search, null, tint = StudioAmber) },
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = StudioAmber,
-                unfocusedBorderColor = StudioLine,
-                textColor = StudioText,
-                backgroundColor = StudioBgPanel
-            )
+        Text(
+            "SCAN_RESULTS",
+            color = StudioText,
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        if (viewModel.query.isEmpty()) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("WAITING_FOR_SIGNALS...", color = StudioTextFaint)
+            }
+        } else {
+            if (viewModel.isSearching) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), color = StudioAmber)
+            }
 
-        if (viewModel.isSearching) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = StudioAmber)
-        }
-
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(viewModel.results.size) { index ->
-                val song = viewModel.results[index]
-                SignalRow(song.title, "Artist: ${song.artist}")
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(viewModel.results.size) { index ->
+                    val song = viewModel.results[index]
+                    val coverUrl = song.coverPath ?: "api/songs/${song.id}/cover"
+                    SignalRow(
+                        title = song.title,
+                        meta = "Artist: ${song.artist}",
+                        coverPath = coverUrl,
+                        onClick = { DesktopPlayer.play(song) }
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun SignalRow(title: String, meta: String) {
+private fun SignalRow(title: String, meta: String, coverPath: String?, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(StudioBgPanel)
+            .clickable(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(modifier = Modifier.size(40.dp).background(StudioLine))
+        NetworkImage(
+            url = coverPath,
+            modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp))
+        )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             Text(title, color = StudioText, fontSize = 16.sp, fontWeight = FontWeight.Bold)

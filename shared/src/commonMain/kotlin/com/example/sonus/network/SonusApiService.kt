@@ -16,4 +16,18 @@ interface SonusApiService {
     suspend fun getAlbumById(albumId: Long): AlbumDTO
     suspend fun getSongsInAlbum(albumId: Long): List<SongDTO>
     suspend fun toggleFavorite(userId: Long, songId: Long): Map<String, Boolean>
+
+    // Library modifications
+    suspend fun addAlbumToLibrary(albumId: Long, userId: Long): Map<String, Boolean>
+    suspend fun removeAlbumFromLibrary(albumId: Long, userId: Long): Map<String, Boolean>
+    
+    // Playlist modifications
+    suspend fun createPlaylist(userId: Long, name: String, description: String?): PlaylistDTO
+    suspend fun deletePlaylist(playlistId: Long): Map<String, Boolean>
+    suspend fun addSongToPlaylist(playlistId: Long, songId: Long): Map<String, Boolean>
+    suspend fun removeSongFromPlaylist(playlistId: Long, songId: Long): Map<String, Boolean>
+    
+    // Search
+    suspend fun searchSongs(query: String): List<SongDTO>
+    suspend fun searchAlbums(query: String): List<AlbumDTO>
 }

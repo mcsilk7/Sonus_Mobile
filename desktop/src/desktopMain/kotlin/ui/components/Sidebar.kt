@@ -18,9 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
 import ui.Screen
-import ui.DesktopDI
 import ui.theme.*
 
 @Composable
@@ -39,62 +37,16 @@ fun Sidebar(
         // MENU GŁÓWNE
         SidebarSectionHeader("MENU GŁÓWNE")
         SidebarItem("Odkrywaj", Icons.Default.Explore, currentScreen is Screen.Home) { onScreenSelected(Screen.Home) }
+        SidebarItem("Szukaj", Icons.Default.Search, currentScreen is Screen.Search) { onScreenSelected(Screen.Search) }
         SidebarItem("Biblioteka", Icons.Default.LibraryMusic, currentScreen is Screen.Library) { onScreenSelected(Screen.Library) }
-        SidebarItem("Ulubione", Icons.Default.Favorite, false) { }
-        SidebarItem("Radia", Icons.Default.Radio, false) { }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // PLAYLISTY
-        SidebarSectionHeader("PLAYLISTY")
-        SidebarItem("+ Stwórz playlistę", Icons.Default.Add, false) { }
-        SidebarItem("Do auta", Icons.Default.MusicNote, false) { }
-        SidebarItem("Wieczór", Icons.Default.MusicNote, false) { }
-        SidebarItem("Praca / Focus", Icons.Default.MusicNote, false) { }
-        SidebarItem("Chillout", Icons.Default.MusicNote, false) { }
+        SidebarItem("Ulubione", Icons.Default.Favorite, currentScreen is Screen.Favorites) { onScreenSelected(Screen.Favorites) }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         // USTAWIENIA
         SidebarSectionHeader("USTAWIENIA")
-        SidebarItem("Korektor (EQ)", Icons.Default.GraphicEq, false) { }
-        SidebarItem("Konto", Icons.Default.Person, false) { }
-        SidebarItem("Jakość audio", Icons.Default.HighQuality, currentScreen is Screen.Settings) { onScreenSelected(Screen.Settings) }
-        
-        // TEST ONLY: HARD RESET
-        SidebarItem("DEBUG: RESET VPN", Icons.Default.Refresh, false) {
-            DesktopDI.sessionManager.setVpnConfigured(false)
-        }
-        
-        Spacer(modifier = Modifier.height(32.dp))
-        
-        // Terminal feed as small footer
-        Text("SYSTEM_LOGS", color = StudioTextFaint, fontSize = 10.sp, fontWeight = FontWeight.Black)
-        
-        // Setup VPN button if needed
-        androidx.compose.runtime.rememberCoroutineScope().let { scope ->
-            val hasAccess = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(true) }
-            androidx.compose.runtime.LaunchedEffect(Unit) {
-                hasAccess.value = network.DesktopWireGuardManager.hasPasswordlessAccess()
-            }
-            
-            if (!hasAccess.value) {
-                Spacer(modifier = Modifier.height(8.dp))
-                androidx.compose.material.TextButton(
-                    onClick = {
-                        scope.launch {
-                            if (network.DesktopWireGuardManager.runPermissionSetup()) {
-                                hasAccess.value = network.DesktopWireGuardManager.hasPasswordlessAccess()
-                            }
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().height(30.dp),
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    Text("SETUP VPN AUTO-LOGIN", color = StudioAmber, fontSize = 10.sp)
-                }
-            }
-        }
+        SidebarItem("Profil", Icons.Default.Person, currentScreen is Screen.Profile) { onScreenSelected(Screen.Profile) }
+        SidebarItem("Ustawienia", Icons.Default.Settings, currentScreen is Screen.Settings) { onScreenSelected(Screen.Settings) }
     }
 }
 

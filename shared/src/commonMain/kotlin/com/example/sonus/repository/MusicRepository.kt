@@ -189,10 +189,102 @@ class MusicRepository(
             val result = apiService.toggleFavorite(userId, song.id)
             result["added"]
         } catch (e: Exception) {
-            dao.insertSyncAction(SyncAction(actionType = "TOGGLE_FAVORITE", songId = song.id))
+            dao.insertSyncAction(SyncAction(actionType = "TOGGLE_FAVORITE", songId = song.id, timestamp = dateFormatter.now()))
             newStatus
         }
     }
+
+    suspend fun addAlbumToLibrary(userId: Long, albumId: Long): Boolean = withContext(Dispatchers.IO) {
+        try {
+            apiService.addAlbumToLibrary(albumId, userId).isNotEmpty()
+        } catch (e: Exception) {
+            dao.insertSyncAction(SyncAction(actionType = "ADD_ALBUM", albumId = albumId, timestamp = dateFormatter.now()))
+            true
+        }
+    }
+
+    suspend fun removeAlbumFromLibrary(userId: Long, albumId: Long): Boolean = withContext(Dispatchers.IO) {
+        try {
+            apiService.removeAlbumFromLibrary(albumId, userId).isNotEmpty()
+        } catch (e: Exception) {
+            dao.insertSyncAction(SyncAction(actionType = "REMOVE_ALBUM", albumId = albumId, timestamp = dateFormatter.now()))
+            true
+        }
+    }
+
+    suspend fun searchSongs(query: String): List<SongDTO> = withContext(Dispatchers.IO) {
+        try {
+            val results = apiService.searchSongs(query)
+            enrichSongMetadata(results)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun searchAlbums(query: String): List<AlbumDTO> = withContext(Dispatchers.IO) {
+        try {
+            val results = apiService.searchAlbums(query)
+            enrichAlbumMetadata(results)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun createPlaylist(userId: Long, name: String, description: String?): PlaylistDTO? = withContext(Dispatchers.IO) {
+        try {
+            apiService.createPlaylist(userId, name, description)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun addSongToPlaylist(playlistId: Long, songId: Long): Boolean = withContext(Dispatchers.IO) {
+        try {
+            apiService.addSongToPlaylist(playlistId, songId).isNotEmpty()
+        } catch (e: Exception) {
+            dao.insertSyncAction(SyncAction(actionType = "ADD_SONG_TO_PLAYLIST", songId = songId, playlistId = playlistId, timestamp = dateFormatter.now()))
+            true
+        }
+    }
+
+    suspend fun removeSongFromPlaylist(playlistId: Long, songId: Long): Boolean = withContext(Dispatchers.IO) {
+        try {
+            apiService.removeSongFromPlaylist(playlistId, songId).isNotEmpty()
+        } catch (e: Exception) {
+            dao.insertSyncAction(SyncAction(actionType = "REMOVE_SONG_FROM_PLAYLIST", songId = songId, playlistId = playlistId, timestamp = dateFormatter.now()))
+            true
+        }
+    }
+
+    // Recently Played Mechanics
+    fun getRecentlyPlayedFlow(): Flow<List<SongDTO>> {
+        return dao.getRecentlyPlayedFlow().map { list -> list.map { it.toDTO() } }
+    }
+
+    suspend fun addSongToRecentlyPlayed(song: SongDTO) = withContext(Dispatchers.IO) {
+        dao.insertSongs(listOf(song.toEntity()))
+        dao.insertRecentlyPlayed(RecentlyPlayedEntity(song.id, dateFormatter.now()))
+        dao.trimRecentlyPlayed()
+    }
+
+    // Search History Mechanics
+    fun getSearchHistoryFlow(): Flow<List<String>> {
+        return dao.getSearchHistoryFlow().map { list -> list.map { it.query } }
+    }
+
+    suspend fun addSearchQuery(query: String) = withContext(Dispatchers.IO) {
+        if (query.isBlank()) return@withContext
+        dao.insertSearchHistory(SearchHistoryEntity(query, dateFormatter.now()))
+    }
+
+    suspend fun deleteSearchQuery(query: String) = withContext(Dispatchers.IO) {
+        dao.deleteSearchHistory(query)
+    }
+
+    suspend fun clearSearchHistory() = withContext(Dispatchers.IO) {
+        dao.clearSearchHistory()
+    }
+
 
     suspend fun enrichSongMetadata(songs: List<SongDTO>): List<SongDTO> = withContext(Dispatchers.IO) {
         val favoriteIds = dao.getFavoriteSongs().map { it.id }.toSet()

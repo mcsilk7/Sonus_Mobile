@@ -9,5 +9,5 @@ fun getDatabaseBuilder(context: Context): RoomDatabase.Builder<SonusDatabase> {
     return Room.databaseBuilder<SonusDatabase>(
         context = context.applicationContext,
         name = dbFile.absolutePath
-    )
+    ).fallbackToDestructiveMigration(dropAllTables = true)
 }

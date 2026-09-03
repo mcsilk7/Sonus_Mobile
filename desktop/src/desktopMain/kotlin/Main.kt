@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import network.DesktopWireGuardManager
 import ui.DesktopDI
 import ui.Screen
-import ui.TerminalManager
+import ui.viewmodel.SearchViewModel
 import ui.components.*
 import ui.screens.*
 import ui.theme.SonusTheme
@@ -56,6 +56,8 @@ fun main() {
             
             SonusTheme {
                 val scope = rememberCoroutineScope()
+                val searchViewModel = remember { SearchViewModel(scope) }
+                
                 var currentScreen by remember { 
                     mutableStateOf<Screen>(if (DesktopDI.sessionManager.isLoggedIn()) Screen.Home else Screen.Login) 
                 }
@@ -64,25 +66,12 @@ fun main() {
 
                 // Auto-connect VPN on startup
                 LaunchedEffect(Unit) {
-                    TerminalManager.addLog("SYSTEM_BOOT_SEQUENCE_INITIATED")
-                    
                     if (DesktopDI.sessionManager.isVpnConfigured()) {
                         if (DesktopWireGuardManager.hasPasswordlessAccess()) {
-                            TerminalManager.addLog("VPN_PERMISSIONS: PASSWORDLESS_OK")
-                            TerminalManager.addLog("ESTABLISHING_SECURE_TUNNEL...")
-                            
-                            val success = DesktopWireGuardManager.startVpn()
-                            if (success) {
-                                TerminalManager.addLog("VPN_LINK_ESTABLISHED: ENCRYPTED")
-                            } else {
-                                TerminalManager.addLog("VPN_LINK_FAILED: CHECK_WIREGUARD_STATUS")
-                            }
+                            DesktopWireGuardManager.startVpn()
                         } else {
-                            TerminalManager.addLog("VPN_PERMISSIONS: MISSING (Setup required again?)")
                             showVpnSetup = true
                         }
-                    } else {
-                        TerminalManager.addLog("VPN_PERMISSIONS: FIRST_RUN_SETUP_REQUIRED")
                     }
                 }
 
@@ -94,18 +83,30 @@ fun main() {
                         })
                     } else {
                         Column(modifier = Modifier.fillMaxSize().background(StudioBg)) {
-                            HeaderBar(onLogout = {
-                                DesktopDI.sessionManager.clearSession()
-                                isLoggedIn = false
-                                currentScreen = Screen.Login
-                            })
+                            HeaderBar(
+                                query = searchViewModel.query,
+                                onQueryChange = { 
+                                    searchViewModel.onQueryChange(it)
+                                    if (it.isNotEmpty() && currentScreen !is Screen.Search) {
+                                        currentScreen = Screen.Search
+                                    }
+                                },
+                                onProfileClick = { currentScreen = Screen.Profile },
+                                onLogout = {
+                                    DesktopDI.sessionManager.clearSession()
+                                    isLoggedIn = false
+                                    currentScreen = Screen.Login
+                                }
+                            )
                             Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
                                 Sidebar(currentScreen) { currentScreen = it }
                                 Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
                                     when (currentScreen) {
                                         is Screen.Home -> HomeScreen()
-                                        is Screen.Search -> SearchScreen()
+                                        is Screen.Search -> SearchScreen(searchViewModel)
                                         is Screen.Library -> LibraryScreen()
+                                        is Screen.Favorites -> FavoritesScreen()
+                                        is Screen.Profile -> ProfileScreen()
                                         is Screen.Settings -> SettingsScreen()
                                         else -> {}
                                     }
@@ -127,20 +128,15 @@ fun main() {
                             VpnSetupDialog(
                                 onConfirm = {
                                     scope.launch {
-                                        TerminalManager.addLog("RUNNING_PERM_SETUP...")
                                         val success = DesktopWireGuardManager.runPermissionSetup()
                                         if (success) {
-                                            TerminalManager.addLog("KONFIGURACJA_UKONCZONA: SUKCES")
                                             DesktopDI.sessionManager.setVpnConfigured(true)
                                             
                                             // Po sukcesie, od razu odpalamy VPN
                                             if (DesktopWireGuardManager.hasPasswordlessAccess()) {
-                                                TerminalManager.addLog("ESTABLISHING_SECURE_TUNNEL...")
                                                 DesktopWireGuardManager.startVpn()
                                             }
                                             showVpnSetup = false
-                                        } else {
-                                            TerminalManager.addLog("ERROR: SCRIPT_FAILED_OR_NOT_FOUND")
                                         }
                                     }
                                 }

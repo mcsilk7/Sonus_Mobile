@@ -10,8 +10,10 @@ import androidx.room.RoomDatabase
     PlaylistSongCrossRef::class, 
     SyncAction::class, 
     SyncMetadata::class, 
-    RemoteKey::class
-], version = 4)
+    RemoteKey::class,
+    RecentlyPlayedEntity::class,
+    SearchHistoryEntity::class
+], version = 5)
 abstract class SonusDatabase : RoomDatabase() {
     abstract fun musicDao(): MusicDao
 }

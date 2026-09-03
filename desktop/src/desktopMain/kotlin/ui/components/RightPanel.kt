@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import audio.DesktopPlayer
 import ui.theme.*
 
 @Composable
@@ -42,44 +43,31 @@ fun RightPanel() {
                 .background(StudioBgCard),
             contentAlignment = Alignment.Center
         ) {
-            Text("OKŁADKA ALBUMU\n(200x200 px)", color = StudioTextDim, fontSize = 12.sp)
+            val song = DesktopPlayer.currentSong
+            if (song != null) {
+                val coverUrl = song.coverPath ?: "api/songs/${song.id}/cover"
+                NetworkImage(
+                    url = coverUrl,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Text("OKŁADKA ALBUMU\n(200x200 px)", color = StudioTextDim, fontSize = 12.sp)
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Metadata
-        Text("Utwór: Night Call", color = StudioText, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        Text("Artysta: Kavinsky", color = StudioTextDim, fontSize = 14.sp)
-        Text("Album: OutRun (2013)", color = StudioTextFaint, fontSize = 12.sp)
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Top Tracks
-        Text(
-            "[ Top Utwory Wykon. ]",
-            color = StudioAmber,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        Column {
-            TopTrackItem("Drive", "4:12")
-            TopTrackItem("Pacific", "3:55")
+        val currentSong = DesktopPlayer.currentSong
+        if (currentSong != null) {
+            Text(currentSong.title, color = StudioText, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(currentSong.artist, color = StudioTextDim, fontSize = 14.sp)
+            Text("Streaming from: ${currentSong.filePath?.takeLast(20)}...", color = StudioTextFaint, fontSize = 10.sp)
+        } else {
+            Text("Brak sygnału", color = StudioTextDim, fontSize = 18.sp)
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Mini Equalizer
-        Text(
-            "KOREKTOR DŹWIĘKU",
-            color = StudioTextFaint,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        
-        EqualizerSlider("Bass")
-        EqualizerSlider("Treble")
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 

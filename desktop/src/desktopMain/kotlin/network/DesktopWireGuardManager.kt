@@ -2,7 +2,6 @@ package network
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ui.TerminalManager
 import java.io.File
 import java.util.Properties
 
@@ -56,13 +55,8 @@ object DesktopWireGuardManager {
                 script = File("../scripts/setup_vpn_perms.sh")
             }
             
-            if (!script.exists()) {
-                TerminalManager.addLog("ERROR: SCRIPT_NOT_FOUND")
-                println("VPN Setup Error: Script not found at ${script.absolutePath}")
-                return@withContext false
-            }
+            if (!script.exists()) return@withContext false
 
-            TerminalManager.addLog("SCRIPT_FOUND: ${script.name}")
             val currentUser = System.getProperty("user.name") ?: "mcsilk"
             
             val command = if (isFlatpak()) {
@@ -71,24 +65,11 @@ object DesktopWireGuardManager {
                 listOf("pkexec", "sh", script.absolutePath, currentUser)
             }
             
-            TerminalManager.addLog("AWAITING_AUTH...")
             val process = ProcessBuilder(command).start()
-            
-            // Log output in background
-            val output = process.inputStream.bufferedReader().readText()
-            val error = process.errorStream.bufferedReader().readText()
-            
             val exitCode = process.waitFor()
-            TerminalManager.addLog("SETUP_EXIT_CODE: $exitCode")
-            if (exitCode != 0) {
-                println("Output: $output")
-                println("Error: $error")
-            }
             
             return@withContext exitCode == 0
         } catch (e: Exception) {
-            println("Setup Error: ${e.message}")
-            e.printStackTrace()
             false
         }
     }
@@ -101,10 +82,7 @@ object DesktopWireGuardManager {
 
     suspend fun startVpn(): Boolean = withContext(Dispatchers.IO) {
         try {
-            if (clientPrivateKey.isBlank()) {
-                println("VPN Start Error: Client Private Key is empty!")
-                return@withContext false
-            }
+            if (clientPrivateKey.isBlank()) return@withContext false
 
             val configContent = """
                 [Interface]
@@ -132,14 +110,11 @@ object DesktopWireGuardManager {
                 configFile.writeText(configContent)
                 configFile.setReadable(false, false)
                 configFile.setReadable(true, true)
-                // W Linuxie lepiej użyć chmod przez ProcessBuilder dla pewności 600
                 Runtime.getRuntime().exec(arrayOf("chmod", "600", configFilePath)).waitFor()
             }
 
-            // Delegujemy do użytkownika 'sonus', który ma uprawnienia do wg-quick
             val sudoCommand = listOf("sudo", "-u", "sonus", "sudo", "wg-quick", "up", configFilePath)
 
-            // Wyjście z piaskownicy Flatpak na hosta (jeśli w niej jesteśmy)
             val command = if (isFlatpak()) {
                 listOf("flatpak-spawn", "--host") + sudoCommand
             } else {
@@ -150,13 +125,9 @@ object DesktopWireGuardManager {
                 .redirectErrorStream(true)
                 .start()
 
-            val output = process.inputStream.bufferedReader().readText()
             val exitCode = process.waitFor()
-
-            println("VPN Start Output: $output")
             exitCode == 0
         } catch (e: Exception) {
-            println("VPN Start Error: ${e.message}")
             false
         }
     }
@@ -179,7 +150,6 @@ object DesktopWireGuardManager {
             val exitCode = process.waitFor()
             exitCode == 0
         } catch (e: Exception) {
-            println("VPN Stop Error: ${e.message}")
             false
         }
     }

@@ -51,7 +51,10 @@ fun PlayerBar() {
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("01:45", color = StudioTextDim, fontSize = 12.sp)
+            val totalSeconds = player.currentSong?.duration ?: 0
+            val currentSeconds = (player.progress * totalSeconds).toInt()
+            
+            Text(formatTime(currentSeconds), color = StudioTextDim, fontSize = 12.sp)
             Spacer(modifier = Modifier.width(12.dp))
             Slider(
                 value = player.progress,
@@ -64,7 +67,7 @@ fun PlayerBar() {
                 )
             )
             Spacer(modifier = Modifier.width(12.dp))
-            Text("04:20", color = StudioTextDim, fontSize = 12.sp)
+            Text(formatTime(totalSeconds), color = StudioTextDim, fontSize = 12.sp)
         }
 
         Spacer(modifier = Modifier.width(32.dp))
@@ -88,4 +91,10 @@ fun PlayerBar() {
             )
         }
     }
+}
+
+private fun formatTime(seconds: Int): String {
+    val m = seconds / 60
+    val s = seconds % 60
+    return "${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}"
 }

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.sonus.network.AlbumDTO
 import com.example.sonus.network.PlaylistDTO
+import com.example.sonus.network.SongDTO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -14,6 +15,7 @@ import ui.DesktopDI
 class HomeViewModel(private val scope: CoroutineScope) {
     var playlists by mutableStateOf<List<PlaylistDTO>>(emptyList())
     var albums by mutableStateOf<List<AlbumDTO>>(emptyList())
+    var recentlyPlayed by mutableStateOf<List<SongDTO>>(emptyList())
     var isRefreshing by mutableStateOf(false)
 
     init {
@@ -30,6 +32,11 @@ class HomeViewModel(private val scope: CoroutineScope) {
         scope.launch {
             DesktopDI.container.repository.getAlbumsFlow().collectLatest {
                 albums = it
+            }
+        }
+        scope.launch {
+            DesktopDI.container.repository.getRecentlyPlayedFlow().collectLatest {
+                recentlyPlayed = it
             }
         }
     }

@@ -58,10 +58,10 @@ data class PlaylistSongCrossRef(
 data class SyncAction(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val actionType: String,
-    val songId: Long,
+    val songId: Long? = null,
     val albumId: Long? = null,
     val playlistId: Long? = null,
-    val timestamp: Long = 0L // Changed to 0L, will handle in repo
+    val timestamp: Long = 0L
 )
 
 @Entity(tableName = "sync_metadata")
@@ -76,4 +76,16 @@ data class RemoteKey(
     @PrimaryKey val label: String, // e.g., "song_id"
     val nextKey: Int?,
     val prevKey: Int?
+)
+
+@Entity(tableName = "recently_played")
+data class RecentlyPlayedEntity(
+    @PrimaryKey val songId: Long,
+    val timestamp: Long
+)
+
+@Entity(tableName = "search_history")
+data class SearchHistoryEntity(
+    @PrimaryKey val query: String,
+    val timestamp: Long
 )

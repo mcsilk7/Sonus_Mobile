@@ -13,6 +13,10 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(compose.materialIconsExtended)
                 implementation(libs.logback.classic)
+                implementation(libs.jlayer)
+                implementation(libs.kotlinx.coroutines.swing)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.java)
                 implementation(project(":shared"))
             }
         }

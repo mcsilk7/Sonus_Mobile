@@ -110,4 +110,43 @@ class KtorSonusClient(
     override suspend fun toggleFavorite(userId: Long, songId: Long): Map<String, Boolean> {
         return client.post("api/favorites/$userId/songs/$songId/toggle").body()
     }
+
+    override suspend fun addAlbumToLibrary(albumId: Long, userId: Long): Map<String, Boolean> {
+        return client.post("api/albums/$albumId/library/$userId").body()
+    }
+
+    override suspend fun removeAlbumFromLibrary(albumId: Long, userId: Long): Map<String, Boolean> {
+        return client.delete("api/albums/$albumId/library/$userId").body()
+    }
+
+    override suspend fun createPlaylist(userId: Long, name: String, description: String?): PlaylistDTO {
+        return client.post("api/playlists/user/$userId") {
+            setBody(PlaylistDTO(id = null, name = name, description = description, songs = null, songCount = 0))
+            contentType(ContentType.Application.Json)
+        }.body()
+    }
+
+    override suspend fun deletePlaylist(playlistId: Long): Map<String, Boolean> {
+        return client.delete("api/playlists/$playlistId").body()
+    }
+
+    override suspend fun addSongToPlaylist(playlistId: Long, songId: Long): Map<String, Boolean> {
+        return client.post("api/playlists/$playlistId/songs/$songId").body()
+    }
+
+    override suspend fun removeSongFromPlaylist(playlistId: Long, songId: Long): Map<String, Boolean> {
+        return client.delete("api/playlists/$playlistId/songs/$songId").body()
+    }
+
+    override suspend fun searchSongs(query: String): List<SongDTO> {
+        return client.get("api/songs/search") {
+            parameter("q", query)
+        }.body()
+    }
+
+    override suspend fun searchAlbums(query: String): List<AlbumDTO> {
+        return client.get("api/albums/search") {
+            parameter("title", query)
+        }.body()
+    }
 }

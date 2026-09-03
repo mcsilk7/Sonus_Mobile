@@ -18,6 +18,8 @@ serialization = "1.8.0"
 ktor = "3.0.3"
 logback = "1.5.16"
 junit = "4.13.2"
+jlayer = "1.0.1"
+coroutines = "1.10.1"
 
 ksp = "2.1.10-1.0.30"
 [libraries]
@@ -48,6 +50,8 @@ ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref =
 ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref = "ktor" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+jlayer = { group = "javazoom", name = "jlayer", version.ref = "jlayer" }
+kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

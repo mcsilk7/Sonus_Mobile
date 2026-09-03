@@ -10,4 +10,5 @@ fun getDatabaseBuilder(): RoomDatabase.Builder<SonusDatabase> {
     return Room.databaseBuilder<SonusDatabase>(
         name = dbFile.absolutePath,
     ).setDriver(BundledSQLiteDriver())
+        .fallbackToDestructiveMigration(dropAllTables = true)
 }
