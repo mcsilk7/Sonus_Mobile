@@ -17,10 +17,31 @@ class HomeViewModel(private val scope: CoroutineScope) {
     var albums by mutableStateOf<List<AlbumDTO>>(emptyList())
     var recentlyPlayed by mutableStateOf<List<SongDTO>>(emptyList())
     var isRefreshing by mutableStateOf(false)
+    var terminalLogs by mutableStateOf<List<String>>(listOf("SESSION_INITIALIZED", "LINK_STABLE", "WAITING_FOR_INPUT..."))
 
     init {
         observeData()
         refreshData()
+        startTerminalSimulation()
+    }
+
+    private fun startTerminalSimulation() {
+        scope.launch {
+            val messages = listOf(
+                "SCANNING_SECTOR_7...",
+                "DECRYPTING_SIGNAL...",
+                "ENCRYPTED_HANDSHAKE_OK",
+                "BUFFERING_STREAM...",
+                "READY_FOR_OPERATOR",
+                "MONITORING_UPLINK..."
+            )
+            var idx = 0
+            while(true) {
+                kotlinx.coroutines.delay(5000)
+                terminalLogs = (terminalLogs + messages[idx % messages.size]).takeLast(10)
+                idx++
+            }
+        }
     }
 
     private fun observeData() {

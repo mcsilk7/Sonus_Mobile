@@ -238,6 +238,14 @@ class MusicRepository(
         }
     }
 
+    suspend fun deletePlaylist(playlistId: Long): Boolean = withContext(Dispatchers.IO) {
+        try {
+            apiService.deletePlaylist(playlistId).isNotEmpty()
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     suspend fun addSongToPlaylist(playlistId: Long, songId: Long): Boolean = withContext(Dispatchers.IO) {
         try {
             apiService.addSongToPlaylist(playlistId, songId).isNotEmpty()

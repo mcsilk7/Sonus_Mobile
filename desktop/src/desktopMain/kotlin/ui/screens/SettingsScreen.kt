@@ -3,6 +3,7 @@ package ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -38,6 +39,22 @@ fun SettingsScreen() {
             SettingsToggle("DARK_MODE_OVERRIDE", true) {}
             SettingsToggle("HI_RES_COVERS", false) {}
             SettingsToggle("TERMINAL_LOG_ENABLED", true) {}
+        }
+
+        SettingsSection("STORAGE_MAINTENANCE") {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Column {
+                    Text("BATCH_WIPE_LOCAL_SIGNALS", color = StudioText, fontSize = 16.sp)
+                    Text("ERASE_ALL_LOCAL_SIGNALS_FROM_DISK", color = StudioTextDim, fontSize = 12.sp)
+                }
+                Button(
+                    onClick = { /* Wipe implementation */ },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = StudioBgPanel),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Text("::EXE_WIPE", color = StudioRed, fontSize = 12.sp)
+                }
+            }
         }
 
         SettingsSection("NETWORK_LINK") {

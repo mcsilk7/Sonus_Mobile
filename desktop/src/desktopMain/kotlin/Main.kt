@@ -1,5 +1,7 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,10 +38,8 @@ fun main() {
 
         Window(
             onCloseRequest = {
-                // Próbujemy wyłączyć VPN przy zamykaniu - tylko jeśli mamy uprawnienia (bez hasła)
                 try {
                     val isFlatpak = java.io.File("/.flatpak-info").exists()
-                    // Używamy "sudo -n" (non-interactive), aby uniknąć okna z hasłem przy zamykaniu
                     val command = if (isFlatpak) {
                         arrayOf("flatpak-spawn", "--host", "sudo", "-n", "wg-quick", "down", "/tmp/sonus_vpn.conf")
                     } else {
@@ -53,94 +53,110 @@ fun main() {
             icon = icon,
             state = windowState
         ) {
-            
+            // Natywne tło okna, aby uniknąć białych błysków
+            LaunchedEffect(window) {
+                val studioBgAwt = java.awt.Color(20, 18, 15) // #14120F
+                window.background = studioBgAwt
+                window.contentPane.background = studioBgAwt
+            }
+
             SonusTheme {
-                val scope = rememberCoroutineScope()
-                val searchViewModel = remember { SearchViewModel(scope) }
-                
-                var currentScreen by remember { 
-                    mutableStateOf<Screen>(if (DesktopDI.sessionManager.isLoggedIn()) Screen.Home else Screen.Login) 
-                }
-                var isLoggedIn by remember { mutableStateOf(DesktopDI.sessionManager.isLoggedIn()) }
-                var showVpnSetup by remember { mutableStateOf(!DesktopDI.sessionManager.isVpnConfigured()) }
-
-                // Auto-connect VPN on startup
-                LaunchedEffect(Unit) {
-                    if (DesktopDI.sessionManager.isVpnConfigured()) {
-                        if (DesktopWireGuardManager.hasPasswordlessAccess()) {
-                            DesktopWireGuardManager.startVpn()
-                        } else {
-                            showVpnSetup = true
-                        }
+                Surface(modifier = Modifier.fillMaxSize(), color = StudioBg) {
+                    val scope = rememberCoroutineScope()
+                    val searchViewModel = remember { SearchViewModel(scope) }
+                    
+                    var currentScreen by remember { 
+                        mutableStateOf<Screen>(if (DesktopDI.sessionManager.isLoggedIn()) Screen.Home else Screen.Login) 
                     }
-                }
+                    var isLoggedIn by remember { mutableStateOf(DesktopDI.sessionManager.isLoggedIn()) }
+                    var showVpnSetup by remember { mutableStateOf(!DesktopDI.sessionManager.isVpnConfigured()) }
 
-                Box(modifier = Modifier.fillMaxSize()) {
-                    if (!isLoggedIn) {
-                        LoginScreen(onLoginSuccess = { 
-                            isLoggedIn = true 
-                            currentScreen = Screen.Home 
-                        })
-                    } else {
-                        Column(modifier = Modifier.fillMaxSize().background(StudioBg)) {
-                            HeaderBar(
-                                query = searchViewModel.query,
-                                onQueryChange = { 
-                                    searchViewModel.onQueryChange(it)
-                                    if (it.isNotEmpty() && currentScreen !is Screen.Search) {
-                                        currentScreen = Screen.Search
-                                    }
-                                },
-                                onProfileClick = { currentScreen = Screen.Profile },
-                                onLogout = {
-                                    DesktopDI.sessionManager.clearSession()
-                                    isLoggedIn = false
-                                    currentScreen = Screen.Login
-                                }
-                            )
-                            Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                                Sidebar(currentScreen) { currentScreen = it }
-                                Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                                    when (currentScreen) {
-                                        is Screen.Home -> HomeScreen()
-                                        is Screen.Search -> SearchScreen(searchViewModel)
-                                        is Screen.Library -> LibraryScreen()
-                                        is Screen.Favorites -> FavoritesScreen()
-                                        is Screen.Profile -> ProfileScreen()
-                                        is Screen.Settings -> SettingsScreen()
-                                        else -> {}
-                                    }
-                                }
-                                RightPanel()
+                    LaunchedEffect(Unit) {
+                        if (DesktopDI.sessionManager.isVpnConfigured()) {
+                            if (DesktopWireGuardManager.hasPasswordlessAccess()) {
+                                DesktopWireGuardManager.startVpn()
+                            } else {
+                                showVpnSetup = true
                             }
-                            PlayerBar()
                         }
                     }
 
-                    // VPN Setup Overlay (Brama wejściowa - "Tylko jedna droga")
-                    if (showVpnSetup) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.8f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            VpnSetupDialog(
-                                onConfirm = {
-                                    scope.launch {
-                                        val success = DesktopWireGuardManager.runPermissionSetup()
-                                        if (success) {
-                                            DesktopDI.sessionManager.setVpnConfigured(true)
-                                            
-                                            // Po sukcesie, od razu odpalamy VPN
-                                            if (DesktopWireGuardManager.hasPasswordlessAccess()) {
-                                                DesktopWireGuardManager.startVpn()
-                                            }
-                                            showVpnSetup = false
+                    // Główny kontener aplikacji z użyciem Scaffold dla stabilności layoutu
+                    Scaffold(
+                        backgroundColor = StudioBg,
+                        topBar = {
+                            if (isLoggedIn) {
+                                HeaderBar(
+                                    query = searchViewModel.query,
+                                    onQueryChange = { 
+                                        searchViewModel.onQueryChange(it)
+                                        if (it.isNotEmpty() && currentScreen !is Screen.Search) {
+                                            currentScreen = Screen.Search
+                                        }
+                                    },
+                                    onProfileClick = { currentScreen = Screen.Profile },
+                                    onLogout = {
+                                        DesktopDI.sessionManager.clearSession()
+                                        isLoggedIn = false
+                                        currentScreen = Screen.Login
+                                    }
+                                )
+                            }
+                        },
+                        bottomBar = {
+                            if (isLoggedIn) {
+                                PlayerBar()
+                            }
+                        }
+                    ) { paddingValues ->
+                        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                            if (!isLoggedIn) {
+                                LoginScreen(onLoginSuccess = { 
+                                    isLoggedIn = true 
+                                    currentScreen = Screen.Home 
+                                })
+                            } else {
+                                Row(modifier = Modifier.fillMaxSize()) {
+                                    Sidebar(currentScreen) { currentScreen = it }
+                                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                                        when (currentScreen) {
+                                            is Screen.Home -> HomeScreen()
+                                            is Screen.Search -> SearchScreen(searchViewModel)
+                                            is Screen.Library -> LibraryScreen()
+                                            is Screen.Favorites -> FavoritesScreen()
+                                            is Screen.Profile -> ProfileScreen()
+                                            is Screen.Settings -> SettingsScreen()
+                                            else -> {}
                                         }
                                     }
+                                    RightPanel()
                                 }
-                            )
+                            }
+
+                            // VPN Setup Overlay
+                            if (showVpnSetup) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.8f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    VpnSetupDialog(
+                                        onConfirm = {
+                                            scope.launch {
+                                                val success = DesktopWireGuardManager.runPermissionSetup()
+                                                if (success) {
+                                                    DesktopDI.sessionManager.setVpnConfigured(true)
+                                                    if (DesktopWireGuardManager.hasPasswordlessAccess()) {
+                                                        DesktopWireGuardManager.startVpn()
+                                                    }
+                                                    showVpnSetup = false
+                                                }
+                                            }
+                                        }
+                                    )
+                                }
+                            }
                         }
                     }
                 }

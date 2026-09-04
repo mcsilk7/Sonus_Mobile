@@ -46,6 +46,15 @@ object DesktopPlayer {
         stopPlayback()
         currentSong = song
         
+        // Zapisz do historii odtwarzania (identycznie jak na Androidzie)
+        scope.launch {
+            try {
+                DesktopDI.container.repository.addSongToRecentlyPlayed(song)
+            } catch (e: Exception) {
+                println("SONUS_PLAYER: Failed to add to history: ${e.message}")
+            }
+        }
+
         playbackJob = scope.launch(Dispatchers.IO) {
             var inputStream: InputStream? = null
             try {
